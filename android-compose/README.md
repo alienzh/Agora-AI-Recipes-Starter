@@ -1,16 +1,16 @@
-# agent-starter-convoai-android
+# agent-starter-convoai-android-compose
 
 ## 功能概述
 
 ### 解决的问题
 
-本示例项目展示了如何在 Android 应用中集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
+本示例项目展示了如何在 Android 应用中使用 **Jetpack Compose** 集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
 
 - **实时语音交互**：通过 Agora RTC SDK 实现与 AI 代理的实时音频通信
 - **消息传递**：通过 Agora RTM SDK 实现与 AI 代理的消息交互和状态同步
 - **实时转录**：支持实时显示用户和 AI 代理的对话转录内容
-- **Agent 说话状态指示器**：通过动画效果实时显示 AI Agent 的说话状态
-- **状态管理**：统一管理连接状态、静音状态、转录状态等 UI 状态
+- **Agent 说话状态指示器**：通过 Compose 动画效果实时显示 AI Agent 的说话状态
+- **状态管理**：使用 Compose State 和 ViewModel 统一管理连接状态、静音状态、转录状态等 UI 状态
 
 ### 适用场景
 
@@ -39,6 +39,7 @@
   - JDK 11 或更高版本
   - Gradle 8.13.0
   - Kotlin 2.0.21
+  - Jetpack Compose
 
 - **运行环境**：
   - Android 8.0（API Level 26）或更高版本
@@ -49,7 +50,7 @@
 1. **克隆项目**：
 ```bash
 git clone https://github.com/alienzh/Agora-AI-Recipes-Starter.git
-cd Agora-AI-Recipes-Starter/android-kotlin
+cd Agora-AI-Recipes-Starter/android-compose
 ```
 
 2. **配置 Android 项目**：
@@ -183,33 +184,45 @@ conversationalAIAPI?.addHandler(object : IConversationalAIAPIEventHandler {
 })
 ```
 
-4. **实现 UI 状态观察**：
+4. **实现 Compose UI 状态观察**：
    
-   在 `VoiceAssistantFragment.kt` 中观察 Agent 状态，控制说话状态指示器：
+   在 Compose 中观察 Agent 状态，控制说话状态指示器：
 ```kotlin
-lifecycleScope.launch {
-    viewModel.agentState.collect { agentState ->
-        agentState?.let {
-            if (agentState == AgentState.SPEAKING) {
-                agentSpeakingIndicator.startAnimation()
-            } else {
-                agentSpeakingIndicator.stopAnimation()
-            }
-        }
+@Composable
+fun AgentSpeakingIndicator(agentState: AgentState?) {
+    val infiniteTransition = rememberInfiniteTransition(label = "speaking")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
+    
+    if (agentState == AgentState.SPEAKING) {
+        Icon(
+            imageVector = Icons.Default.Mic,
+            contentDescription = "Speaking",
+            modifier = Modifier.scale(scale)
+        )
     }
 }
 ```
 
    观察转录列表，实现字幕显示：
 ```kotlin
-viewLifecycleOwner.lifecycleScope.launch {
-    viewModel.transcriptList.collect { transcriptList ->
-        transcriptAdapter.submitList(transcriptList) {
-            // Scroll to bottom when new transcript is added
-            if (transcriptList.isNotEmpty()) {
-                rvTranscript.smoothScrollToPosition(transcriptList.size - 1)
-            }
+@Composable
+fun TranscriptList(transcriptList: List<Transcript>) {
+    LazyColumn {
+        items(transcriptList) { transcript ->
+            TranscriptItem(transcript = transcript)
         }
+    }
+    
+    LaunchedEffect(transcriptList.size) {
+        // Auto scroll to bottom when new transcript is added
     }
 }
 ```
@@ -247,6 +260,16 @@ venv\Scripts\activate  # Windows
 
 ## 扩展功能
 
+### Jetpack Compose 特性
+
+本示例展示了如何在 Compose 中集成 Conversational AI：
+
+- **声明式 UI**：使用 Compose 函数式 UI 构建界面
+- **状态管理**：使用 `remember`、`mutableStateOf` 和 ViewModel 管理状态
+- **动画效果**：使用 Compose Animation API 实现 Agent 说话状态指示器
+- **列表显示**：使用 `LazyColumn` 显示转录列表
+- **Material 3**：使用 Material 3 设计系统构建现代化 UI
+
 ### 高级配置
 
 本示例展示了基础的 Conversational AI 集成方式。更多高级功能请参考 [ConversationalAI API 组件文档](./app/src/main/java/io/agora/convoai/convoaiApi/README.md)，包括：
@@ -263,18 +286,20 @@ venv\Scripts\activate  # Windows
 - 使用 `AUDIO_SCENARIO_AI_CLIENT` 场景以获得最佳 AI 对话质量
 - 根据网络状况调整音频编码参数
 - 及时清理不再使用的 Transcript 数据
-- 使用 `DiffUtil` 优化 RecyclerView 更新性能
+- 使用 `LazyColumn` 优化长列表性能
+- 使用 `remember` 和 `derivedStateOf` 优化 Compose 重组
 - 实现 Token 自动刷新机制
 - 处理网络断开重连逻辑
 
 ### 最佳实践
 
 - 实现完善的错误处理机制，包括网络错误、Token 过期等
-- 使用 StateFlow 统一管理 UI 状态
+- 使用 StateFlow 和 Compose State 统一管理 UI 状态
 - 将业务逻辑与 UI 分离，使用 ViewModel 管理状态
+- 在 Compose 中正确使用 `remember` 和 `LaunchedEffect`
 - 在加入频道前检查并请求麦克风权限
 - 正确管理 RTC Engine 和 RTM Client 的生命周期
-- 在 Activity/Fragment 销毁时清理资源
+- 在 Activity/Composable 销毁时清理资源
 - 启用 API 日志以便调试：`enableLog = true`
 
 
@@ -286,6 +311,7 @@ venv\Scripts\activate  # Windows
 - [Agora RTM Android SDK 文档](https://doc.shengwang.cn/doc/rtm2/android/landing-page)
 - [Conversational AI RESTful API 文档](https://doc.shengwang.cn/doc/convoai/restful/landing-page)
 - [Conversational AI Android 客户端组件 文档](https://doc.shengwang.cn/api-ref/convoai/android/android-component/overview)
+- [Jetpack Compose 文档](https://developer.android.com/jetpack/compose)
 
 ### 相关 Recipes
 
@@ -300,3 +326,4 @@ venv\Scripts\activate  # Windows
 ---
 
 **注意**：使用本示例前，请确保已在 Agora 控制台开通 RTM 功能，否则组件无法正常工作。
+

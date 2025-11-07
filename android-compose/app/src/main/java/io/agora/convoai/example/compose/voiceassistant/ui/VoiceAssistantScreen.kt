@@ -48,6 +48,8 @@ fun VoiceAssistantScreen(
             uiState.statusMessage.contains("muted", ignoreCase = true) -> false
             uiState.statusMessage.contains("unmuted", ignoreCase = true) -> false
             uiState.statusMessage.contains("Transcript", ignoreCase = true) -> false
+            uiState.statusMessage.contains("Agent joined", ignoreCase = true) -> false
+            uiState.statusMessage.contains("Agent left", ignoreCase = true) -> false
             else -> true
         }
 

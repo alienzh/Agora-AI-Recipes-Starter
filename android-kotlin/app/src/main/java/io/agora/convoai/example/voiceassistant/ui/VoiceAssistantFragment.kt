@@ -161,7 +161,9 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
                 // Show Snackbar for mute/unmute and transcript actions
                 if (state.statusMessage.contains("muted", ignoreCase = true) ||
                     state.statusMessage.contains("unmuted", ignoreCase = true) ||
-                    state.statusMessage.contains("transcript", ignoreCase = true)
+                    state.statusMessage.contains("transcript", ignoreCase = true) ||
+                    state.statusMessage.contains("Agent joined", ignoreCase = true) ||
+                    state.statusMessage.contains("Agent left", ignoreCase = true)
                 ) {
                     SnackbarHelper.showNormal(this@VoiceAssistantFragment, state.statusMessage)
                 }
@@ -175,11 +177,6 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
 
                 // Navigate back to first fragment when connection state is Disconnected
                 if (state.connectionState == ConversationViewModel.ConnectionState.Disconnected) {
-                    if (state.statusMessage.isNotEmpty() &&
-                        state.statusMessage.contains("agent left", ignoreCase = true)
-                    ) {
-                        SnackbarHelper.showNormal(this@VoiceAssistantFragment, state.statusMessage)
-                    }
                     // Navigate back to AgentConfigFragment
                     findNavController().popBackStack()
                 }
