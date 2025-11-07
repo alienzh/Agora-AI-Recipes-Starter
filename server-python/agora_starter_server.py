@@ -7,10 +7,21 @@ A Python script to start and stop Agora conversational AI agents via REST API
 import argparse  # 用于解析命令行参数
 import base64  # 用于 Base64 编码（Basic Auth 认证）
 import json  # 用于处理 JSON 数据
+import os  # 用于环境变量和文件操作
 import sys  # 用于系统操作和退出
 import time  # 用于获取时间戳（生成 token 时需要）
 from typing import Optional, Dict, Any, List  # 类型提示，用于代码可读性
 import requests  # HTTP 请求库，用于调用 REST API
+
+# Load .env.local file for configuration
+# Note: python-dotenv package is required, install with: pip install python-dotenv
+try:
+    from dotenv import load_dotenv
+    load_dotenv(".env.local")
+except ImportError:
+    # dotenv not installed, skip loading .env.local file
+    # You can still use environment variables or command line arguments
+    pass
 
 
 class AgoraStarterServer:
@@ -20,18 +31,33 @@ class AgoraStarterServer:
     """
     
     # API 端点配置
-    API_BASE_URL = "https://api.agora.io/cn/api/conversational-ai-agent/v2/projects"  # Agent 管理 API 基础 URL
+    API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"  # Agent 管理 API 基础 URL
     TOOLBOX_SERVER_HOST = "https://service.apprtc.cn/toolbox"  # Token 生成服务的基础 URL
     JSON_MEDIA_TYPE = "application/json; charset=utf-8"  # JSON 请求的 Content-Type
     DEFAULT_CHANNEL_NAME = "default_android_channel"  # 默认频道名称
     DEFAULT_AGENT_RTC_UID = "1009527"  # 默认 Agent RTC UID
     DEFAULT_EXPIRE_SECONDS = 60 * 60 * 24  # 默认 Token 过期时间：24 小时（秒）
+    DEFAULT_TIMEOUT = 30  # 默认 HTTP 请求超时时间（秒）
     
-    # 默认配置（可以在脚本中直接修改）
-    DEFAULT_APP_ID = ""  # 默认 App ID（请在此处填写）
-    DEFAULT_APP_CERT = ""  # 默认 App Certificate（请在此处填写）
-    DEFAULT_BASIC_AUTH = ""  # 默认 Basic Auth，格式为 "key:secret"（请在此处填写）
-    DEFAULT_PIPELINE_ID = ""  # 默认 Pipeline ID（请在此处填写）
+    # 默认配置（从环境变量或 .env 文件读取，如果没有则使用空字符串）
+    # 优先级：命令行参数 > 环境变量/.env > 代码中的默认值
+    DEFAULT_APP_ID = os.getenv("AGORA_APP_ID", "")  # 默认 App ID
+    DEFAULT_APP_CERT = os.getenv("AGORA_APP_CERT", "")  # 默认 App Certificate
+    DEFAULT_PIPELINE_ID = os.getenv("AGORA_PIPELINE_ID", "")  # 默认 Pipeline ID
+    
+    # Basic Auth 配置（从两个独立的环境变量读取）
+    _BASIC_KEY = os.getenv("AGORA_BASIC_KEY", "")  # Basic Auth Key
+    _BASIC_SECRET = os.getenv("AGORA_BASIC_SECRET", "")  # Basic Auth Secret
+    
+    @classmethod
+    def _get_default_basic_auth(cls) -> str:
+        """
+        获取默认 Basic Auth 配置
+        如果两个字段都存在，则拼接成 "key:secret" 格式；否则返回空字符串
+        """
+        if cls._BASIC_KEY and cls._BASIC_SECRET:
+            return f"{cls._BASIC_KEY}:{cls._BASIC_SECRET}"
+        return ""
     
     def __init__(
         self,
@@ -156,8 +182,22 @@ class AgoraStarterServer:
         # 构建请求体
         payload = self._build_json_payload(name, channel, agent_rtc_uid, token, remote_rtc_uids)
         
-        # 发送 POST 请求（使用已配置 Basic Auth 的 session）
-        response = self.session.post(url, json=payload)
+        try:
+            response = self.session.post(url, json=payload, timeout=self.DEFAULT_TIMEOUT)
+        except requests.exceptions.Timeout:
+            raise RuntimeError(
+                f"Join agent error: Request timeout after {self.DEFAULT_TIMEOUT} seconds. "
+                f"Please check your network connection or try again later."
+            )
+        except requests.exceptions.ConnectionError as e:
+            raise RuntimeError(
+                f"Join agent error: Connection failed. Please check your network connection. "
+                f"Details: {str(e)}"
+            )
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(
+                f"Join agent error: Request failed. Details: {str(e)}"
+            )
         
         # 检查响应状态码
         if not response.ok:
@@ -184,7 +224,22 @@ class AgoraStarterServer:
         url = f"{self.API_BASE_URL}/{self.app_id}/agents/{agent_id}/leave"
         
         # 发送 POST 请求，请求体为空 JSON 对象（参考 Android 代码）
-        response = self.session.post(url, json={})
+        try:
+            response = self.session.post(url, json={}, timeout=self.DEFAULT_TIMEOUT)
+        except requests.exceptions.Timeout:
+            raise RuntimeError(
+                f"Leave agent error: Request timeout after {self.DEFAULT_TIMEOUT} seconds. "
+                f"Please check your network connection or try again later."
+            )
+        except requests.exceptions.ConnectionError as e:
+            raise RuntimeError(
+                f"Leave agent error: Connection failed. Please check your network connection. "
+                f"Details: {str(e)}"
+            )
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(
+                f"Leave agent error: Request failed. Details: {str(e)}"
+            )
         
         # 检查响应状态码
         if not response.ok:
@@ -394,7 +449,7 @@ Examples:
     auth_parser = argparse.ArgumentParser(add_help=False)
     auth_parser.add_argument(
         "--basicauth",
-        default=AgoraStarterServer.DEFAULT_BASIC_AUTH,
+        default=AgoraStarterServer._get_default_basic_auth(),
         help="Basic auth credentials in format 'key:secret' (optional, default: from script config)"
     )
     
@@ -446,7 +501,7 @@ Examples:
             if not args.appid:
                 raise ValueError("App ID is required. Please set DEFAULT_APP_ID in script or use --appid argument")
             if not args.basicauth:
-                raise ValueError("Basic Auth is required. Please set DEFAULT_BASIC_AUTH in script or use --basicauth argument")
+                raise ValueError("Basic Auth is required. Please set AGORA_BASIC_KEY and AGORA_BASIC_SECRET in .env.local file or use --basicauth argument")
             if not args.pipeline:
                 raise ValueError("Pipeline ID is required. Please set DEFAULT_PIPELINE_ID in script or use --pipeline argument")
             
@@ -504,7 +559,7 @@ Examples:
             if not args.appid:
                 raise ValueError("App ID is required. Please set DEFAULT_APP_ID in script or use --appid argument")
             if not args.basicauth:
-                raise ValueError("Basic Auth is required. Please set DEFAULT_BASIC_AUTH in script or use --basicauth argument")
+                raise ValueError("Basic Auth is required. Please set AGORA_BASIC_KEY and AGORA_BASIC_SECRET in .env.local file or use --basicauth argument")
             
             # 创建 AgoraStarterServer 实例
             # 注意：停止命令不需要 pipeline_id

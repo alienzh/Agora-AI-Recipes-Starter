@@ -17,17 +17,46 @@ Python script to start and stop Agora conversational AI agents via REST API.
 
 ## Configuration
 
-You can configure default values directly in the script (`agora_starter_server.py`):
+You can configure default values using a `.env` file (recommended) or directly in the script.
 
-```python
-# 默认配置（可以在脚本中直接修改）
-DEFAULT_APP_ID = ""  # 默认 App ID（请在此处填写）
-DEFAULT_APP_CERT = ""  # 默认 App Certificate（请在此处填写）
-DEFAULT_BASIC_AUTH = ""  # 默认 Basic Auth，格式为 "key:secret"（请在此处填写）
-DEFAULT_PIPELINE_ID = ""  # 默认 Pipeline ID（请在此处填写）
+### Using .env.local file (Recommended)
+
+**Note**: You need to install `python-dotenv` package first:
+```bash
+pip install python-dotenv
 ```
 
-If these values are set in the script, you can run commands without providing these parameters. You can still override them using command line arguments.
+1. **Copy the example file**:
+```bash
+cp .env.example .env.local
+```
+
+2. **Edit `.env.local` file** and fill in your actual values:
+```bash
+# Agora App ID (Project ID)
+AGORA_APP_ID=your_app_id_here
+
+# Agora App Certificate (optional, for token generation)
+AGORA_APP_CERT=your_app_cert_here
+
+# Basic Auth credentials (split into two fields)
+AGORA_BASIC_KEY=your_key_here
+AGORA_BASIC_SECRET=your_secret_here
+
+# Pipeline ID (for starting agents)
+AGORA_PIPELINE_ID=your_pipeline_id_here
+```
+
+3. **The `.env.local` file is automatically loaded** when you run the script. Make sure to add `.env.local` to `.gitignore` to avoid committing sensitive information.
+
+### Configuration Priority
+
+The configuration priority is:
+1. Command line arguments (highest priority)
+2. Environment variables or `.env.local` file
+3. Default values in script (lowest priority)
+
+If these values are set in `.env.local` file or environment variables, you can run commands without providing these parameters. You can still override them using command line arguments.
 
 ## 快速开始
 
@@ -36,11 +65,69 @@ If these values are set in the script, you can run commands without providing th
 - **Python 版本**：Python 3.6 或更高版本
 - **网络连接**：用于调用 Agora REST API
 
-### 依赖安装
+### 一键安装依赖
+
+在 `server-python` 目录下执行以下命令安装所有依赖：
+
+**macOS/Linux 用户**：
+```bash
+cd server-python && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
+```
+
+**Windows 用户**：
+```bash
+cd server-python && python3 -m venv venv && venv\Scripts\activate && pip install -r requirements.txt
+```
+
+这将自动完成以下步骤：
+1. 创建虚拟环境 `venv`
+2. 激活虚拟环境
+3. 安装所有依赖（包括 `requests` 和 `python-dotenv`）
+
+**注意**：安装完成后，虚拟环境会保持激活状态。下次使用时，只需激活虚拟环境：
+```bash
+# macOS/Linux
+source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
+```
+
+### 依赖安装（详细步骤）
+
+**快速安装（推荐）**：
+
+```bash
+# 进入项目目录
+cd server-python
+
+# 创建虚拟环境（如果还没有）
+python3 -m venv venv
+
+# 激活虚拟环境
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+# venv\Scripts\activate
+
+# 安装所有依赖（包括 python-dotenv）
+pip install -r requirements.txt
+```
+
+或者，如果你想一次性执行所有步骤：
+
+```bash
+cd server-python && \
+python3 -m venv venv && \
+source venv/bin/activate && \
+pip install -r requirements.txt
+```
+
+**详细步骤**：
 
 1. **克隆项目**（如果尚未克隆）：
 ```bash
-cd agent-starter-server
+cd server-python
 ```
 
 2. **创建虚拟环境**：
@@ -62,9 +149,31 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+这将安装以下依赖：
+- `requests>=2.31.0` - HTTP 请求库
+- `python-dotenv>=1.0.0` - 用于加载 `.env.local` 文件
+
+5. **配置环境变量**（推荐）：
+```bash
+# 复制示例文件
+cp .env.example .env.local
+
+# 编辑 .env.local 文件，填入你的配置信息
+# 或者直接设置环境变量
+export AGORA_APP_ID="your_app_id"
+export AGORA_BASIC_KEY="your_key"
+export AGORA_BASIC_SECRET="your_secret"
+export AGORA_PIPELINE_ID="your_pipeline_id"
+```
+
+**注意**：使用 `.env.local` 文件需要先安装 `python-dotenv`：
+```bash
+pip install python-dotenv
+```
+
 ### 配置说明
 
-在 `agora_starter_server.py` 中配置默认的 App ID、App Certificate、Basic Auth 和 Pipeline ID，这样就不需要在每次运行时都传递这些参数。
+推荐使用 `.env.local` 文件来配置默认的 App ID、App Certificate、Basic Auth 和 Pipeline ID，这样就不需要在每次运行时都传递这些参数，同时也能避免在代码中硬编码敏感信息。
 
 ## Usage
 
@@ -135,20 +244,20 @@ python agora_starter_server.py stop --help
 
 ### Start Command Parameters
 
-- `--basicauth`: Basic auth credentials in format "key:secret" [optional, default: from script config `DEFAULT_BASIC_AUTH`]
+- `--basicauth`: Basic auth credentials in format "key:secret" [optional, default: from `.env.local` file (`AGORA_BASIC_KEY` and `AGORA_BASIC_SECRET`)]
 - `--pipeline`: Pipeline ID [optional, default: from script config `DEFAULT_PIPELINE_ID`]
 - `--expire`: Token expiration time in seconds [optional, default: 86400 (24 hours)]
 - `--remote-rtc-uids`: Remote RTC UIDs list [optional, default: "*"]
 
 **Note:** 
-- You can set default values in the script (`DEFAULT_APP_ID`, `DEFAULT_APP_CERT`, `DEFAULT_BASIC_AUTH`, `DEFAULT_PIPELINE_ID`) to avoid passing them as arguments
+- You can set default values in `.env.local` file (`AGORA_APP_ID`, `AGORA_APP_CERT`, `AGORA_BASIC_KEY`, `AGORA_BASIC_SECRET`, `AGORA_PIPELINE_ID`) to avoid passing them as arguments
 - Token will be generated automatically before starting the agent (default: RTC and RTM token)
 - Agent name will use the channelName value
 - Agent RTC UID is fixed to 1009527
 
 ### Stop Command Parameters
 
-- `--basicauth`: Basic auth credentials in format "key:secret" [optional, default: from script config `DEFAULT_BASIC_AUTH`]
+- `--basicauth`: Basic auth credentials in format "key:secret" [optional, default: from `.env.local` file (`AGORA_BASIC_KEY` and `AGORA_BASIC_SECRET`)]
 - `--agent-id`: Agent ID to stop [required]
 
 ## Examples
