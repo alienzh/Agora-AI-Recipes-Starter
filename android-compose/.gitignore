@@ -14,3 +14,6 @@
 .cxx
 local.properties
 /.idea/
+
+# Environment configuration (contains sensitive credentials)
+env.properties

@@ -11,8 +11,6 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtm.RtmClient
-import io.agora.scene.base.AgoraTokenType
-import io.agora.scene.base.TokenGenerator
 import io.agora.scene.convoai.convoaiApi.AgentState
 import io.agora.scene.convoai.convoaiApi.ConversationalAIAPIConfig
 import io.agora.scene.convoai.convoaiApi.ConversationalAIAPIImpl

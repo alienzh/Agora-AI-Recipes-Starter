@@ -6,5 +6,8 @@ build/
 local.properties
 /.idea/
 
+# Environment configuration (contains sensitive credentials)
+env.properties
+
 # Python virtual environment
 server/venv/

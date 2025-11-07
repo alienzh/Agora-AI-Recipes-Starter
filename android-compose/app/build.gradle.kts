@@ -1,7 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+}
+
+// Load env.properties file for Agora configuration
+val envProperties = Properties()
+val envPropertiesFile = rootProject.file("env.properties")
+if (envPropertiesFile.exists()) {
+    envPropertiesFile.inputStream().use { envProperties.load(it) }
 }
 
 android {
@@ -11,13 +20,17 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.agora.convoai.example.compose.voiceassistant"
+        applicationId = "io.agora.agent.example.starter.compose"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Load Agora configuration from env.properties
+        buildConfigField("String", "AGORA_APP_ID", "\"${envProperties.getProperty("agora.appId", "")}\"")
+        buildConfigField("String", "AGORA_APP_CERTIFICATE", "\"${envProperties.getProperty("agora.appCertificate", "")}\"")
     }
 
     buildTypes {
@@ -35,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

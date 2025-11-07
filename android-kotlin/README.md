@@ -64,7 +64,16 @@ cd agent-starter-convoai-android
 
 1. **配置 App ID 和 App Certificate**：
    
-   在 `app/src/main/java/io/agora/convoai/example/voiceassistant/KeyCenter.kt` 中配置你的 App ID 和 App Certificate。
+   1. 复制 `env.example.properties` 文件为 `env.properties`：
+   ```bash
+   cp env.example.properties env.properties
+   ```
+   
+   2. 编辑 `env.properties` 文件，填入你的实际配置值：
+   - `agora.appId`：你的 Agora App ID
+   - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
+   
+   **注意**：`env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
 
 2. **权限配置**：
    

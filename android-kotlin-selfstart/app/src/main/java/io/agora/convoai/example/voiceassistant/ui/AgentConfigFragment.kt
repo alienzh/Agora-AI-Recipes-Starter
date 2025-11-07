@@ -39,7 +39,7 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
             tvPipelineId.text = pipelineIdPrefix
 
             // Generate random channel name for joining (client-side start)
-            val randomChannelName = "user_channel_${Random.nextInt(10000, 100000000)}"
+            val randomChannelName = "android_kotlin_selfstart_${Random.nextInt(10000, 100000000)}"
             etChannel.setText(randomChannelName)
 
             btnStarter.setOnClickListener {
