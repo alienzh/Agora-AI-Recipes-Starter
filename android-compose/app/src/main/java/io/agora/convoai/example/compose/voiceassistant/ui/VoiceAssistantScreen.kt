@@ -34,10 +34,10 @@ fun VoiceAssistantScreen(
     val uiState by viewModel.uiState.collectAsState()
     val transcriptList by viewModel.transcriptList.collectAsState()
     val agentState by viewModel.agentState.collectAsState()
-    
+
     val statusHistory = remember { mutableStateListOf<String>() }
     var lastStatusMessage by remember { mutableStateOf("") }
-    
+
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -48,8 +48,6 @@ fun VoiceAssistantScreen(
             uiState.statusMessage.contains("muted", ignoreCase = true) -> false
             uiState.statusMessage.contains("unmuted", ignoreCase = true) -> false
             uiState.statusMessage.contains("Transcript", ignoreCase = true) -> false
-            uiState.statusMessage.contains("Agent joined", ignoreCase = true) -> false
-            uiState.statusMessage.contains("Agent left", ignoreCase = true) -> false
             else -> true
         }
 
@@ -62,19 +60,10 @@ fun VoiceAssistantScreen(
             lastStatusMessage = uiState.statusMessage
         }
 
-        // Clear history when disconnected or idle
-        if (uiState.connectionState == ConnectionState.Idle ||
-            uiState.connectionState == ConnectionState.Disconnected
-        ) {
+        // Clear history when idle
+        if (uiState.connectionState == ConnectionState.Idle) {
             statusHistory.clear()
             lastStatusMessage = ""
-        }
-    }
-
-    // Navigate back when disconnected
-    LaunchedEffect(uiState.connectionState) {
-        if (uiState.connectionState == ConnectionState.Disconnected) {
-            onNavigateBack()
         }
     }
 
@@ -92,7 +81,10 @@ fun VoiceAssistantScreen(
             TopAppBar(
                 title = { Text("Voice Assistant") },
                 navigationIcon = {
-                    IconButton(onClick = { viewModel.hangup() }) {
+                    IconButton(onClick = {
+                        viewModel.hangup()
+                        onNavigateBack()
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -162,11 +154,13 @@ fun VoiceAssistantScreen(
                                         statusHistory.joinToString("\n").contains("joined", ignoreCase = true) -> {
                                     Color(0xFF4CAF50)
                                 }
+
                                 statusHistory.joinToString("\n").contains("error", ignoreCase = true) ||
                                         statusHistory.joinToString("\n").contains("failed", ignoreCase = true) ||
                                         statusHistory.joinToString("\n").contains("left", ignoreCase = true) -> {
                                     Color(0xFFF44336)
                                 }
+
                                 else -> {
                                     Color(0xFF666666)
                                 }
@@ -263,7 +257,10 @@ fun VoiceAssistantScreen(
 
                 // Hangup button
                 FloatingActionButton(
-                    onClick = { viewModel.hangup() },
+                    onClick = {
+                        viewModel.hangup()
+                        onNavigateBack()
+                    },
                     modifier = Modifier.weight(1f),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer

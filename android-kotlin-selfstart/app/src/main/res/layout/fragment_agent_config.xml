@@ -170,9 +170,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        tools:text="Ready to start"
                         android:textColor="#666666"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        tools:text="Ready to start" />
 
                 </LinearLayout>
 
@@ -184,43 +184,45 @@
                 android:layout_width="0dp"
                 android:layout_height="64dp"
                 android:layout_marginTop="32dp"
-                android:text="Start Agent"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textAllCaps="false"
                 android:letterSpacing="0.02"
-                android:textColor="@android:color/white"
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
-                app:cornerRadius="16dp"
+                android:text="Start Agent"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
                 app:backgroundTint="@color/colorPrimary"
+                app:cornerRadius="16dp"
                 app:elevation="8dp"
                 app:icon="@drawable/ic_play_arrow"
                 app:iconGravity="textStart"
                 app:iconPadding="12dp"
                 app:iconSize="28dp"
                 app:iconTint="@android:color/white"
-                app:rippleColor="#33FFFFFF"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cardMain"
-                app:layout_constraintWidth_percent="0.9" />
-
-            <!-- Progress Bar -->
-            <androidx.core.widget.ContentLoadingProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:indeterminateTint="@color/colorPrimary"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnStarter" />
-
+                app:layout_constraintWidth_percent="0.9"
+                app:rippleColor="#33FFFFFF" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/colorPrimary"
+        android:visibility="gone"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

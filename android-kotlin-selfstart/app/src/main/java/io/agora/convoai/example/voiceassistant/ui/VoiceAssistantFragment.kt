@@ -1,5 +1,6 @@
 package io.agora.convoai.example.voiceassistant.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
@@ -20,10 +21,10 @@ import io.agora.convoai.example.voiceassistant.ui.common.BaseFragment
 import io.agora.scene.convoai.convoaiApi.Transcript
 import io.agora.scene.convoai.convoaiApi.TranscriptStatus
 import io.agora.scene.convoai.convoaiApi.TranscriptType
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.text.ifEmpty
 import androidx.core.graphics.toColorInt
+import androidx.core.view.isVisible
 import io.agora.scene.convoai.convoaiApi.AgentState
 
 class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
@@ -79,7 +80,13 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
             }
 
             btnHangup.setOnClickListener {
-                handleHangup()
+                lifecycleScope.launch {
+                    handleHangup()
+                    // Navigate back to first page after hangup completes
+                    if (isAdded) {
+                        findNavController().popBackStack()
+                    }
+                }
             }
         }
         viewModel.startAgent()
@@ -102,28 +109,31 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
 
     override fun onHandleOnBackPressed() {
         // Handle back press (including swipe back gesture) same as hangup button
-        handleHangup()
+        lifecycleScope.launch {
+            handleHangup()
+            // Navigate back to first page after hangup completes
+            if (isAdded) {
+                findNavController().popBackStack()
+            }
+        }
     }
 
-    private fun handleHangup() {
-        viewModel.hangup()
+    private suspend fun handleHangup() {
+        viewModel.hangupSuspend()
     }
 
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 mBinding?.apply {
-                    // Check if agent start failed, show error and navigate back after 3s
-                    if (state.agentStartFailed) {
-                        SnackbarHelper.showError(
-                            this@VoiceAssistantFragment,
-                            "Agent Start Failed: ${state.statusMessage}"
-                        )
-                        // Delay 3s and navigate back to first page
-                        delay(3000)
-                        findNavController().popBackStack()
-                        return@collect
-                    }
+                    // Update loading state for agent start/stop
+                    progressBar.isVisible = state.isLoadingAgent
+
+                    // Show/hide transcript list based on transcript enabled state
+                    cardTranscript.isVisible = state.isTranscriptEnabled
+
+                    // Show agent status indicator when transcript is hidden
+                    agentSpeakingIndicator.isVisible = state.isTranscriptEnabled
 
                     // Update status message - only show important connection/agent status
                     updateStatusMessage(state)
@@ -143,9 +153,7 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
                     }
 
                     // Update mute button icon
-                    btnMute.setImageResource(
-                        if (state.isMuted) R.drawable.ic_mic_off else R.drawable.ic_mic
-                    )
+                    btnMute.setImageResource(if (state.isMuted) R.drawable.ic_mic_off else R.drawable.ic_mic)
                     // Update mute button background based on state (use selector for pressed state)
                     val muteBackground = if (state.isMuted) {
                         R.drawable.bg_button_mute_muted_selector
@@ -158,43 +166,17 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
                     btnTranscript.setImageResource(
                         if (state.isTranscriptEnabled) R.drawable.ic_subtitles else R.drawable.ic_subtitles_off
                     )
+                }
 
-                    // Show/hide transcript list based on transcript enabled state
-                    cardTranscript.visibility = if (state.isTranscriptEnabled) {
-                        android.view.View.VISIBLE
-                    } else {
-                        android.view.View.GONE
+                // Show Snackbar based on connection state (only if fragment is visible)
+                if (isAdded && isResumed) {
+                    if (state.connectionState == ConversationViewModel.ConnectionState.Error) {
+                        // Show error Snackbar for Error state
+                        SnackbarHelper.showError(this@VoiceAssistantFragment, state.statusMessage)
+                    } else if (state.statusMessage.isNotEmpty()) {
+                        // Show normal Snackbar for other status messages
+                        SnackbarHelper.showNormal(this@VoiceAssistantFragment, state.statusMessage)
                     }
-                    
-                    // Show agent status indicator when transcript is hidden
-                    agentSpeakingIndicator.visibility = if (state.isTranscriptEnabled) {
-                        android.view.View.GONE
-                    } else {
-                        android.view.View.VISIBLE
-                    }
-                }
-
-                // Show Snackbar for mute/unmute and transcript actions
-                if (state.statusMessage.contains("muted", ignoreCase = true) ||
-                    state.statusMessage.contains("unmuted", ignoreCase = true) ||
-                    state.statusMessage.contains("transcript", ignoreCase = true) ||
-                    state.statusMessage.contains("Agent joined", ignoreCase = true) ||
-                    state.statusMessage.contains("Agent left", ignoreCase = true)
-                ) {
-                    SnackbarHelper.showNormal(this@VoiceAssistantFragment, state.statusMessage)
-                }
-
-                // Show Snackbar for errors
-                if (state.statusMessage.contains("error", ignoreCase = true) ||
-                    state.statusMessage.contains("failed", ignoreCase = true)
-                ) {
-                    SnackbarHelper.showError(this@VoiceAssistantFragment, state.statusMessage)
-                }
-
-                // Navigate back to first fragment when connection state is Disconnected
-                if (state.connectionState == ConversationViewModel.ConnectionState.Disconnected) {
-                    // Navigate back to AgentConfigFragment
-                    findNavController().popBackStack()
                 }
             }
         }
@@ -235,9 +217,7 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
         }
 
         // Clear history when disconnected or idle
-        if (state.connectionState == ConversationViewModel.ConnectionState.Idle ||
-            state.connectionState == ConversationViewModel.ConnectionState.Disconnected
-        ) {
+        if (state.connectionState == ConversationViewModel.ConnectionState.Idle) {
             statusHistory.clear()
             lastStatusMessage = ""
         }
@@ -335,31 +315,73 @@ class TranscriptAdapter : ListAdapter<Transcript, RecyclerView.ViewHolder>(Trans
         }
     }
 
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+            return
+        }
+
+        val transcript = getItem(position)
+        val payload = payloads[0] as? Set<*>
+
+        when (holder) {
+            is UserViewHolder -> {
+                if (payload == null || payload.contains("text") || payload.contains("status")) {
+                    holder.bind(transcript)
+                }
+            }
+
+            is AgentViewHolder -> {
+                if (payload == null || payload.contains("text") || payload.contains("status")) {
+                    holder.bind(transcript)
+                }
+            }
+        }
+    }
+
     class UserViewHolder(private val binding: ItemTranscriptUserBinding) : RecyclerView.ViewHolder(binding.root) {
         private val tvType: TextView = binding.tvTranscriptType
         private val tvText: TextView = binding.tvTranscriptText
         private val tvStatus: TextView = binding.tvTranscriptStatus
 
+        private var currentTranscript: Transcript? = null
+
         fun bind(transcript: Transcript) {
-            // Set transcript type with color for USER
-            tvType.text = "USER"
-            ContextCompat.getDrawable(binding.root.context, R.drawable.bg_type_badge)?.let { drawable ->
-                drawable.setTint("#10B981".toColorInt())
-                tvType.background = drawable
+            // Only update if content actually changed to avoid unnecessary redraws
+            val textChanged = currentTranscript?.text != transcript.text
+            val statusChanged = currentTranscript?.status != transcript.status
+
+            if (textChanged || currentTranscript == null) {
+                // Set transcript type with color for USER (only set once or when needed)
+                if (currentTranscript == null) {
+                    tvType.text = "USER"
+                    ContextCompat.getDrawable(binding.root.context, R.drawable.bg_type_badge)?.let { drawable ->
+                        drawable.setTint("#10B981".toColorInt())
+                        tvType.background = drawable
+                    }
+                }
+
+                // Set transcript text
+                tvText.text = transcript.text.ifEmpty { "(empty)" }
             }
 
-            // Set transcript text
-            tvText.text = transcript.text.ifEmpty { "(empty)" }
-
-            // Set transcript status with color
-            val (statusText, statusColor) = when (transcript.status) {
-                TranscriptStatus.IN_PROGRESS -> "IN PROGRESS" to "#FF9800".toColorInt()
-                TranscriptStatus.END -> "END" to "#4CAF50".toColorInt()
-                TranscriptStatus.INTERRUPTED -> "INTERRUPTED" to "#F44336".toColorInt()
-                TranscriptStatus.UNKNOWN -> "UNKNOWN" to "#9E9E9E".toColorInt()
+            if (statusChanged || currentTranscript == null) {
+                // Set transcript status with color
+                val (statusText, statusColor) = when (transcript.status) {
+                    TranscriptStatus.IN_PROGRESS -> "IN PROGRESS" to "#FF9800".toColorInt()
+                    TranscriptStatus.END -> "END" to "#4CAF50".toColorInt()
+                    TranscriptStatus.INTERRUPTED -> "INTERRUPTED" to "#F44336".toColorInt()
+                    TranscriptStatus.UNKNOWN -> "UNKNOWN" to "#9E9E9E".toColorInt()
+                }
+                tvStatus.text = statusText
+                tvStatus.setTextColor(statusColor)
             }
-            tvStatus.text = statusText
-            tvStatus.setTextColor(statusColor)
+
+            currentTranscript = transcript
         }
     }
 
@@ -368,26 +390,40 @@ class TranscriptAdapter : ListAdapter<Transcript, RecyclerView.ViewHolder>(Trans
         private val tvText: TextView = binding.tvTranscriptText
         private val tvStatus: TextView = binding.tvTranscriptStatus
 
+        private var currentTranscript: Transcript? = null
+
         fun bind(transcript: Transcript) {
-            // Set transcript type with color for AGENT
-            tvType.text = "AGENT"
-            ContextCompat.getDrawable(binding.root.context, R.drawable.bg_type_badge)?.let { drawable ->
-                drawable.setTint("#6366F1".toColorInt())
-                tvType.background = drawable
+            // Only update if content actually changed to avoid unnecessary redraws
+            val textChanged = currentTranscript?.text != transcript.text
+            val statusChanged = currentTranscript?.status != transcript.status
+
+            if (textChanged || currentTranscript == null) {
+                // Set transcript type with color for AGENT (only set once or when needed)
+                if (currentTranscript == null) {
+                    tvType.text = "AGENT"
+                    ContextCompat.getDrawable(binding.root.context, R.drawable.bg_type_badge)?.let { drawable ->
+                        drawable.setTint("#6366F1".toColorInt())
+                        tvType.background = drawable
+                    }
+                }
+
+                // Set transcript text
+                tvText.text = transcript.text.ifEmpty { "(empty)" }
             }
 
-            // Set transcript text
-            tvText.text = transcript.text.ifEmpty { "(empty)" }
-
-            // Set transcript status with color
-            val (statusText, statusColor) = when (transcript.status) {
-                TranscriptStatus.IN_PROGRESS -> "IN PROGRESS" to "#FF9800".toColorInt()
-                TranscriptStatus.END -> "END" to "#4CAF50".toColorInt()
-                TranscriptStatus.INTERRUPTED -> "INTERRUPTED" to "#F44336".toColorInt()
-                TranscriptStatus.UNKNOWN -> "UNKNOWN" to "#9E9E9E".toColorInt()
+            if (statusChanged || currentTranscript == null) {
+                // Set transcript status with color
+                val (statusText, statusColor) = when (transcript.status) {
+                    TranscriptStatus.IN_PROGRESS -> "IN PROGRESS" to "#FF9800".toColorInt()
+                    TranscriptStatus.END -> "END" to "#4CAF50".toColorInt()
+                    TranscriptStatus.INTERRUPTED -> "INTERRUPTED" to "#F44336".toColorInt()
+                    TranscriptStatus.UNKNOWN -> "UNKNOWN" to "#9E9E9E".toColorInt()
+                }
+                tvStatus.text = statusText
+                tvStatus.setTextColor(statusColor)
             }
-            tvStatus.text = statusText
-            tvStatus.setTextColor(statusColor)
+
+            currentTranscript = transcript
         }
     }
 
@@ -397,7 +433,22 @@ class TranscriptAdapter : ListAdapter<Transcript, RecyclerView.ViewHolder>(Trans
         }
 
         override fun areContentsTheSame(oldItem: Transcript, newItem: Transcript): Boolean {
-            return oldItem == newItem
+            // Compare only the fields that affect UI display
+            return oldItem.text == newItem.text &&
+                    oldItem.status == newItem.status &&
+                    oldItem.type == newItem.type
+        }
+
+        override fun getChangePayload(oldItem: Transcript, newItem: Transcript): Any? {
+            // Return payload to indicate what changed for partial update
+            val payload = mutableSetOf<String>()
+            if (oldItem.text != newItem.text) {
+                payload.add("text")
+            }
+            if (oldItem.status != newItem.status) {
+                payload.add("status")
+            }
+            return if (payload.isEmpty()) null else payload
         }
     }
 }

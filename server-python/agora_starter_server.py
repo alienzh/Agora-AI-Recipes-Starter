@@ -49,20 +49,11 @@ class AgoraStarterServer:
     _BASIC_KEY = os.getenv("AGORA_BASIC_KEY", "")  # Basic Auth Key
     _BASIC_SECRET = os.getenv("AGORA_BASIC_SECRET", "")  # Basic Auth Secret
     
-    @classmethod
-    def _get_default_basic_auth(cls) -> str:
-        """
-        获取默认 Basic Auth 配置
-        如果两个字段都存在，则拼接成 "key:secret" 格式；否则返回空字符串
-        """
-        if cls._BASIC_KEY and cls._BASIC_SECRET:
-            return f"{cls._BASIC_KEY}:{cls._BASIC_SECRET}"
-        return ""
-    
     def __init__(
         self,
         app_id: str,
-        basic_auth: str,
+        basic_key: str,
+        basic_secret: str,
         pipeline_id: str,
         channel_name: Optional[str] = None,
         app_cert: Optional[str] = None
@@ -72,7 +63,8 @@ class AgoraStarterServer:
         
         参数:
             app_id: Agora App ID（项目 ID）
-            basic_auth: Basic Auth 认证信息，格式为 "key:secret"
+            basic_key: Basic Auth Key
+            basic_secret: Basic Auth Secret
             pipeline_id: Pipeline ID（用于启动 Agent）
             channel_name: 频道名称（可选，默认使用 DEFAULT_CHANNEL_NAME）
             app_cert: App Certificate（可选，用于生成 Token）
@@ -83,12 +75,9 @@ class AgoraStarterServer:
         self.channel_name = channel_name or self.DEFAULT_CHANNEL_NAME  # 如果没有指定频道名，使用默认值
         self.app_cert = app_cert
         
-        # 解析 Basic Auth 认证信息（格式：key:secret）
-        if ':' not in basic_auth:
-            raise ValueError("basicauth must be in format 'key:secret'")
-        key, secret = basic_auth.split(':', 1)  # 分割 key 和 secret，最多分割一次（防止 secret 中包含冒号）
-        self.rest_key = key
-        self.rest_secret = secret
+        # 保存 Basic Auth 认证信息
+        self.rest_key = basic_key
+        self.rest_secret = basic_secret
         
         # 创建 HTTP 会话并配置 Basic Auth 认证
         # 参考 Android 代码中的 Base64Encoding.gen() 方法
@@ -415,14 +404,16 @@ Examples:
   python agora_starter_server.py start \\
     --appid YOUR_APP_ID \\
     --appcert "YOUR_APP_CERTIFICATE" \\
-    --basicauth "YOUR_REST_KEY:YOUR_REST_SECRET" \\
+    --basic-key YOUR_REST_KEY \\
+    --basic-secret YOUR_REST_SECRET \\
     --pipeline YOUR_PIPELINE_ID \\
     --channelName "my_channel"
   
   # Stop an agent
   python agora_starter_server.py stop \\
     --appid YOUR_APP_ID \\
-    --basicauth "YOUR_REST_KEY:YOUR_REST_SECRET" \\
+    --basic-key YOUR_REST_KEY \\
+    --basic-secret YOUR_REST_SECRET \\
     --agent-id "agent_id_here"
         """
     )
@@ -448,9 +439,14 @@ Examples:
     # 需要 Basic Auth 的命令的参数（start 和 stop 命令需要）
     auth_parser = argparse.ArgumentParser(add_help=False)
     auth_parser.add_argument(
-        "--basicauth",
-        default=AgoraStarterServer._get_default_basic_auth(),
-        help="Basic auth credentials in format 'key:secret' (optional, default: from script config)"
+        "--basic-key",
+        default=AgoraStarterServer._BASIC_KEY,
+        help="Basic Auth Key (optional, default: from AGORA_BASIC_KEY environment variable)"
+    )
+    auth_parser.add_argument(
+        "--basic-secret",
+        default=AgoraStarterServer._BASIC_SECRET,
+        help="Basic Auth Secret (optional, default: from AGORA_BASIC_SECRET environment variable)"
     )
     
     # 创建子命令解析器（支持 start、stop 两个命令）
@@ -500,8 +496,8 @@ Examples:
             # 验证必需的配置参数
             if not args.appid:
                 raise ValueError("App ID is required. Please set DEFAULT_APP_ID in script or use --appid argument")
-            if not args.basicauth:
-                raise ValueError("Basic Auth is required. Please set AGORA_BASIC_KEY and AGORA_BASIC_SECRET in .env.local file or use --basicauth argument")
+            if not args.basic_key or not args.basic_secret:
+                raise ValueError("Basic Auth Key and Secret are required. Please set AGORA_BASIC_KEY and AGORA_BASIC_SECRET in .env.local file or use --basic-key and --basic-secret arguments")
             if not args.pipeline:
                 raise ValueError("Pipeline ID is required. Please set DEFAULT_PIPELINE_ID in script or use --pipeline argument")
             
@@ -511,10 +507,11 @@ Examples:
             # 使用默认的 Agent RTC UID
             agent_rtc_uid = AgoraStarterServer.DEFAULT_AGENT_RTC_UID
             
-            # 创建 AgoraStarterServer 实例（用于生成 Token，不需要 basic_auth 和 pipeline_id）
+            # 创建 AgoraStarterServer 实例（用于生成 Token，不需要 basic_key/basic_secret 和 pipeline_id）
             token_server = AgoraStarterServer(
                 app_id=args.appid,
-                basic_auth="dummy:dummy",  # 占位符，生成 Token 不需要 Basic Auth
+                basic_key="dummy",  # 占位符，生成 Token 不需要 Basic Auth
+                basic_secret="dummy",  # 占位符，生成 Token 不需要 Basic Auth
                 pipeline_id="",  # 占位符，生成 Token 不需要 Pipeline ID
                 channel_name=args.channelName,
                 app_cert=args.appcert
@@ -533,7 +530,8 @@ Examples:
             # 创建用于启动 Agent 的 AgoraStarterServer 实例
             server = AgoraStarterServer(
                 app_id=args.appid,
-                basic_auth=args.basicauth,
+                basic_key=args.basic_key,
+                basic_secret=args.basic_secret,
                 pipeline_id=args.pipeline,
                 channel_name=args.channelName,
                 app_cert=args.appcert
@@ -558,14 +556,15 @@ Examples:
             # 验证必需的配置参数
             if not args.appid:
                 raise ValueError("App ID is required. Please set DEFAULT_APP_ID in script or use --appid argument")
-            if not args.basicauth:
-                raise ValueError("Basic Auth is required. Please set AGORA_BASIC_KEY and AGORA_BASIC_SECRET in .env.local file or use --basicauth argument")
+            if not args.basic_key or not args.basic_secret:
+                raise ValueError("Basic Auth Key and Secret are required. Please set AGORA_BASIC_KEY and AGORA_BASIC_SECRET in .env.local file or use --basic-key and --basic-secret arguments")
             
             # 创建 AgoraStarterServer 实例
             # 注意：停止命令不需要 pipeline_id
             server = AgoraStarterServer(
                 app_id=args.appid,
-                basic_auth=args.basicauth,
+                basic_key=args.basic_key,
+                basic_secret=args.basic_secret,
                 pipeline_id="",  # 占位符，停止 Agent 不需要 Pipeline ID
                 channel_name=args.channelName,
                 app_cert=args.appcert

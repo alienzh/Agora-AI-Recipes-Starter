@@ -87,20 +87,21 @@
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="20dp"
         app:cardElevation="6dp"
-        tools:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/cardControls"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardInfo">
+        app:layout_constraintTop_toBottomOf="@id/cardInfo"
+        tools:visibility="gone">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvTranscript"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingVertical="12dp"
             android:clipToPadding="false"
+            android:paddingVertical="12dp"
             android:scrollbars="vertical" />
     </com.google.android.material.card.MaterialCardView>
+
 
     <!-- Agent Speaking Indicator (shown when transcript is hidden) -->
     <io.agora.convoai.example.voiceassistant.ui.common.VoiceWaveView
@@ -109,12 +110,14 @@
         android:layout_height="wrap_content"
         android:scaleX="5"
         android:scaleY="5"
-        tools:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/cardControls"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardInfo"
-        android:visibility="gone" />
+        tools:visibility="visible" />
+
+
 
     <!-- Control Buttons -->
     <com.google.android.material.card.MaterialCardView
@@ -187,6 +190,22 @@
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- Loading Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:indeterminateTint="@color/colorPrimary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

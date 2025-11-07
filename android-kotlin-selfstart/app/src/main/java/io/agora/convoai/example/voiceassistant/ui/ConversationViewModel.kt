@@ -10,7 +10,6 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtm.RtmClient
-import io.agora.convoai.example.voiceassistant.tools.AgoraTokenType
 import io.agora.convoai.example.voiceassistant.tools.TokenGenerator
 import io.agora.scene.convoai.convoaiApi.AgentState
 import io.agora.scene.convoai.convoaiApi.ConversationalAIAPIConfig
@@ -53,7 +52,7 @@ class ConversationViewModel : ViewModel() {
         Idle,
         Connecting,
         Connected,
-        Disconnected
+        Error
     }
 
     // UI State - shared between AgentConfigFragment and VoiceAssistantFragment
@@ -68,9 +67,8 @@ class ConversationViewModel : ViewModel() {
         val agentId: String = "",
         // Connection state
         val connectionState: ConnectionState = ConnectionState.Idle,
-        // Agent state
-        val agentStarted: Boolean = false,
-        val agentStartFailed: Boolean = false
+        // Loading state
+        val isLoadingAgent: Boolean = false
     )
 
     private val _uiState = MutableStateFlow(ConversationUiState())
@@ -125,9 +123,6 @@ class ConversationViewModel : ViewModel() {
                         statusMessage = "Agent left the channel"
                     )
                     Log.d(TAG, "Agent left the channel, uid: $uid, reason: $reason")
-                    // Hangup when agent leaves (will set Disconnected state)
-                    delay(1000)
-                    hangup()
                 } else {
                     Log.d(TAG, "User left the channel, uid: $uid, reason: $reason")
                 }
@@ -137,7 +132,7 @@ class ConversationViewModel : ViewModel() {
         override fun onError(err: Int) {
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Idle,
+                    connectionState = ConnectionState.Error,
                     statusMessage = "RTC error: $err"
                 )
                 Log.e(TAG, "RTC error: $err")
@@ -256,10 +251,12 @@ class ConversationViewModel : ViewModel() {
      * Start agent using AgentAIStudioStarter
      */
     fun startAgent() {
+        Log.d(TAG, "startAgent")
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(
-                    statusMessage = "Starting agent..."
+                    statusMessage = "Starting agent...",
+                    isLoadingAgent = true
                 )
 
                 val agentName = "default_agent"
@@ -279,7 +276,8 @@ class ConversationViewModel : ViewModel() {
                     onSuccess = { token -> token },
                     onFailure = { exception ->
                         _uiState.value = _uiState.value.copy(
-                            agentStartFailed = true,
+                            connectionState = ConnectionState.Error,
+                            isLoadingAgent = false,
                             statusMessage = "Failed to generate agent token: ${exception.message}"
                         )
                         Log.e(TAG, "Failed to generate agent token: ${exception.message}", exception)
@@ -298,18 +296,17 @@ class ConversationViewModel : ViewModel() {
                 result.fold(
                     onSuccess = { id ->
                         _uiState.value = _uiState.value.copy(
-                            agentStarted = true,
-                            agentStartFailed = false,
                             agentId = id,
+                            isLoadingAgent = false,
                             statusMessage = "Agent started successfully"
                         )
                         Log.d(TAG, "Agent started successfully, agentId: $id")
                     },
                     onFailure = { exception ->
                         _uiState.value = _uiState.value.copy(
-                            agentStarted = false,
-                            agentStartFailed = true,
+                            connectionState = ConnectionState.Error,
                             agentId = "",
+                            isLoadingAgent = false,
                             statusMessage = "Failed to start agent: ${exception.message}"
                         )
                         Log.e(TAG, "Failed to start agent: ${exception.message}", exception)
@@ -317,9 +314,9 @@ class ConversationViewModel : ViewModel() {
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    agentStarted = false,
-                    agentStartFailed = true,
+                    connectionState = ConnectionState.Error,
                     agentId = "",
+                    isLoadingAgent = false,
                     statusMessage = "Failed to start agent: ${e.message}"
                 )
                 Log.e(TAG, "Error starting agent: ${e.message}", e)
@@ -329,41 +326,48 @@ class ConversationViewModel : ViewModel() {
 
     /**
      * Stop agent using AgentAIStudioStarter
+     * @return Result indicating success or failure
      */
-    private fun stopAgent() {
-        viewModelScope.launch {
-            try {
-                val currentAgentId = _uiState.value.agentId
-                if (currentAgentId.isEmpty()) {
-                    Log.d(TAG, "No agent to stop, agentId is empty")
-                    return@launch
-                }
-
-                _uiState.value = _uiState.value.copy(
-                    statusMessage = "Stopping agent..."
-                )
-
-                val result = AgentAIStudioStarter.stopAgentAsync(currentAgentId)
-
-                result.fold(
-                    onSuccess = {
-                        _uiState.value = _uiState.value.copy(
-                            agentStarted = false,
-                            agentId = "",
-                            statusMessage = "Agent stopped successfully"
-                        )
-                        Log.d(TAG, "Agent stopped successfully")
-                    },
-                    onFailure = { exception ->
-                        _uiState.value = _uiState.value.copy(
-                            statusMessage = "Failed to stop agent: ${exception.message}"
-                        )
-                        Log.e(TAG, "Failed to stop agent: ${exception.message}", exception)
-                    }
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "Error stopping agent: ${e.message}", e)
+    private suspend fun stopAgent(): Result<Unit> {
+        return try {
+            val currentAgentId = _uiState.value.agentId
+            if (currentAgentId.isEmpty()) {
+                Log.d(TAG, "No agent to stop, agentId is empty")
+                return Result.success(Unit)
             }
+
+            _uiState.value = _uiState.value.copy(
+                statusMessage = "Stopping agent...",
+                isLoadingAgent = true
+            )
+
+            val result = AgentAIStudioStarter.stopAgentAsync(currentAgentId)
+
+            result.fold(
+                onSuccess = {
+                    _uiState.value = _uiState.value.copy(
+                        agentId = "",
+                        isLoadingAgent = false,
+                        statusMessage = "Agent stopped successfully"
+                    )
+                    Log.d(TAG, "Agent stopped successfully")
+                    Result.success(Unit)
+                },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoadingAgent = false,
+                        statusMessage = "Failed to stop agent: ${exception.message}"
+                    )
+                    Log.e(TAG, "Failed to stop agent: ${exception.message}", exception)
+                    Result.failure(exception)
+                }
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoadingAgent = false
+            )
+            Log.e(TAG, "Error stopping agent: ${e.message}", e)
+            Result.failure(e)
         }
     }
 
@@ -505,35 +509,33 @@ class ConversationViewModel : ViewModel() {
     }
 
     /**
-     * Hang up and cleanup connections
+     * Hang up and cleanup connections (suspend version)
      */
-    fun hangup() {
-        viewModelScope.launch {
-            try {
-                // Stop agent first
-                stopAgent()
+    suspend fun hangupSuspend() {
+        try {
+            // Stop agent first and wait for it to complete
+            stopAgent()
 
-                conversationalAIAPI?.unsubscribeMessage(channelName) { errorInfo ->
-                    if (errorInfo != null) {
-                        Log.e(TAG, "Unsubscribe message error: ${errorInfo}")
-                    }
+            // Continue with cleanup after agent is stopped
+            conversationalAIAPI?.unsubscribeMessage(channelName) { errorInfo ->
+                if (errorInfo != null) {
+                    Log.e(TAG, "Unsubscribe message error: $errorInfo")
                 }
-                RtcManager.leaveChannel()
-                CovRtmManager.logout()
-                rtcJoined = false
-                rtmLoggedIn = false
-                _uiState.value = _uiState.value.copy(
-                    statusMessage = "Hanging up...",
-                    connectionState = ConnectionState.Disconnected,
-                    agentStarted = false,
-                    agentStartFailed = false,
-                    agentId = ""
-                )
-                clearTranscripts()
-                Log.d(TAG, "Hangup completed")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error during hangup: ${e.message}", e)
             }
+            RtcManager.leaveChannel()
+            CovRtmManager.logout()
+            rtcJoined = false
+            rtmLoggedIn = false
+            _uiState.value = _uiState.value.copy(
+                statusMessage = "",
+                connectionState = ConnectionState.Idle,
+                agentId = "",
+                isLoadingAgent = false
+            )
+            clearTranscripts()
+            Log.d(TAG, "Hangup completed")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error during hangup: ${e.message}", e)
         }
     }
 

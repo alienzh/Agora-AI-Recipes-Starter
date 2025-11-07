@@ -7,12 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import io.agora.convoai.example.voiceassistant.ui.common.SnackbarHelper
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.convoai.example.voiceassistant.KeyCenter
 import io.agora.convoai.example.voiceassistant.R
 import io.agora.convoai.example.voiceassistant.databinding.FragmentVoiceAssistantBinding
 import io.agora.convoai.example.voiceassistant.databinding.ItemTranscriptAgentBinding
@@ -24,6 +22,8 @@ import io.agora.scene.convoai.convoaiApi.TranscriptType
 import kotlinx.coroutines.launch
 import kotlin.text.ifEmpty
 import androidx.core.graphics.toColorInt
+import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
 import io.agora.scene.convoai.convoaiApi.AgentState
 
 class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
@@ -106,12 +106,21 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
 
     private fun handleHangup() {
         viewModel.hangup()
+        if (isAdded) {
+            findNavController().popBackStack()
+        }
     }
 
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 mBinding?.apply {
+                    // Show/hide transcript list based on transcript enabled state
+                    cardTranscript.isVisible = state.isTranscriptEnabled
+
+                    // Show agent status indicator when transcript is hidden
+                    agentSpeakingIndicator.isVisible = !state.isTranscriptEnabled
+
                     // Update status message - only show important connection/agent status
                     updateStatusMessage(state)
 
@@ -127,9 +136,7 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
                     }
 
                     // Update mute button icon
-                    btnMute.setImageResource(
-                        if (state.isMuted) R.drawable.ic_mic_off else R.drawable.ic_mic
-                    )
+                    btnMute.setImageResource(if (state.isMuted) R.drawable.ic_mic_off else R.drawable.ic_mic)
                     // Update mute button background based on state (use selector for pressed state)
                     val muteBackground = if (state.isMuted) {
                         R.drawable.bg_button_mute_muted_selector
@@ -142,43 +149,17 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
                     btnTranscript.setImageResource(
                         if (state.isTranscriptEnabled) R.drawable.ic_subtitles else R.drawable.ic_subtitles_off
                     )
+                }
 
-                    // Show/hide transcript list based on transcript enabled state
-                    cardTranscript.visibility = if (state.isTranscriptEnabled) {
-                        android.view.View.VISIBLE
-                    } else {
-                        android.view.View.GONE
+                // Show Snackbar based on connection state (only if fragment is visible)
+                if (isAdded && isResumed) {
+                    if (state.connectionState == ConversationViewModel.ConnectionState.Error) {
+                        // Show error Snackbar for Error state
+                        SnackbarHelper.showError(this@VoiceAssistantFragment, state.statusMessage)
+                    } else if (state.statusMessage.isNotEmpty()) {
+                        // Show normal Snackbar for other status messages
+                        SnackbarHelper.showNormal(this@VoiceAssistantFragment, state.statusMessage)
                     }
-                    
-                    // Show agent status indicator when transcript is hidden
-                    agentSpeakingIndicator.visibility = if (state.isTranscriptEnabled) {
-                        android.view.View.GONE
-                    } else {
-                        android.view.View.VISIBLE
-                    }
-                }
-
-                // Show Snackbar for mute/unmute and transcript actions
-                if (state.statusMessage.contains("muted", ignoreCase = true) ||
-                    state.statusMessage.contains("unmuted", ignoreCase = true) ||
-                    state.statusMessage.contains("transcript", ignoreCase = true) ||
-                    state.statusMessage.contains("Agent joined", ignoreCase = true) ||
-                    state.statusMessage.contains("Agent left", ignoreCase = true)
-                ) {
-                    SnackbarHelper.showNormal(this@VoiceAssistantFragment, state.statusMessage)
-                }
-
-                // Show Snackbar for errors
-                if (state.statusMessage.contains("error", ignoreCase = true) ||
-                    state.statusMessage.contains("failed", ignoreCase = true)
-                ) {
-                    SnackbarHelper.showError(this@VoiceAssistantFragment, state.statusMessage)
-                }
-
-                // Navigate back to first fragment when connection state is Disconnected
-                if (state.connectionState == ConversationViewModel.ConnectionState.Disconnected) {
-                    // Navigate back to AgentConfigFragment
-                    findNavController().popBackStack()
                 }
             }
         }
@@ -219,9 +200,7 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
         }
 
         // Clear history when disconnected or idle
-        if (state.connectionState == ConversationViewModel.ConnectionState.Idle ||
-            state.connectionState == ConversationViewModel.ConnectionState.Disconnected
-        ) {
+        if (state.connectionState == ConversationViewModel.ConnectionState.Idle) {
             statusHistory.clear()
             lastStatusMessage = ""
         }

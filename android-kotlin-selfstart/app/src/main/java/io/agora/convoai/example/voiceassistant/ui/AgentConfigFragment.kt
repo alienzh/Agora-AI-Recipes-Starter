@@ -3,6 +3,7 @@ package io.agora.convoai.example.voiceassistant.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import io.agora.convoai.example.voiceassistant.ui.common.SnackbarHelper
 import io.agora.convoai.example.voiceassistant.R
@@ -39,7 +40,7 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
             tvPipelineId.text = pipelineIdPrefix
 
             // Generate random channel name for joining (client-side start)
-            val randomChannelName = "android_kotlin_selfstart_${Random.nextInt(10000, 100000000)}"
+            val randomChannelName = "android_selfstart_${Random.nextInt(10000, 100000000)}"
             etChannel.setText(randomChannelName)
 
             btnStarter.setOnClickListener {
@@ -56,10 +57,12 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
                     if (granted) {
                         viewModel.joinChannelAndLogin(channelName)
                     } else {
-                        SnackbarHelper.showError(
-                            this@AgentConfigFragment,
-                            "Microphone permission is required to join channel"
-                        )
+                        if (isAdded && isResumed) {
+                            SnackbarHelper.showError(
+                                this@AgentConfigFragment,
+                                "Microphone permission is required to join channel"
+                            )
+                        }
                     }
                 }
             }
@@ -82,38 +85,21 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
                     updateStatusMessage(state)
 
                     // Update loading state
-                    btnStarter.isEnabled = state.connectionState != ConversationViewModel.ConnectionState.Connecting
-                    progressBar.visibility =
-                        if (state.connectionState == ConversationViewModel.ConnectionState.Connecting) View.VISIBLE else View.GONE
+                    val isLoading =
+                        state.connectionState == ConversationViewModel.ConnectionState.Connecting || state.isLoadingAgent
+                    btnStarter.isEnabled = !isLoading
+                    progressBar.isVisible = isLoading
 
-                    // Show error via Snackbar if status message contains error keywords
-                    if (state.connectionState != ConversationViewModel.ConnectionState.Connecting &&
+                    // Show error via Snackbar if connection state is Error
+                    if (state.connectionState == ConversationViewModel.ConnectionState.Error &&
                         state.statusMessage.isNotEmpty() &&
-                        (state.statusMessage.contains("error", ignoreCase = true) ||
-                                state.statusMessage.contains("failed", ignoreCase = true))
+                        isAdded && isResumed
                     ) {
                         SnackbarHelper.showError(this@AgentConfigFragment, state.statusMessage)
                     }
 
-                    // Check if agent start failed, show error and navigate back after 3s
-                    if (state.agentStartFailed && !hasNavigated) {
-                        SnackbarHelper.showError(
-                            this@AgentConfigFragment,
-                            "Agent启动失败: ${state.statusMessage}"
-                        )
-                        // Delay 3s and navigate back to first page
-                        launch {
-                            delay(3000)
-                            if (isAdded && !hasNavigated) {
-                                findNavController().popBackStack()
-                            }
-                        }
-                        return@apply
-                    }
-
                     // Navigate to voice assistant when agent is started successfully (only once)
-                    if (state.connectionState == ConversationViewModel.ConnectionState.Connected && !hasNavigated
-                    ) {
+                    if (state.connectionState == ConversationViewModel.ConnectionState.Connected && !hasNavigated) {
                         hasNavigated = true
                         findNavController().navigate(R.id.action_agentConfig_to_voiceAssistant)
                     }
@@ -137,9 +123,7 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
         }
 
         // Clear history when disconnected or idle
-        if (state.connectionState == ConversationViewModel.ConnectionState.Idle ||
-            state.connectionState == ConversationViewModel.ConnectionState.Disconnected
-        ) {
+        if (state.connectionState == ConversationViewModel.ConnectionState.Idle) {
             statusHistory.clear()
             lastStatusMessage = ""
         }

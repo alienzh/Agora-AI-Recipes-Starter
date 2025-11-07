@@ -50,7 +50,7 @@ class ConversationViewModel : ViewModel() {
         Idle,
         Connecting,
         Connected,
-        Disconnected
+        Error
     }
 
     // UI State - shared between AgentConfigFragment and VoiceAssistantFragment
@@ -118,9 +118,6 @@ class ConversationViewModel : ViewModel() {
                         statusMessage = "Agent left the channel"
                     )
                     Log.d(TAG, "Agent left the channel, uid: $uid, reason: $reason")
-                    // Hangup when agent leaves (will set Disconnected state)
-                    delay(1000)
-                    hangup()
                 } else {
                     Log.d(TAG, "User left the channel, uid: $uid, reason: $reason")
                 }
@@ -130,7 +127,7 @@ class ConversationViewModel : ViewModel() {
         override fun onError(err: Int) {
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Idle,
+                    connectionState = ConnectionState.Error,
                     statusMessage = "RTC error: $err"
                 )
                 Log.e(TAG, "RTC error: $err")
@@ -147,6 +144,7 @@ class ConversationViewModel : ViewModel() {
         override fun onFailed() {
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(
+                    connectionState = ConnectionState.Error,
                     statusMessage = "RTM connection failed, attempting re-login"
                 )
                 Log.d(TAG, "RTM connection failed, attempting re-login with new token")
@@ -291,7 +289,7 @@ class ConversationViewModel : ViewModel() {
                         },
                         onFailure = { exception ->
                             _uiState.value = _uiState.value.copy(
-                                connectionState = ConnectionState.Idle,
+                                connectionState = ConnectionState.Error,
                                 statusMessage = "Failed to get token: ${exception.message}"
                             )
                             Log.e(TAG, "Failed to get token: ${exception.message}", exception)
@@ -319,7 +317,7 @@ class ConversationViewModel : ViewModel() {
                             checkConnectionComplete()
                         } else {
                             _uiState.value = _uiState.value.copy(
-                                connectionState = ConnectionState.Idle,
+                                connectionState = ConnectionState.Error,
                                 statusMessage = "RTM login failed: ${exception.message}"
                             )
                             Log.e(TAG, "RTM login failed: ${exception.message}", exception)
@@ -328,7 +326,7 @@ class ConversationViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Idle,
+                    connectionState = ConnectionState.Error,
                     statusMessage = "Error: ${e.message}"
                 )
                 Log.e(TAG, "Error joining channel/login: ${e.message}", e)
@@ -405,8 +403,8 @@ class ConversationViewModel : ViewModel() {
                 rtcJoined = false
                 rtmLoggedIn = false
                 _uiState.value = _uiState.value.copy(
-                    statusMessage = "Hanging up...",
-                    connectionState = ConnectionState.Disconnected
+                    statusMessage = "",
+                    connectionState = ConnectionState.Idle
                 )
                 clearTranscripts()
                 Log.d(TAG, "Hangup completed")

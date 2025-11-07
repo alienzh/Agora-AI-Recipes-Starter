@@ -78,11 +78,10 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
                     progressBar.visibility =
                         if (state.connectionState == ConversationViewModel.ConnectionState.Connecting) View.VISIBLE else View.GONE
 
-                    // Show error via Snackbar if status message contains error keywords
-                    if (state.connectionState != ConversationViewModel.ConnectionState.Connecting &&
+                    // Show error via Snackbar if connection state is Error
+                    if (state.connectionState == ConversationViewModel.ConnectionState.Error &&
                         state.statusMessage.isNotEmpty() &&
-                        (state.statusMessage.contains("error", ignoreCase = true) ||
-                                state.statusMessage.contains("failed", ignoreCase = true))
+                        isAdded && isResumed
                     ) {
                         SnackbarHelper.showError(this@AgentConfigFragment, state.statusMessage)
                     }
@@ -112,9 +111,7 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
         }
 
         // Clear history when disconnected or idle
-        if (state.connectionState == ConversationViewModel.ConnectionState.Idle ||
-            state.connectionState == ConversationViewModel.ConnectionState.Disconnected
-        ) {
+        if (state.connectionState == ConversationViewModel.ConnectionState.Idle) {
             statusHistory.clear()
             lastStatusMessage = ""
         }

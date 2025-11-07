@@ -50,7 +50,7 @@ class ConversationViewModel : ViewModel() {
         Idle,
         Connecting,
         Connected,
-        Disconnected
+        Error
     }
 
     // UI State - shared between AgentConfigScreen and VoiceAssistantScreen
@@ -118,7 +118,7 @@ class ConversationViewModel : ViewModel() {
                         statusMessage = "Agent left the channel"
                     )
                     Log.d(TAG, "Agent left the channel, uid: $uid, reason: $reason")
-                    // Hangup when agent leaves (will set Disconnected state)
+                    // Hangup when agent leaves
                     delay(1000)
                     hangup()
                 } else {
@@ -130,7 +130,7 @@ class ConversationViewModel : ViewModel() {
         override fun onError(err: Int) {
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Idle,
+                    connectionState = ConnectionState.Error,
                     statusMessage = "RTC error: $err"
                 )
                 Log.e(TAG, "RTC error: $err")
@@ -173,11 +173,23 @@ class ConversationViewModel : ViewModel() {
         }
 
         override fun onAgentError(agentUserId: String, error: ModuleError) {
-            // Handle agent error
+            viewModelScope.launch {
+                _uiState.value = _uiState.value.copy(
+                    connectionState = ConnectionState.Error,
+                    statusMessage = "Agent error: ${error.message}"
+                )
+                Log.e(TAG, "Agent error: ${error.message}")
+            }
         }
 
         override fun onMessageError(agentUserId: String, error: MessageError) {
-            // Handle message error
+            viewModelScope.launch {
+                _uiState.value = _uiState.value.copy(
+                    connectionState = ConnectionState.Error,
+                    statusMessage = "Message error: ${error.message}"
+                )
+                Log.e(TAG, "Message error: ${error.message}")
+            }
         }
 
         override fun onTranscriptUpdated(agentUserId: String, transcript: Transcript) {
@@ -215,6 +227,7 @@ class ConversationViewModel : ViewModel() {
         } catch (e: Exception) {
             Log.e(TAG, "Error creating RTC/RTM instances: ${e.message}", e)
             _uiState.value = _uiState.value.copy(
+                connectionState = ConnectionState.Error,
                 statusMessage = "Error creating RTC/RTM: ${e.message}"
             )
         }
@@ -328,7 +341,7 @@ class ConversationViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Idle,
+                    connectionState = ConnectionState.Error,
                     statusMessage = "Error: ${e.message}"
                 )
                 Log.e(TAG, "Error joining channel/login: ${e.message}", e)
@@ -406,7 +419,7 @@ class ConversationViewModel : ViewModel() {
                 rtmLoggedIn = false
                 _uiState.value = _uiState.value.copy(
                     statusMessage = "Hanging up...",
-                    connectionState = ConnectionState.Disconnected
+                    connectionState = ConnectionState.Idle
                 )
                 clearTranscripts()
                 Log.d(TAG, "Hangup completed")
