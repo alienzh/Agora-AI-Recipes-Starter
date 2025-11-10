@@ -34,16 +34,16 @@ class AgoraStarterServer:
     API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"  # Agent 管理 API 基础 URL
     TOOLBOX_SERVER_HOST = "https://service.apprtc.cn/toolbox"  # Token 生成服务的基础 URL
     JSON_MEDIA_TYPE = "application/json; charset=utf-8"  # JSON 请求的 Content-Type
-    DEFAULT_CHANNEL_NAME = "default_android_channel"  # 默认频道名称
     DEFAULT_AGENT_RTC_UID = "1009527"  # 默认 Agent RTC UID
     DEFAULT_EXPIRE_SECONDS = 60 * 60 * 24  # 默认 Token 过期时间：24 小时（秒）
     DEFAULT_TIMEOUT = 30  # 默认 HTTP 请求超时时间（秒）
     
-    # 默认配置（从环境变量或 .env 文件读取，如果没有则使用空字符串）
+    # 默认配置（从环境变量或 .env 文件读取，如果没有则使用空字符串或默认值）
     # 优先级：命令行参数 > 环境变量/.env > 代码中的默认值
     DEFAULT_APP_ID = os.getenv("AGORA_APP_ID", "")  # 默认 App ID
     DEFAULT_APP_CERT = os.getenv("AGORA_APP_CERT", "")  # 默认 App Certificate
     DEFAULT_PIPELINE_ID = os.getenv("AGORA_PIPELINE_ID", "")  # 默认 Pipeline ID
+    DEFAULT_CHANNEL_NAME = os.getenv("AGORA_CHANNEL_NAME", "default_android_channel")  # 默认频道名称
     
     # Basic Auth 配置（从两个独立的环境变量读取）
     _BASIC_KEY = os.getenv("AGORA_BASIC_KEY", "")  # Basic Auth Key

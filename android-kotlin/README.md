@@ -72,6 +72,7 @@ cd Agora-AI-Recipes-Starter/android-kotlin
    2. 编辑 `env.properties` 文件，填入你的实际配置值：
    - `agora.appId`：你的 Agora App ID
    - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
+   - `agora.channelName`：频道名称（可选，默认值："default_android_channel"）
    
    **注意**：`env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
 

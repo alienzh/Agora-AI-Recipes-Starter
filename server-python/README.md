@@ -47,6 +47,9 @@ AGORA_BASIC_SECRET=your_secret_here
 
 # Pipeline ID (用于启动 Agent)
 AGORA_PIPELINE_ID=your_pipeline_id_here
+
+# Channel Name (可选，默认值："default_android_channel")
+AGORA_CHANNEL_NAME=default_android_channel
 ```
 
 ## 使用方法
@@ -111,7 +114,7 @@ python agora_starter_server.py stop --help
 - `--basic-key`: Basic Auth Key [可选，默认值：从 `.env.local` 文件读取 (`AGORA_BASIC_KEY`)]
 - `--basic-secret`: Basic Auth Secret [可选，默认值：从 `.env.local` 文件读取 (`AGORA_BASIC_SECRET`)]
 - `--pipeline`: Pipeline ID [可选，默认值：从环境变量或 `.env.local` 文件读取]
-- `--channelName`: 频道名称 [可选，默认值："default_android_channel"]
+- `--channelName`: 频道名称 [可选，默认值：从环境变量或 `.env.local` 文件读取 (`AGORA_CHANNEL_NAME`)，如果未设置则使用 "default_android_channel"]
 
 ### Stop 命令参数
 

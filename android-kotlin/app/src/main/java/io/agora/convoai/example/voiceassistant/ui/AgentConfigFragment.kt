@@ -33,6 +33,7 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
             tvAppId.text = appIdPrefix
 
             etChannel.setText(ConversationViewModel.defaultChannel)
+            etChannel.isEnabled = false
 
             btnStarter.setOnClickListener {
                 val channelName = etChannel.text?.toString()?.trim() ?: ConversationViewModel.defaultChannel

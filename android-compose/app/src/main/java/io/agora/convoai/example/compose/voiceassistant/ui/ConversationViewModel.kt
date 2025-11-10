@@ -3,6 +3,7 @@ package io.agora.convoai.example.compose.voiceassistant.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.agora.convoai.example.compose.voiceassistant.KeyCenter
 import io.agora.convoai.example.compose.voiceassistant.rtc.CovRtmManager
 import io.agora.convoai.example.compose.voiceassistant.rtc.IRtmManagerListener
 import io.agora.convoai.example.compose.voiceassistant.rtc.RtcManager
@@ -40,7 +41,7 @@ class ConversationViewModel : ViewModel() {
         private const val TAG = "ConversationViewModel"
         const val userId = 1001086
         const val agentUid = 1009527
-        const val defaultChannel = "default_android_channel"
+        val defaultChannel: String = KeyCenter.AGORA_CHANNEL_NAME
     }
 
     /**

@@ -80,6 +80,7 @@ fun AgentConfigScreen(
             // Channel name input
             OutlinedTextField(
                 value = channelName,
+                enabled = false,
                 onValueChange = { channelName = it },
                 label = { Text("Channel Name") },
                 modifier = Modifier.fillMaxWidth(),

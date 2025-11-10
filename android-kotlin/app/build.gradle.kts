@@ -34,6 +34,7 @@ android {
         // Load Agora configuration from env.properties
         buildConfigField("String", "AGORA_APP_ID", "\"${envProperties.getProperty("agora.appId", "")}\"")
         buildConfigField("String", "AGORA_APP_CERTIFICATE", "\"${envProperties.getProperty("agora.appCertificate", "")}\"")
+        buildConfigField("String", "AGORA_CHANNEL_NAME", "\"${envProperties.getProperty("agora.channelName", "default_android_channel")}\"")
     }
 
     buildTypes {
