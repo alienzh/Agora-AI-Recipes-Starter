@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,10 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.agora.convoai.example.compose.voiceassistant.ui.ConversationViewModel.ConnectionState
-import io.agora.scene.convoai.convoaiApi.AgentState
-import io.agora.scene.convoai.convoaiApi.Transcript
-import io.agora.scene.convoai.convoaiApi.TranscriptStatus
-import io.agora.scene.convoai.convoaiApi.TranscriptType
+import io.agora.convoai.convoaiApi.AgentState
+import io.agora.convoai.convoaiApi.Transcript
+import io.agora.convoai.convoaiApi.TranscriptStatus
+import io.agora.convoai.convoaiApi.TranscriptType
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

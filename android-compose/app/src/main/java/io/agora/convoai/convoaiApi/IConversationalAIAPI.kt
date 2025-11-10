@@ -1,9 +1,9 @@
-package io.agora.scene.convoai.convoaiApi
+package io.agora.convoai.convoaiApi
 
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 import io.agora.rtm.RtmClient
-import io.agora.scene.convoai.convoaiApi.AgentState.UNKNOWN
+import io.agora.convoai.convoaiApi.AgentState.UNKNOWN
 
 const val ConversationalAIAPI_VERSION = "2.0.0"
 

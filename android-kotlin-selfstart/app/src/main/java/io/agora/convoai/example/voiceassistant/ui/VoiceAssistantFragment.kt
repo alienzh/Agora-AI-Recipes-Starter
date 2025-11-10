@@ -1,9 +1,6 @@
 package io.agora.convoai.example.voiceassistant.ui
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -20,15 +17,14 @@ import io.agora.convoai.example.voiceassistant.databinding.FragmentVoiceAssistan
 import io.agora.convoai.example.voiceassistant.databinding.ItemTranscriptAgentBinding
 import io.agora.convoai.example.voiceassistant.databinding.ItemTranscriptUserBinding
 import io.agora.convoai.example.voiceassistant.ui.common.BaseFragment
-import io.agora.scene.convoai.convoaiApi.Transcript
-import io.agora.scene.convoai.convoaiApi.TranscriptStatus
-import io.agora.scene.convoai.convoaiApi.TranscriptType
+import io.agora.convoai.convoaiApi.Transcript
+import io.agora.convoai.convoaiApi.TranscriptStatus
+import io.agora.convoai.convoaiApi.TranscriptType
 import kotlinx.coroutines.launch
 import kotlin.text.ifEmpty
 import androidx.core.graphics.toColorInt
 import androidx.core.view.isVisible
-import io.agora.convoai.example.voiceassistant.ui.common.dp
-import io.agora.scene.convoai.convoaiApi.AgentState
+import io.agora.convoai.convoaiApi.AgentState
 
 class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
 

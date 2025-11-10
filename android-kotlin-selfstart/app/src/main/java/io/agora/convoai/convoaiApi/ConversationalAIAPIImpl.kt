@@ -1,4 +1,4 @@
-package io.agora.scene.convoai.convoaiApi
+package io.agora.convoai.convoaiApi
 
 import android.util.Log
 import io.agora.rtc2.Constants
@@ -14,10 +14,10 @@ import io.agora.rtm.PresenceEvent
 import io.agora.rtm.RtmConstants
 import io.agora.rtm.RtmEventListener
 import io.agora.rtm.SubscribeOptions
-import io.agora.scene.convoai.convoaiApi.subRender.IConversationTranscriptCallback
-import io.agora.scene.convoai.convoaiApi.subRender.MessageParser
-import io.agora.scene.convoai.convoaiApi.subRender.TranscriptController
-import io.agora.scene.convoai.convoaiApi.subRender.TranscriptConfig
+import io.agora.convoai.convoaiApi.subRender.IConversationTranscriptCallback
+import io.agora.convoai.convoaiApi.subRender.MessageParser
+import io.agora.convoai.convoaiApi.subRender.TranscriptController
+import io.agora.convoai.convoaiApi.subRender.TranscriptConfig
 import java.util.UUID
 
 /**

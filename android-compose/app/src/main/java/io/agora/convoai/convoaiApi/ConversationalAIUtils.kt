@@ -1,4 +1,4 @@
-package io.agora.scene.convoai.convoaiApi
+package io.agora.convoai.convoaiApi
 
 import android.os.Handler
 import android.os.Looper
