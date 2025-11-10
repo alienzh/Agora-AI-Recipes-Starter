@@ -1,4 +1,4 @@
-package io.agora.scene.convoai.convoaiApi.subRender
+package io.agora.convoai.convoaiApi.subRender
 
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IAudioFrameObserver
@@ -17,6 +17,7 @@ import io.agora.scene.convoai.convoaiApi.Transcript
 import io.agora.scene.convoai.convoaiApi.TranscriptRenderMode
 import io.agora.scene.convoai.convoaiApi.TranscriptStatus
 import io.agora.scene.convoai.convoaiApi.TranscriptType
+import io.agora.scene.convoai.convoaiApi.subRender.MessageParser
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ticker
 import java.nio.ByteBuffer

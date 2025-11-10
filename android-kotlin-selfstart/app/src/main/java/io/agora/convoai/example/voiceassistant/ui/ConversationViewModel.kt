@@ -59,7 +59,7 @@ class ConversationViewModel : ViewModel() {
     data class ConversationUiState constructor(
         val statusMessage: String = "",
         val isMuted: Boolean = false,
-        val isTranscriptEnabled: Boolean = true,
+        val isTranscriptEnabled: Boolean = false,
         // Channel and user info
         val channelName: String = "",
         val userUid: Int = 0,

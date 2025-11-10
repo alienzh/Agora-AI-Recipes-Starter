@@ -3,6 +3,7 @@ package io.agora.convoai.example.compose.voiceassistant.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,9 @@ fun VoiceAssistantScreen(
 
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    
+    // Track whether to automatically scroll to bottom
+    var autoScrollToBottom by remember { mutableStateOf(true) }
 
     // Update status history
     LaunchedEffect(uiState.statusMessage, uiState.connectionState) {
@@ -67,11 +71,33 @@ fun VoiceAssistantScreen(
         }
     }
 
+    // Track scroll state and update autoScrollToBottom
+    LaunchedEffect(listState.isScrollInProgress) {
+        if (!listState.isScrollInProgress) {
+            // Check if at bottom when scrolling stops
+            val canScrollForward = listState.canScrollForward
+            if (!canScrollForward) {
+                autoScrollToBottom = true
+            }
+        }
+    }
+    
+    // Track user scroll gestures to disable auto-scroll
+    LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
+        if (listState.isScrollInProgress) {
+            // Check if user is scrolling up (can scroll forward means not at bottom)
+            val canScrollForward = listState.canScrollForward
+            if (canScrollForward) {
+                autoScrollToBottom = false
+            }
+        }
+    }
+    
     // Scroll to bottom when new transcript is added
-    LaunchedEffect(transcriptList.size) {
-        if (transcriptList.isNotEmpty()) {
+    LaunchedEffect(transcriptList) {
+        if (transcriptList.isNotEmpty() && autoScrollToBottom) {
             scope.launch {
-                listState.animateScrollToItem(transcriptList.size - 1)
+                scrollToBottom(listState, transcriptList.size)
             }
         }
     }
@@ -335,6 +361,43 @@ fun TranscriptItem(transcript: Transcript) {
                 text = transcript.text.ifEmpty { "(empty)" },
                 style = MaterialTheme.typography.bodyMedium
             )
+        }
+    }
+}
+
+/**
+ * Scroll to bottom of the list
+ * Reference: Kotlin version scrollToBottom() method
+ */
+private suspend fun scrollToBottom(listState: LazyListState, itemCount: Int) {
+    val lastPosition = itemCount - 1
+    if (lastPosition < 0) return
+
+    // First jump to target position
+    listState.scrollToItem(lastPosition)
+
+    // Handle extra-long messages within the same coroutine
+    // In Compose, we check if the last item extends beyond the viewport
+    val layoutInfo = listState.layoutInfo
+    val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+    
+    if (lastVisibleItem != null && lastVisibleItem.index == lastPosition) {
+        // Check if the last item extends beyond viewport (extra-long message)
+        val viewportHeight = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
+        val itemEndOffset = lastVisibleItem.offset + lastVisibleItem.size
+        val viewportEndOffset = layoutInfo.viewportEndOffset
+        
+        // If item extends beyond viewport, ensure scrolling to bottom
+        if (itemEndOffset > viewportEndOffset) {
+            // For extra-long messages, calculate offset to align bottom of item with bottom of viewport
+            // Similar to Kotlin version: offset = height - lastView.height
+            // In Compose, scrollOffset is the offset from item top to viewport top
+            // To align item bottom with viewport bottom: offset = viewportHeight - itemSize
+            val offset = viewportHeight - lastVisibleItem.size
+            if (offset < 0) {
+                // Only apply offset if item is taller than viewport
+                listState.scrollToItem(lastPosition, scrollOffset = offset)
+            }
         }
     }
 }

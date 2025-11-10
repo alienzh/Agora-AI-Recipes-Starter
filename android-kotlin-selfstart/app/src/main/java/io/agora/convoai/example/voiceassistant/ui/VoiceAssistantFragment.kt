@@ -2,6 +2,8 @@ package io.agora.convoai.example.voiceassistant.ui
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -25,12 +27,18 @@ import kotlinx.coroutines.launch
 import kotlin.text.ifEmpty
 import androidx.core.graphics.toColorInt
 import androidx.core.view.isVisible
+import io.agora.convoai.example.voiceassistant.ui.common.dp
 import io.agora.scene.convoai.convoaiApi.AgentState
 
 class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
 
     private val viewModel: ConversationViewModel by activityViewModels()
     private val transcriptAdapter: TranscriptAdapter = TranscriptAdapter()
+
+    // Track whether to automatically scroll to bottom
+    private var autoScrollToBottom = true
+
+    private var isScrollBottom = false
     private val statusHistory = mutableListOf<String>()
     private var lastStatusMessage = ""
 
@@ -66,10 +74,7 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
             setupScrollableStatus()
 
             // Setup RecyclerView for transcript list
-            rvTranscript.layoutManager = LinearLayoutManager(requireContext()).apply {
-                reverseLayout = false
-            }
-            rvTranscript.adapter = transcriptAdapter
+            setupRecyclerView()
 
             btnMute.setOnClickListener {
                 viewModel.toggleMute()
@@ -107,6 +112,49 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
         }
     }
 
+    /**
+     *  Setup RecyclerView for transcript list
+     */
+    private fun setupRecyclerView() {
+        mBinding?.rvTranscript?.apply {
+            layoutManager = LinearLayoutManager(requireContext()).apply {
+                reverseLayout = false
+            }
+            adapter = transcriptAdapter
+            itemAnimator = null
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    when (newState) {
+                        RecyclerView.SCROLL_STATE_IDLE -> {
+                            // Check if at bottom when scrolling stops
+                            isScrollBottom = !recyclerView.canScrollVertically(1)
+                            if (isScrollBottom) {
+                                autoScrollToBottom = true
+                                isScrollBottom = true
+                            }
+                        }
+
+                        RecyclerView.SCROLL_STATE_DRAGGING -> {
+                            // When user actively drags
+                            autoScrollToBottom = false
+                        }
+                    }
+                }
+
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    // Show button when scrolling up a significant distance
+                    if (dy < -50) {
+                        if (recyclerView.canScrollVertically(1)) {
+                            autoScrollToBottom = false
+                        }
+                    }
+                }
+            })
+        }
+    }
+
     override fun onHandleOnBackPressed() {
         // Handle back press (including swipe back gesture) same as hangup button
         lifecycleScope.launch {
@@ -133,7 +181,7 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
                     cardTranscript.isVisible = state.isTranscriptEnabled
 
                     // Show agent status indicator when transcript is hidden
-                    agentSpeakingIndicator.isVisible = state.isTranscriptEnabled
+                    agentSpeakingIndicator.isVisible = !state.isTranscriptEnabled
 
                     // Update status message - only show important connection/agent status
                     updateStatusMessage(state)
@@ -265,15 +313,43 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
     private fun observeTranscriptList() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.transcriptList.collect { transcriptList ->
-                mBinding?.apply {
-                    // Update transcript list
-                    transcriptAdapter.submitList(transcriptList) {
-                        // Scroll to bottom when new transcript is added
-                        if (transcriptList.isNotEmpty()) {
-                            rvTranscript.smoothScrollToPosition(transcriptList.size - 1)
-                        }
+                // Update transcript list
+                transcriptAdapter.submitList(transcriptList)
+                if (autoScrollToBottom) {
+                    scrollToBottom()
+                }
+            }
+        }
+    }
+
+    private fun scrollToBottom() {
+        mBinding?.rvTranscript?.apply {
+            val lastPosition = transcriptAdapter.itemCount - 1
+            if (lastPosition < 0) return
+
+            // Stop any ongoing scrolling
+            stopScroll()
+
+            // Get layout manager
+            val layoutManager = layoutManager as? LinearLayoutManager ?: return
+
+            // Use single post call to handle all scrolling logic
+            post {
+                // First jump to target position
+                layoutManager.scrollToPosition(lastPosition)
+
+                // Handle extra-long messages within the same post
+                val lastView = layoutManager.findViewByPosition(lastPosition)
+                if (lastView != null) {
+                    // For extra-long messages, ensure scrolling to bottom
+                    if (lastView.height > height) {
+                        val offset = height - lastView.height
+                        layoutManager.scrollToPositionWithOffset(lastPosition, offset)
                     }
                 }
+
+                // Update UI state
+                isScrollBottom = true
             }
         }
     }
