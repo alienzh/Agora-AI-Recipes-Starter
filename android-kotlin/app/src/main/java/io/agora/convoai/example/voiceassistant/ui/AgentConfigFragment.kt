@@ -32,11 +32,13 @@ class AgentConfigFragment : BaseFragment<FragmentAgentConfigBinding>() {
             val appIdPrefix = KeyCenter.AGORA_APP_ID.take(5) + "***"
             tvAppId.text = appIdPrefix
 
-            etChannel.setText(ConversationViewModel.defaultChannel)
-            etChannel.isEnabled = false
+            // Display Pipeline ID first 5 characters
+            val pipelineIdPrefix = KeyCenter.PIPELINE_ID.take(5) + "***"
+            tvPipelineId.text = pipelineIdPrefix
 
             btnStarter.setOnClickListener {
-                val channelName = etChannel.text?.toString()?.trim() ?: ConversationViewModel.defaultChannel
+                // Generate random channel name each time joining channel
+                val channelName = ConversationViewModel.generateRandomChannelName()
 
                 // Clear status history when starting new connection
                 statusHistory.clear()

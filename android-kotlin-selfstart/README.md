@@ -70,9 +70,7 @@ cd Agora-AI-Recipes-Starter/android-kotlin-selfstart
    - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
    - `agora.restKey`：你的 REST Key（用于客户端启动 Agent）
    - `agora.restSecret`：你的 REST Secret（用于客户端启动 Agent）
-   - `agora.pipelineId`：你的 Conversational AI Pipeline ID
-   
-   **注意**：`env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+   - `agora.pipelineId`：你的 Pipeline ID
 
 2. **权限配置**：
    
@@ -286,12 +284,10 @@ lifecycleScope.launch {
 ```kotlin
 viewLifecycleOwner.lifecycleScope.launch {
     viewModel.transcriptList.collect { transcriptList ->
-        transcriptAdapter.submitList(transcriptList) {
-            // Scroll to bottom when new transcript is added
-            if (transcriptList.isNotEmpty()) {
-                rvTranscript.smoothScrollToPosition(transcriptList.size - 1)
+        transcriptAdapter.submitList(transcriptList) 
+        if (autoScrollToBottom) {
+            scrollToBottom()
             }
-        }
     }
 }
 ```
@@ -313,55 +309,6 @@ viewLifecycleOwner.lifecycleScope.launch {
    - ✅ 验证 Agent 说话状态指示器是否正常显示动画
    - ✅ 测试与 AI Agent 的对话交互
    - ✅ 验证挂断时 Agent 是否正确停止
-
-3. **错误处理**：
-   - 如果 Agent 启动失败，应用会显示错误提示并在 3 秒后自动返回配置页面
-   - 检查日志以查看详细的错误信息
-
-## 核心特性
-
-### 客户端启动 Agent
-
-本示例实现了**客户端启动 Agent**的功能，无需额外的服务器端支持：
-
-- **自动生成随机频道名称**：应用会自动为用户和 Agent 生成随机的频道名称
-- **客户端启动 Agent**：使用 `AgentAIStudioStarter.startAgentAsync()` 在客户端直接启动 Agent
-- **自动停止 Agent**：在挂断时自动调用 `AgentAIStudioStarter.stopAgentAsync()` 停止 Agent
-- **状态管理**：通过 UI State 统一管理 Agent 启动状态和 Agent ID
-- **错误处理**：如果 Agent 启动失败，会显示错误提示并自动返回配置页面
-
-### 高级配置
-
-本示例展示了基础的 Conversational AI 集成方式。更多高级功能请参考 [ConversationalAI API 组件文档](./app/src/main/java/io/agora/convoai/convoaiApi/README.md)，包括：
-
-- **自定义音频参数**：配置不同的音频场景（标准模式、数字人模式等）
-- **自定义转录渲染模式**：支持文本模式和逐词模式
-- **发送消息给 AI Agent**：发送文本消息、图片消息，支持优先级控制
-- **打断 Agent**：实现打断 AI Agent 的功能
-- **消息状态跟踪**：处理消息发送成功/失败的回调
-- **事件处理**：处理 Agent 状态变化、错误、指标等事件
-
-### 性能优化
-
-- 使用 `AUDIO_SCENARIO_AI_CLIENT` 场景以获得最佳 AI 对话质量
-- 根据网络状况调整音频编码参数
-- 及时清理不再使用的 Transcript 数据
-- 使用 `DiffUtil` 优化 RecyclerView 更新性能
-- 实现 Token 自动刷新机制
-- 处理网络断开重连逻辑
-
-### 最佳实践
-
-- **客户端启动 Agent**：使用 `AgentAIStudioStarter` 在客户端启动和停止 Agent，无需服务器端支持
-- **随机频道名称**：为每次会话生成随机的频道名称，避免频道冲突
-- **Agent Token 管理**：为 Agent 生成独立的 Token（使用 agentUid），不要使用用户的 Token
-- **状态管理**：使用 StateFlow 统一管理 UI 状态，包括 Agent 启动状态和 Agent ID
-- **错误处理**：实现完善的错误处理机制，包括 Agent 启动失败、网络错误、Token 过期等
-- **生命周期管理**：在挂断时确保先停止 Agent，再清理 RTC 和 RTM 连接
-- **权限管理**：在加入频道前检查并请求麦克风权限
-- **资源清理**：在 Activity/Fragment 销毁时清理资源，包括停止 Agent
-- **调试支持**：启用 API 日志以便调试：`enableLog = true`
-
 
 ## 相关资源
 

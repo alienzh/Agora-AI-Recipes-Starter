@@ -56,9 +56,53 @@ cd Agora-AI-Recipes-Starter/android-kotlin
    - 使用 Android Studio 打开项目
    - 等待 Gradle 同步完成
 
-3. **配置 Agent 启动服务器**：
+3. **配置 Agent 启动方式**：
    
-   参考 [server-python](../server-python/README.md) 的说明配置和启动 Agent 服务器。
+   有两种方式启动 Agent，在 `AgentStarter.kt` 中直接切换：
+   
+   **方式一：本地 HTTP 服务器模式**（推荐用于开发测试）
+   
+   1. 启动 Python HTTP 服务器：
+   ```bash
+   cd ../server-python
+   python agora_http_server.py
+   ```
+   
+   服务器默认运行在 `http://localhost:8080`。
+   
+   2. 在 `AgentStarter.kt` 中配置本地服务器 URL：
+   ```kotlin
+   object AgentStarter {
+       // Switch between local server and Agora API by commenting/uncommenting the lines below
+   //    private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+       private const val AGORA_API_BASE_URL = "http://10.0.2.2:8080"  // Android Emulator
+   //    private const val AGORA_API_BASE_URL = "http://192.168.1.100:8080"  // Physical device (replace with your computer IP)
+   }
+   ```
+   
+   **IP 地址说明**：
+   - **Android 模拟器**：使用 `http://10.0.2.2:8080`（`10.0.2.2` 是模拟器访问主机 localhost 的特殊 IP）
+   - **真机**：使用 `http://<你的电脑IP>:8080`（查找电脑 IP：`ifconfig en0 | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'`）
+   
+   **方式二：直接调用 Agora API 模式**（推荐用于生产环境）
+   
+   不需要启动 Python 服务器，Android 应用直接调用 Agora API。
+   
+   在 `AgentStarter.kt` 中配置：
+   ```kotlin
+   object AgentStarter {
+       // Switch between local server and Agora API by commenting/uncommenting the lines below
+       private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+   //    private const val AGORA_API_BASE_URL = "http://10.0.2.2:8080"  // Local server
+   }
+   ```
+   
+   在 `env.properties` 中配置 REST API 凭证：
+   ```properties
+   agora.restKey=your_rest_key
+   agora.restSecret=your_rest_secret
+   agora.pipelineId=your_pipeline_id
+   ```
 
 ### 配置说明
 
@@ -72,9 +116,11 @@ cd Agora-AI-Recipes-Starter/android-kotlin
    2. 编辑 `env.properties` 文件，填入你的实际配置值：
    - `agora.appId`：你的 Agora App ID
    - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
-   - `agora.channelName`：频道名称（可选，默认值："default_android_channel"）
+   - `agora.restKey`：REST API Key（直接 API 模式必需，HTTP 服务器模式也需要）
+   - `agora.restSecret`：REST API Secret（直接 API 模式必需，HTTP 服务器模式也需要）
+   - `agora.pipelineId`：Pipeline ID（直接 API 模式必需，HTTP 服务器模式也需要）
    
-   **注意**：`env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+   **注意**：URL 切换在 `AgentStarter.kt` 中完成，不再使用 `env.properties` 中的 `agentServerUrl` 配置。
 
 2. **权限配置**：
    
@@ -205,37 +251,40 @@ lifecycleScope.launch {
 ```kotlin
 viewLifecycleOwner.lifecycleScope.launch {
     viewModel.transcriptList.collect { transcriptList ->
-        transcriptAdapter.submitList(transcriptList) {
-            // Scroll to bottom when new transcript is added
-            if (transcriptList.isNotEmpty()) {
-                rvTranscript.smoothScrollToPosition(transcriptList.size - 1)
+        transcriptAdapter.submitList(transcriptList) 
+        if (autoScrollToBottom) {
+            scrollToBottom()
             }
-        }
     }
 }
 ```
 
 ### 步骤3：测试验证
 
-1. **启动 AI Agent**：
+1. **启动 Python HTTP 服务器**（如果使用 HTTP 服务器模式）：
    
-   参考 [server-python](../server-python/README.md) 的说明启动 Agent 服务器：
-```bash
-cd ../server-python
-python agora_starter_server.py start --channelName "test_channel"
-```
-
-   **注意**：如果使用虚拟环境，请先激活虚拟环境：
-```bash
-source venv/bin/activate  # macOS/Linux
-# 或
-venv\Scripts\activate  # Windows
-```
+   ```bash
+   cd ../server-python
+   python agora_http_server.py
+   ```
+   
+   服务器启动后，Android 应用会自动通过 `AgentStarter.kt` 中配置的地址调用服务器来启动 Agent。
+   
+   **注意**：
+   - 如果使用虚拟环境，请先激活虚拟环境：
+     ```bash
+     source venv/bin/activate  # macOS/Linux
+     # 或
+     venv\Scripts\activate  # Windows
+     ```
+   - 确保 Android 设备和电脑在同一局域网内（真机）或使用模拟器的特殊 IP（`10.0.2.2`）
+   - 如果端口被占用，可以修改服务器端口和 Android 代码中的端口号
 
 2. **运行 Android 应用**：
    - 在 Android Studio 中运行应用
-   - 输入频道名称（与 Agent 启动时的频道名称一致）
+   - 输入频道名称
    - 点击"Start"按钮
+   - 应用会自动启动 Agent 并加入频道
 
 3. **验证功能**：
    - ✅ 检查是否成功加入 RTC 频道
@@ -245,39 +294,6 @@ venv\Scripts\activate  # Windows
    - ✅ 验证转录功能是否正常显示
    - ✅ 验证 Agent 说话状态指示器是否正常显示动画
    - ✅ 测试与 AI Agent 的对话交互
-
-## 扩展功能
-
-### 高级配置
-
-本示例展示了基础的 Conversational AI 集成方式。更多高级功能请参考 [ConversationalAI API 组件文档](./app/src/main/java/io/agora/convoai/convoaiApi/README.md)，包括：
-
-- **自定义音频参数**：配置不同的音频场景（标准模式、数字人模式等）
-- **自定义转录渲染模式**：支持文本模式和逐词模式
-- **发送消息给 AI Agent**：发送文本消息、图片消息，支持优先级控制
-- **打断 Agent**：实现打断 AI Agent 的功能
-- **消息状态跟踪**：处理消息发送成功/失败的回调
-- **事件处理**：处理 Agent 状态变化、错误、指标等事件
-
-### 性能优化
-
-- 使用 `AUDIO_SCENARIO_AI_CLIENT` 场景以获得最佳 AI 对话质量
-- 根据网络状况调整音频编码参数
-- 及时清理不再使用的 Transcript 数据
-- 使用 `DiffUtil` 优化 RecyclerView 更新性能
-- 实现 Token 自动刷新机制
-- 处理网络断开重连逻辑
-
-### 最佳实践
-
-- 实现完善的错误处理机制，包括网络错误、Token 过期等
-- 使用 StateFlow 统一管理 UI 状态
-- 将业务逻辑与 UI 分离，使用 ViewModel 管理状态
-- 在加入频道前检查并请求麦克风权限
-- 正确管理 RTC Engine 和 RTM Client 的生命周期
-- 在 Activity/Fragment 销毁时清理资源
-- 启用 API 日志以便调试：`enableLog = true`
-
 
 ## 相关资源
 

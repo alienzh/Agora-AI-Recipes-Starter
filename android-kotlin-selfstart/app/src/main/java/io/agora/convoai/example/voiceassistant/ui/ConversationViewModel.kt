@@ -377,8 +377,6 @@ class ConversationViewModel : ViewModel() {
     fun joinChannelAndLogin(channelName: String) {
         viewModelScope.launch {
             try {
-
-                
                 this@ConversationViewModel.channelName = channelName
                 rtcJoined = false
                 rtmLoggedIn = false
@@ -409,7 +407,7 @@ class ConversationViewModel : ViewModel() {
                         },
                         onFailure = { exception ->
                             _uiState.value = _uiState.value.copy(
-                                connectionState = ConnectionState.Idle,
+                                connectionState = ConnectionState.Error,
                                 statusMessage = "Failed to get token: ${exception.message}"
                             )
                             Log.e(TAG, "Failed to get token: ${exception.message}", exception)
@@ -437,7 +435,7 @@ class ConversationViewModel : ViewModel() {
                             checkConnectionComplete()
                         } else {
                             _uiState.value = _uiState.value.copy(
-                                connectionState = ConnectionState.Idle,
+                                connectionState = ConnectionState.Error,
                                 statusMessage = "RTM login failed: ${exception.message}"
                             )
                             Log.e(TAG, "RTM login failed: ${exception.message}", exception)
@@ -446,7 +444,7 @@ class ConversationViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Idle,
+                    connectionState = ConnectionState.Error,
                     statusMessage = "Error: ${e.message}"
                 )
                 Log.e(TAG, "Error joining channel/login: ${e.message}", e)

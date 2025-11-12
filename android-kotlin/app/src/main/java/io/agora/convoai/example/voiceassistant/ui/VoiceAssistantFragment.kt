@@ -84,6 +84,9 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
                 handleHangup()
             }
         }
+        
+        // Start agent when fragment is created (after RTC and RTM are connected)
+        viewModel.startAgent()
     }
 
     /**

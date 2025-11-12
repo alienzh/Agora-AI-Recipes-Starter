@@ -89,44 +89,29 @@
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <!-- Channel Name Section -->
+                    <!-- Pipeline ID Section -->
                     <TextView
-                        android:id="@+id/tvChannelLabel"
+                        android:id="@+id/tvPipelineIdLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="4dp"
                         android:letterSpacing="0.05"
-                        android:text="Channel Name"
+                        android:text="Pipeline ID"
                         android:textAllCaps="true"
                         android:textColor="#666666"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilChannel"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvPipelineId"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:hint="Enter channel name"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxStrokeWidth="2dp"
-                        app:boxStrokeWidthFocused="2dp"
-                        app:hintTextColor="@color/colorPrimary">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etChannel"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="text"
-                            android:maxLines="1"
-                            android:padding="16dp"
-                            android:textSize="16sp" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginBottom="24dp"
+                        android:fontFamily="monospace"
+                        android:text="Pipeline ID: "
+                        android:textColor="#212121"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <!-- Status Section -->
                     <TextView

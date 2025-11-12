@@ -7,6 +7,7 @@ import io.agora.convoai.example.voiceassistant.KeyCenter
 import io.agora.convoai.example.voiceassistant.rtc.CovRtmManager
 import io.agora.convoai.example.voiceassistant.rtc.IRtmManagerListener
 import io.agora.convoai.example.voiceassistant.rtc.RtcManager
+import io.agora.convoai.example.voiceassistant.tools.AgentStarter
 import io.agora.convoai.example.voiceassistant.tools.TokenGenerator
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -40,7 +41,13 @@ class ConversationViewModel : ViewModel() {
         private const val TAG = "ConversationViewModel"
         const val userId = 1001086
         const val agentUid = 1009527
-        val defaultChannel: String = KeyCenter.AGORA_CHANNEL_NAME
+        
+        /**
+         * Generate a random channel name
+         */
+        fun generateRandomChannelName(): String {
+            return "channel_kotlin_${(1000..9999).random()}"
+        }
     }
 
     /**
@@ -80,10 +87,14 @@ class ConversationViewModel : ViewModel() {
 
     private var conversationalAIAPI: IConversationalAIAPI? = null
 
-    private var channelName: String = defaultChannel
+    private var channelName: String = ""
 
     private var rtcJoined = false
     private var rtmLoggedIn = false
+
+    // Agent management
+    private var agentId: String? = null
+    private var agentStarted = false
 
     private val rtcEventHandler = object : IRtcEngineEventHandler() {
         override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
@@ -238,7 +249,77 @@ class ConversationViewModel : ViewModel() {
         if (rtcJoined && rtmLoggedIn) {
             _uiState.value = _uiState.value.copy(
                 connectionState = ConnectionState.Connected,
-                statusMessage = "RTC and RTM initialized successfully"
+                statusMessage = "RTC and RTM connected successfully"
+            )
+        }
+    }
+
+    /**
+     * Start agent (called from VoiceAssistantFragment)
+     */
+    fun startAgent() {
+        viewModelScope.launch {
+            if (agentStarted) {
+                Log.d(TAG, "Agent already started, agentId: $agentId")
+                return@launch
+            }
+
+            if (channelName.isEmpty()) {
+                _uiState.value = _uiState.value.copy(
+                    connectionState = ConnectionState.Error,
+                    statusMessage = "Channel name is empty, cannot start agent"
+                )
+                Log.e(TAG, "Channel name is empty, cannot start agent")
+                return@launch
+            }
+
+            _uiState.value = _uiState.value.copy(
+                statusMessage = "Generating agent token..."
+            )
+
+            // Generate token for agent (always required)
+            val tokenResult = TokenGenerator.generateTokensAsync(
+                channelName = channelName,
+                uid = agentUid.toString()
+            )
+
+            val agentToken = tokenResult.fold(
+                onSuccess = { token -> token },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        connectionState = ConnectionState.Error,
+                        statusMessage = "Failed to generate agent token: ${exception.message}"
+                    )
+                    Log.e(TAG, "Failed to generate agent token: ${exception.message}", exception)
+                    return@launch
+                }
+            )
+
+            _uiState.value = _uiState.value.copy(
+                statusMessage = "Starting agent..."
+            )
+
+            val startAgentResult = AgentStarter.startAgentAsync(
+                channelName = channelName,
+                agentRtcUid = agentUid.toString(),
+                token = agentToken
+            )
+            startAgentResult.fold(
+                onSuccess = { agentId ->
+                    this@ConversationViewModel.agentId = agentId
+                    agentStarted = true
+                    _uiState.value = _uiState.value.copy(
+                        statusMessage = "Agent started successfully"
+                    )
+                    Log.d(TAG, "Agent started successfully, agentId: $agentId")
+                },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        connectionState = ConnectionState.Error,
+                        statusMessage = "Failed to start agent: ${exception.message}"
+                    )
+                    Log.e(TAG, "Failed to start agent: ${exception.message}", exception)
+                }
             )
         }
     }
@@ -398,6 +479,27 @@ class ConversationViewModel : ViewModel() {
                         Log.e(TAG, "Unsubscribe message error: ${errorInfo}")
                     }
                 }
+
+                // Stop agent if it was started
+                if (agentStarted && agentId != null) {
+                    _uiState.value = _uiState.value.copy(
+                        statusMessage = "Stopping agent..."
+                    )
+                    val stopResult = AgentStarter.stopAgentAsync(
+                        agentId = agentId!!
+                    )
+                    stopResult.fold(
+                        onSuccess = {
+                            Log.d(TAG, "Agent stopped successfully")
+                        },
+                        onFailure = { exception ->
+                            Log.e(TAG, "Failed to stop agent: ${exception.message}", exception)
+                        }
+                    )
+                    agentId = null
+                    agentStarted = false
+                }
+
                 RtcManager.leaveChannel()
                 CovRtmManager.logout()
                 rtcJoined = false
