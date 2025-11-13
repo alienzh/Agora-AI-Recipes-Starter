@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "agent-kotlin"
+rootProject.name = "android-kotlin"
 include(":app")
  

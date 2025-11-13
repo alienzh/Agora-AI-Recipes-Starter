@@ -3,10 +3,10 @@ package io.agora.convoai.example.compose.voiceassistant.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.agora.convoai.example.compose.voiceassistant.KeyCenter
 import io.agora.convoai.example.compose.voiceassistant.rtc.CovRtmManager
 import io.agora.convoai.example.compose.voiceassistant.rtc.IRtmManagerListener
 import io.agora.convoai.example.compose.voiceassistant.rtc.RtcManager
+import io.agora.convoai.example.compose.voiceassistant.tools.AgentStarter
 import io.agora.convoai.example.compose.voiceassistant.tools.TokenGenerator
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -26,7 +26,6 @@ import io.agora.convoai.convoaiApi.StateChangeEvent
 import io.agora.convoai.convoaiApi.Transcript
 import io.agora.convoai.convoaiApi.TranscriptRenderMode
 import io.agora.convoai.convoaiApi.VoiceprintStateChangeEvent
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,7 +40,13 @@ class ConversationViewModel : ViewModel() {
         private const val TAG = "ConversationViewModel"
         const val userId = 1001086
         const val agentUid = 1009527
-        val defaultChannel: String = KeyCenter.AGORA_CHANNEL_NAME
+        
+        /**
+         * Generate a random channel name
+         */
+        fun generateRandomChannelName(): String {
+            return "channel_compose_${(1000..9999).random()}"
+        }
     }
 
     /**
@@ -81,10 +86,14 @@ class ConversationViewModel : ViewModel() {
 
     private var conversationalAIAPI: IConversationalAIAPI? = null
 
-    private var channelName: String = defaultChannel
+    private var channelName: String = ""
 
     private var rtcJoined = false
     private var rtmLoggedIn = false
+
+    // Agent management
+    private var agentId: String? = null
+    private var agentStarted = false
 
     private val rtcEventHandler = object : IRtcEngineEventHandler() {
         override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
@@ -119,9 +128,6 @@ class ConversationViewModel : ViewModel() {
                         statusMessage = "Agent left the channel"
                     )
                     Log.d(TAG, "Agent left the channel, uid: $uid, reason: $reason")
-                    // Hangup when agent leaves
-                    delay(1000)
-                    hangup()
                 } else {
                     Log.d(TAG, "User left the channel, uid: $uid, reason: $reason")
                 }
@@ -255,6 +261,80 @@ class ConversationViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(
                 connectionState = ConnectionState.Connected,
                 statusMessage = "RTC and RTM initialized successfully"
+            )
+        }
+    }
+
+    /**
+     * Start agent (called from VoiceAssistantScreen)
+     */
+    fun startAgent() {
+        Log.d(TAG, "[startAgent] Called - agentStarted=$agentStarted, agentId=$agentId, channelName=$channelName")
+        Log.d(TAG, "[startAgent] Current connectionState: ${_uiState.value.connectionState}")
+        viewModelScope.launch {
+            if (agentStarted) {
+                Log.d(TAG, "[startAgent] Agent already started, agentId: $agentId")
+                return@launch
+            }
+
+            if (channelName.isEmpty()) {
+                _uiState.value = _uiState.value.copy(
+                    connectionState = ConnectionState.Error,
+                    statusMessage = "Channel name is empty, cannot start agent"
+                )
+                Log.e(TAG, "[startAgent] Channel name is empty, cannot start agent")
+                return@launch
+            }
+
+            _uiState.value = _uiState.value.copy(
+                statusMessage = "Generating agent token..."
+            )
+
+            // Generate token for agent (always required)
+            val tokenResult = TokenGenerator.generateTokensAsync(
+                channelName = channelName,
+                uid = agentUid.toString()
+            )
+
+            val agentToken = tokenResult.fold(
+                onSuccess = { token -> token },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        connectionState = ConnectionState.Error,
+                        statusMessage = "Failed to generate agent token: ${exception.message}"
+                    )
+                    Log.e(TAG, "Failed to generate agent token: ${exception.message}", exception)
+                    return@launch
+                }
+            )
+
+            _uiState.value = _uiState.value.copy(
+                statusMessage = "Starting agent..."
+            )
+
+            val startAgentResult = AgentStarter.startAgentAsync(
+                channelName = channelName,
+                agentRtcUid = agentUid.toString(),
+                token = agentToken
+            )
+            startAgentResult.fold(
+                onSuccess = { agentId ->
+                    this@ConversationViewModel.agentId = agentId
+                    agentStarted = true
+                    _uiState.value = _uiState.value.copy(
+                        statusMessage = "Agent started successfully"
+                    )
+                    Log.d(TAG, "[startAgent] Agent started successfully, agentId: $agentId")
+                    Log.d(TAG, "[startAgent] Agent state updated - agentStarted=$agentStarted, agentId=$agentId")
+                    Log.d(TAG, "[startAgent] Current connectionState: ${_uiState.value.connectionState}")
+                },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        connectionState = ConnectionState.Error,
+                        statusMessage = "Failed to start agent: ${exception.message}"
+                    )
+                    Log.e(TAG, "[startAgent] Failed to start agent: ${exception.message}", exception)
+                }
             )
         }
     }
@@ -407,27 +487,64 @@ class ConversationViewModel : ViewModel() {
      * Hang up and cleanup connections
      */
     fun hangup() {
+        Log.d(TAG, "[hangup] Called - agentStarted=$agentStarted, agentId=$agentId, channelName=$channelName")
+        Log.d(TAG, "[hangup] Current connectionState: ${_uiState.value.connectionState}")
         viewModelScope.launch {
             try {
+                Log.d(TAG, "[hangup] Inside coroutine - unsubscribing message")
                 conversationalAIAPI?.unsubscribeMessage(channelName) { errorInfo ->
                     if (errorInfo != null) {
-                        Log.e(TAG, "Unsubscribe message error: ${errorInfo}")
+                        Log.e(TAG, "[hangup] Unsubscribe message error: ${errorInfo}")
+                    } else {
+                        Log.d(TAG, "[hangup] Unsubscribe message success")
                     }
                 }
+
+                // Stop agent if it was started
+                if (agentStarted && agentId != null) {
+                    Log.d(TAG, "[hangup] Stopping agent - agentId=$agentId")
+                    _uiState.value = _uiState.value.copy(
+                        statusMessage = "Stopping agent..."
+                    )
+                    val stopResult = AgentStarter.stopAgentAsync(
+                        agentId = agentId!!
+                    )
+                    stopResult.fold(
+                        onSuccess = {
+                            Log.d(TAG, "[hangup] Agent stopped successfully")
+                        },
+                        onFailure = { exception ->
+                            Log.e(TAG, "[hangup] Failed to stop agent: ${exception.message}", exception)
+                        }
+                    )
+                    agentId = null
+                    agentStarted = false
+                    Log.d(TAG, "[hangup] Agent state cleared - agentId=$agentId, agentStarted=$agentStarted")
+                } else {
+                    Log.d(TAG, "[hangup] Agent not started or agentId is null, skipping stop")
+                }
+
+                Log.d(TAG, "[hangup] Leaving RTC channel and logging out RTM")
                 RtcManager.leaveChannel()
                 CovRtmManager.logout()
                 rtcJoined = false
                 rtmLoggedIn = false
+                Log.d(TAG, "[hangup] RTC/RTM state cleared - rtcJoined=$rtcJoined, rtmLoggedIn=$rtmLoggedIn")
+                
+                Log.d(TAG, "[hangup] Updating UI state to Idle")
                 _uiState.value = _uiState.value.copy(
-                    statusMessage = "Hanging up...",
+                    statusMessage = "",
                     connectionState = ConnectionState.Idle
                 )
+                Log.d(TAG, "[hangup] UI state updated - connectionState=${_uiState.value.connectionState}")
+                
                 clearTranscripts()
-                Log.d(TAG, "Hangup completed")
+                Log.d(TAG, "[hangup] Hangup completed successfully")
             } catch (e: Exception) {
-                Log.e(TAG, "Error during hangup: ${e.message}", e)
+                Log.e(TAG, "[hangup] Error during hangup: ${e.message}", e)
             }
         }
+        Log.d(TAG, "[hangup] Coroutine launched, returning from hangup()")
     }
 
     override fun onCleared() {

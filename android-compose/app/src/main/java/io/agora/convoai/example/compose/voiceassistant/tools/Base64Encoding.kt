@@ -1,4 +1,4 @@
-package io.agora.convoai.example.voiceassistant.tools
+package io.agora.convoai.example.compose.voiceassistant.tools
 
 import java.util.Base64
 
@@ -20,3 +20,4 @@ object Base64Encoding {
         return "Basic $base64Credentials"
     }
 }
+

@@ -57,9 +57,9 @@ cd Agora-AI-Recipes-Starter/android-compose
    - 使用 Android Studio 打开项目
    - 等待 Gradle 同步完成
 
-3. **配置 Agent 启动服务器**：
+3. **配置 Agent 启动服务器（可选）**：
    
-   参考 [server-python](../server-python/README.md) 的说明配置和启动 Agent 服务器。
+   默认情况下，应用直接调用 Agora RESTful API 启动 Agent。如果需要使用本地代理服务器（用于开发调试），请参考 [server-python](../server-python/README.md) 的说明配置和启动 Agent 服务器，然后在 `AgentStarter.kt` 中修改 `AGORA_API_BASE_URL` 为本地服务器地址。
 
 ### 配置说明
 
@@ -72,10 +72,15 @@ cd Agora-AI-Recipes-Starter/android-compose
    
    2. 编辑 `env.properties` 文件，填入你的实际配置值：
    - `agora.appId`：你的 Agora App ID
-   - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
-   - `agora.channelName`：频道名称（可选，默认值："default_android_channel"）
+   - `agora.appCertificate`：你的 App Certificate（用于 Token 生成）
+   - `agora.restKey`：REST API Key（用于启动/停止 Agent）
+   - `agora.restSecret`：REST API Secret（用于启动/停止 Agent）
+   - `agora.pipelineId`：Pipeline ID（用于启动 Agent）
    
-   **注意**：`env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+   **注意**：
+   - `env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+   - 每次启动时会自动生成随机的 channelName，无需手动配置。
+   - 如需使用本地代理服务器，请在 `AgentStarter.kt` 中修改 `AGORA_API_BASE_URL` 为本地服务器地址（如 `http://10.0.2.2:8080` 用于 Android 模拟器）。
 
 2. **权限配置**：
    
@@ -130,9 +135,10 @@ conversationalAIAPI = ConversationalAIAPIImpl(config)
 
 1. **加入频道和登录 RTM**：
    
-   实现 `joinChannelAndLogin()` 方法，依次加入 RTC 频道和登录 RTM：
+   实现 `joinChannelAndLogin()` 方法，自动生成随机 channelName 并依次加入 RTC 频道和登录 RTM：
 ```kotlin
 fun joinChannelAndLogin(channelName: String) {
+    // Channel name is automatically generated as random value
     // Generate unified token for RTC and RTM
     val token = generateUnifiedToken(channelName, userId)
     
@@ -153,7 +159,32 @@ fun joinChannelAndLogin(channelName: String) {
 }
 ```
 
-2. **订阅 RTM 消息**：
+2. **启动 Agent**：
+   
+   在连接成功后（RTC 和 RTM 都已连接），自动启动 Agent：
+```kotlin
+fun startAgent() {
+    // Generate token for agent
+    val agentToken = generateToken(channelName, agentUid)
+    
+    // Start agent via RESTful API
+    AgentStarter.startAgentAsync(
+        channelName = channelName,
+        agentRtcUid = agentUid.toString(),
+        token = agentToken
+    ).fold(
+        onSuccess = { agentId ->
+            // Agent started successfully
+            this.agentId = agentId
+        },
+        onFailure = { exception ->
+            // Handle error
+        }
+    )
+}
+```
+
+3. **订阅 RTM 消息**：
    
    订阅频道消息以接收 AI Agent 的状态和转录：
 ```kotlin
@@ -164,7 +195,7 @@ conversationalAIAPI?.subscribeMessage(channelName) { result ->
 }
 ```
 
-3. **注册事件处理器**：
+4. **注册事件处理器**：
    
    实现 `IConversationalAIAPIEventHandler` 接口，处理各种事件：
 ```kotlin
@@ -185,7 +216,7 @@ conversationalAIAPI?.addHandler(object : IConversationalAIAPIEventHandler {
 })
 ```
 
-4. **实现 Compose UI 状态观察**：
+5. **实现 Compose UI 状态观察**：
    
    在 Compose 中观察 Agent 状态，控制说话状态指示器：
 ```kotlin
@@ -230,33 +261,41 @@ fun TranscriptList(transcriptList: List<Transcript>) {
 
 ### 步骤3：测试验证
 
-1. **启动 AI Agent**：
-   
-   参考 [server-python](../server-python/README.md) 的说明启动 Agent 服务器：
-```bash
-cd ../server-python
-python agora_starter_server.py start --channelName "test_channel"
-```
-
-   **注意**：如果使用虚拟环境，请先激活虚拟环境：
-```bash
-source venv/bin/activate  # macOS/Linux
-# 或
-venv\Scripts\activate  # Windows
-```
-
-2. **运行 Android 应用**：
+1. **运行 Android 应用**：
    - 在 Android Studio 中运行应用
-   - 输入频道名称（与 Agent 启动时的频道名称一致）
-   - 点击"Start"按钮
+   - 在 Agent Configuration 页面查看配置信息（App ID 和 Pipeline ID）
+   - 点击"Start"按钮开始连接
 
-3. **验证功能**：
+2. **自动启动流程**：
+   - 应用会自动生成随机的 channelName
+   - 自动加入 RTC 频道并登录 RTM
+   - 连接成功后自动导航到 Voice Assistant 页面
+   - 自动启动 AI Agent（通过 RESTful API）
+   - Agent 启动成功后即可开始对话
+
+3. **使用本地代理服务器（可选）**：
+   
+   如果需要使用本地代理服务器进行开发调试：
+   - 参考 [server-python](../server-python/README.md) 的说明启动本地服务器
+   - 在 `AgentStarter.kt` 中修改 `AGORA_API_BASE_URL`：
+     ```kotlin
+     // 注释掉 Agora API 地址
+     // private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+     // 使用本地服务器地址
+     private const val AGORA_API_BASE_URL = "http://10.0.2.2:8080"  // Android 模拟器
+     // 或
+     private const val AGORA_API_BASE_URL = "http://<your-local-ip>:8080"  // 物理设备
+     ```
+   - 重新编译并运行应用
+
+4. **验证功能**：
    - ✅ 检查是否成功加入 RTC 频道
    - ✅ 检查是否成功登录 RTM
+   - ✅ 检查 Agent 是否成功启动（查看状态消息）
    - ✅ 验证音频传输是否正常
    - ✅ 测试静音/取消静音功能
    - ✅ 验证转录功能是否正常显示
-   - ✅ 验证 Agent 说话状态指示器是否正常显示动画
+   - ✅ 验证 Agent 说话状态指示器（VoiceWaveView）是否正常显示动画
    - ✅ 测试与 AI Agent 的对话交互
 
 ## 扩展功能

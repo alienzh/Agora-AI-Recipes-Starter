@@ -24,6 +24,10 @@ import io.agora.convoai.convoaiApi.Transcript
 import io.agora.convoai.convoaiApi.TranscriptStatus
 import io.agora.convoai.convoaiApi.TranscriptType
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import android.util.Log
+
+private const val TAG = "VoiceAssistantScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,9 +44,42 @@ fun VoiceAssistantScreen(
 
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    
+
     // Track whether to automatically scroll to bottom
     var autoScrollToBottom by remember { mutableStateOf(true) }
+
+    // Track if we're in the process of hanging up to prevent re-starting agent
+    var isHangingUp by remember { mutableStateOf(false) }
+
+    // Handle hangup (similar to android-kotlin VoiceAssistantFragment.handleHangup)
+    fun handleHangup() {
+        Log.d(TAG, "[handleHangup] Called - starting hangup process")
+        isHangingUp = true
+        viewModel.hangup()
+
+        // Wait for hangup to complete (connectionState becomes Idle) then navigate back
+        scope.launch {
+            try {
+                // Wait for state to become Idle
+                viewModel.uiState.first { it.connectionState == ConnectionState.Idle }
+                isHangingUp = false
+                onNavigateBack()
+                Log.d(TAG, "[handleHangup] onNavigateBack() completed successfully")
+            } catch (e: Exception) {
+                Log.e(TAG, "[handleHangup] Error waiting for hangup or navigating: ${e.message}", e)
+                isHangingUp = false
+            }
+        }
+    }
+
+    // Start agent when connected (but not if we're hanging up)
+    LaunchedEffect(uiState.connectionState, isHangingUp) {
+        Log.d(TAG, "[LaunchedEffect] connectionState changed to: ${uiState.connectionState}, isHangingUp=$isHangingUp")
+        if (uiState.connectionState == ConnectionState.Connected && !isHangingUp) {
+            viewModel.startAgent()
+        }
+    }
+
 
     // Update status history
     LaunchedEffect(uiState.statusMessage, uiState.connectionState) {
@@ -80,7 +117,7 @@ fun VoiceAssistantScreen(
             }
         }
     }
-    
+
     // Track user scroll gestures to disable auto-scroll
     LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
         if (listState.isScrollInProgress) {
@@ -91,7 +128,7 @@ fun VoiceAssistantScreen(
             }
         }
     }
-    
+
     // Scroll to bottom when new transcript is added
     LaunchedEffect(transcriptList) {
         if (transcriptList.isNotEmpty() && autoScrollToBottom) {
@@ -107,8 +144,7 @@ fun VoiceAssistantScreen(
                 title = { Text("Voice Assistant") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        viewModel.hangup()
-                        onNavigateBack()
+                        handleHangup()
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
@@ -156,42 +192,39 @@ fun VoiceAssistantScreen(
             }
 
             // Status display
-            if (statusHistory.isNotEmpty()) {
-                Card(
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 120.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                        .padding(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = statusHistory.joinToString("\n"),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = when {
-                                statusHistory.joinToString("\n").contains("successfully", ignoreCase = true) ||
-                                        statusHistory.joinToString("\n").contains("initialized", ignoreCase = true) ||
-                                        statusHistory.joinToString("\n").contains("joined", ignoreCase = true) -> {
-                                    Color(0xFF4CAF50)
-                                }
-
-                                statusHistory.joinToString("\n").contains("error", ignoreCase = true) ||
-                                        statusHistory.joinToString("\n").contains("failed", ignoreCase = true) ||
-                                        statusHistory.joinToString("\n").contains("left", ignoreCase = true) -> {
-                                    Color(0xFFF44336)
-                                }
-
-                                else -> {
-                                    Color(0xFF666666)
-                                }
+                    Text(
+                        text = statusHistory.joinToString("\n"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = when {
+                            statusHistory.joinToString("\n").contains("successfully", ignoreCase = true) ||
+                                    statusHistory.joinToString("\n").contains("initialized", ignoreCase = true) ||
+                                    statusHistory.joinToString("\n").contains("joined", ignoreCase = true) -> {
+                                Color(0xFF4CAF50)
                             }
-                        )
-                    }
+
+                            statusHistory.joinToString("\n").contains("error", ignoreCase = true) ||
+                                    statusHistory.joinToString("\n").contains("failed", ignoreCase = true) ||
+                                    statusHistory.joinToString("\n").contains("left", ignoreCase = true) -> {
+                                Color(0xFFF44336)
+                            }
+
+                            else -> {
+                                Color(0xFF666666)
+                            }
+                        }
+                    )
                 }
             }
 
@@ -228,7 +261,7 @@ fun VoiceAssistantScreen(
                         modifier = Modifier,
                         isAnimating = agentState == AgentState.SPEAKING,
                         color = MaterialTheme.colorScheme.primary,
-                        scale = 5f // Scale up by 5x for better visibility
+                        scale = 4.0f // Scale up for better visibility
                     )
                 }
             }
@@ -283,8 +316,7 @@ fun VoiceAssistantScreen(
                 // Hangup button
                 FloatingActionButton(
                     onClick = {
-                        viewModel.hangup()
-                        onNavigateBack()
+                        handleHangup()
                     },
                     modifier = Modifier.weight(1f),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -379,13 +411,13 @@ private suspend fun scrollToBottom(listState: LazyListState, itemCount: Int) {
     // In Compose, we check if the last item extends beyond the viewport
     val layoutInfo = listState.layoutInfo
     val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-    
+
     if (lastVisibleItem != null && lastVisibleItem.index == lastPosition) {
         // Check if the last item extends beyond viewport (extra-long message)
         val viewportHeight = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
         val itemEndOffset = lastVisibleItem.offset + lastVisibleItem.size
         val viewportEndOffset = layoutInfo.viewportEndOffset
-        
+
         // If item extends beyond viewport, ensure scrolling to bottom
         if (itemEndOffset > viewportEndOffset) {
             // For extra-long messages, calculate offset to align bottom of item with bottom of viewport

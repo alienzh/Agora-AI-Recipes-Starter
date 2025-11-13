@@ -18,6 +18,7 @@ import io.agora.convoai.example.compose.voiceassistant.ui.AgentConfigScreen
 import io.agora.convoai.example.compose.voiceassistant.ui.ConversationViewModel
 import io.agora.convoai.example.compose.voiceassistant.ui.VoiceAssistantScreen
 import io.agora.convoai.example.compose.voiceassistant.ui.theme.AgentstarterconvoaicomposeTheme
+import android.util.Log
 
 class MainActivity : ComponentActivity() {
     private lateinit var permissionHelp: PermissionHelp
@@ -57,9 +58,11 @@ fun VoiceAssistantApp(
                 viewModel = viewModel,
                 permissionHelp = permissionHelp,
                 onNavigateToVoiceAssistant = {
+                    Log.d("VoiceAssistantApp", "[onNavigateToVoiceAssistant] Navigating to voice_assistant")
                     navController.navigate("voice_assistant") {
                         popUpTo("agent_config") { inclusive = false }
                     }
+                    Log.d("VoiceAssistantApp", "[onNavigateToVoiceAssistant] Navigation completed")
                 }
             )
         }
@@ -67,7 +70,17 @@ fun VoiceAssistantApp(
             VoiceAssistantScreen(
                 viewModel = viewModel,
                 onNavigateBack = {
-                    navController.popBackStack()
+                    Log.d("VoiceAssistantApp", "[onNavigateBack] ===== CALLBACK CALLED =====")
+                    try {
+                        val result = navController.popBackStack()
+                        Log.d("VoiceAssistantApp", "[onNavigateBack] popBackStack() returned: $result")
+                        if (!result) {
+                            Log.w("VoiceAssistantApp", "[onNavigateBack] WARNING: popBackStack() returned false - cannot navigate back!")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("VoiceAssistantApp", "[onNavigateBack] ERROR calling popBackStack(): ${e.message}", e)
+                    }
+                    Log.d("VoiceAssistantApp", "[onNavigateBack] ===== CALLBACK COMPLETED =====")
                 }
             )
         }

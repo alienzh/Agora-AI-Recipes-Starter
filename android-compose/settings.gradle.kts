@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "agent-starter-convoai-compose"
+rootProject.name = "android-compose"
 include(":app")
  

@@ -19,7 +19,6 @@ fun AgentConfigScreen(
     onNavigateToVoiceAssistant: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var channelName by remember { mutableStateOf(ConversationViewModel.defaultChannel) }
     var hasNavigated by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
 
@@ -77,50 +76,64 @@ fun AgentConfigScreen(
                 }
             }
 
-            // Channel name input
-            OutlinedTextField(
-                value = channelName,
-                enabled = false,
-                onValueChange = { channelName = it },
-                label = { Text("Channel Name") },
+            // Pipeline ID display
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            // Status display (only show when connecting)
-            if (uiState.connectionState == ConnectionState.Connecting) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Status",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = uiState.statusMessage,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    Text(
+                        text = "Pipeline ID",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = KeyCenter.PIPELINE_ID.take(5) + "***",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Status",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = uiState.statusMessage,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
             // Start button
             Button(
                 onClick = {
+                    // Generate random channel name each time joining channel
+                    val channelName = ConversationViewModel.generateRandomChannelName()
                     if (permissionHelp.hasMicPerm()) {
-                        viewModel.joinChannelAndLogin(channelName.trim())
+                        viewModel.joinChannelAndLogin(channelName)
                     } else {
                         permissionHelp.checkMicPerm(
                             granted = {
-                                viewModel.joinChannelAndLogin(channelName.trim())
+                                viewModel.joinChannelAndLogin(channelName)
                             },
                             unGranted = {
                                 // Show permission dialog when permission is denied
@@ -143,7 +156,7 @@ fun AgentConfigScreen(
                     Text("Start")
                 }
             }
-            
+
             // Permission dialog
             if (showPermissionDialog) {
                 AlertDialog(
@@ -160,7 +173,8 @@ fun AgentConfigScreen(
                                 showPermissionDialog = false
                                 permissionHelp.launchAppSettingForMic(
                                     granted = {
-                                        viewModel.joinChannelAndLogin(channelName.trim())
+                                        val channelName = ConversationViewModel.generateRandomChannelName()
+                                        viewModel.joinChannelAndLogin(channelName)
                                     },
                                     unGranted = {
                                         // Permission still not granted
