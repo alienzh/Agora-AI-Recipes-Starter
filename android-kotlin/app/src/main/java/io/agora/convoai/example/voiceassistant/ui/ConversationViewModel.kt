@@ -3,7 +3,6 @@ package io.agora.convoai.example.voiceassistant.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.agora.convoai.example.voiceassistant.KeyCenter
 import io.agora.convoai.example.voiceassistant.rtc.CovRtmManager
 import io.agora.convoai.example.voiceassistant.rtc.IRtmManagerListener
 import io.agora.convoai.example.voiceassistant.rtc.RtcManager

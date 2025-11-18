@@ -188,6 +188,21 @@ fun VoiceAssistantScreen(
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
+                    
+                    // Agent status
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Agent Status:",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = agentState?.value ?: "Unknown",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
 

@@ -52,6 +52,31 @@
                 android:textSize="14sp"
                 tools:text="Agent UID: 123456" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Agent Status:"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvAgentStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Unknown"
+                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    tools:text="Speaking" />
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tvStatus"
                 android:layout_width="match_parent"

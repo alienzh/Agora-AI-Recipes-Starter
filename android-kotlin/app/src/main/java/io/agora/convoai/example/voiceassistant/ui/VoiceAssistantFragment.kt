@@ -214,11 +214,21 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
 
         lifecycleScope.launch {    // Observe agent state
             viewModel.agentState.collect { agentState ->
-                agentState?.let {
-                    if (agentState == AgentState.SPEAKING) {
-                        mBinding?.agentSpeakingIndicator?.startAnimation()
-                    } else {
-                        mBinding?.agentSpeakingIndicator?.stopAnimation()
+                mBinding?.apply {
+                    agentState?.let {
+                        // Update agent status text using state.value
+                        tvAgentStatus.text = it.value
+                        
+                        // Control animation based on agent state
+                        if (it == AgentState.SPEAKING) {
+                            agentSpeakingIndicator.startAnimation()
+                        } else {
+                            agentSpeakingIndicator.stopAnimation()
+                        }
+                    } ?: run {
+                        // Agent state is null, show default text
+                        tvAgentStatus.text = "Unknown"
+                        agentSpeakingIndicator.stopAnimation()
                     }
                 }
             }
@@ -336,6 +346,7 @@ class VoiceAssistantFragment : BaseFragment<FragmentVoiceAssistantBinding>() {
             }
         }
     }
+
 }
 
 class TranscriptAdapter : ListAdapter<Transcript, RecyclerView.ViewHolder>(TranscriptDiffCallback()) {

@@ -17,3 +17,4 @@ local.properties
 
 # Environment configuration (contains sensitive credentials)
 env.properties
+/.kotlin/

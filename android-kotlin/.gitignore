@@ -11,3 +11,4 @@ env.properties
 
 # Python virtual environment
 server/venv/
+/.kotlin/
