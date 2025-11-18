@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Agora Conversational AI Voice Assistant"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "Voice Assistant Entry Ability"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "Voice Assistant"
+    },
+    {
+      "name": "internet_permission_reason",
+      "value": "Required for network communication with Agora services"
+    },
+    {
+      "name": "microphone_permission_reason",
+      "value": "Required for voice recording and communication"
+    },
+    {
+      "name": "audio_settings_permission_reason",
+      "value": "Required for audio settings adjustment"
+    }
+  ]
+}

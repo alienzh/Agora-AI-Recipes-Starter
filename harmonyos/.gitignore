@@ -1,0 +1,18 @@
+/node_modules
+/oh_modules
+/local.properties
+/.idea
+**/build
+/.hvigor
+.cxx
+/.clangd
+/.clang-format
+/.clang-tidy
+**/.test
+/.appanalyzer
+/.vscode/
+# Environment configuration file (contains sensitive credentials)
+**/env.json
+entry/src/main/resources/rawfile/env.json
+# Auto-generated config file (generated from env.json at build time)
+entry/src/main/ets/common/KeyCenterConfig.ets
