@@ -57,13 +57,7 @@ cd Agora-AI-Recipes-Starter/android-compose
    - 使用 Android Studio 打开项目
    - 等待 Gradle 同步完成
 
-3. **配置 Agent 启动服务器（可选）**：
-   
-   默认情况下，应用直接调用 Agora RESTful API 启动 Agent。如果需要使用本地代理服务器（用于开发调试），请参考 [server-python](../server-python/README.md) 的说明配置和启动 Agent 服务器，然后在 `AgentStarter.kt` 中修改 `AGORA_API_BASE_URL` 为本地服务器地址。
-
-### 配置说明
-
-1. **配置 App ID 和 App Certificate**：
+3. **配置 Agora Key**：
    
    1. 复制 `env.example.properties` 文件为 `env.properties`：
    ```bash
@@ -71,224 +65,105 @@ cd Agora-AI-Recipes-Starter/android-compose
    ```
    
    2. 编辑 `env.properties` 文件，填入你的实际配置值：
-   - `agora.appId`：你的 Agora App ID
-   - `agora.appCertificate`：你的 App Certificate（用于 Token 生成）
-   - `agora.restKey`：REST API Key（用于启动/停止 Agent）
-   - `agora.restSecret`：REST API Secret（用于启动/停止 Agent）
-   - `agora.pipelineId`：Pipeline ID（用于启动 Agent）
+   ```properties
+   agora.appId=your_app_id
+   agora.appCertificate=your_app_certificate
+   agora.restKey=your_rest_key
+   agora.restSecret=your_rest_secret
+   agora.pipelineId=your_pipeline_id
+   ```
+   
+   **配置项说明**：
+   - `agora.appId`：你的 Agora App ID（必需）
+   - `agora.appCertificate`：你的 App Certificate（必需，用于 Token 生成）
+   - `agora.restKey`：REST API Key（必需，用于启动 Agent）
+   - `agora.restSecret`：REST API Secret（必需，用于启动 Agent）
+   - `agora.pipelineId`：Pipeline ID（必需，用于启动 Agent）
+   
+   **获取方式**：
+   - App ID 和 App Certificate：在 [Agora Console](https://console.shengwang.cn/) 中创建项目后获取
+   - REST Key 和 REST Secret：在 Agora Console 的项目设置中获取
+   - Pipeline ID：在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 中创建 Pipeline 后获取
    
    **注意**：
    - `env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
    - 每次启动时会自动生成随机的 channelName，无需手动配置。
-   - 如需使用本地代理服务器，请在 `AgentStarter.kt` 中修改 `AGORA_API_BASE_URL` 为本地服务器地址（如 `http://10.0.2.2:8080` 用于 Android 模拟器）。
 
-2. **权限配置**：
+4. **配置 Agent 启动方式**：
    
-   确保 `AndroidManifest.xml` 中包含以下权限：
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.RECORD_AUDIO" />
-<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-```
-
-## 实现步骤
-
-### 步骤1：基础设置
-
-1. **初始化 RTC Engine**：
+   有两种方式启动 Agent，在 `AgentStarter.kt` 中直接切换：
    
-   在 `RtcManager.kt` 中创建 RTC Engine 实例：
-```kotlin
-val config = RtcEngineConfig()
-config.mContext = context
-config.mAppId = appId
-config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
-config.mAudioScenario = Constants.AUDIO_SCENARIO_DEFAULT
-config.mEventHandler = rtcEventHandler
-val rtcEngine = RtcEngine.create(config) as RtcEngineEx
-rtcEngine.enableVideo()
-```
-
-2. **初始化 RTM Client**：
+   **方式一：本地 HTTP 服务器模式**（推荐用于开发测试）
    
-   在 `RtmManager.kt` 中创建 RTM Client 实例：
-```kotlin
-val rtmConfig = RtmConfig.Builder(appId, userId.toString()).build()
-val rtmClient = RtmClient.create(rtmConfig)
-rtmClient.addEventListener(rtmEventListener)
-```
-
-3. **配置 ConversationalAI API**：
+   1. 启动 Python HTTP 服务器：
+   ```bash
+   cd ../server-python
+   python agora_http_server.py
+   ```
    
-   在 `ConversationViewModel.kt` 中初始化 API：
-```kotlin
-val config = ConversationalAIAPIConfig(
-    rtcEngine = rtcEngine,
-    rtmClient = rtmClient,
-    enableLog = true,
-    renderMode = TranscriptRenderMode.Text
-)
-conversationalAIAPI = ConversationalAIAPIImpl(config)
-```
-
-### 步骤2：核心实现
-
-1. **加入频道和登录 RTM**：
+   服务器默认运行在 `http://localhost:8080`。
    
-   实现 `joinChannelAndLogin()` 方法，自动生成随机 channelName 并依次加入 RTC 频道和登录 RTM：
-```kotlin
-fun joinChannelAndLogin(channelName: String) {
-    // Channel name is automatically generated as random value
-    // Generate unified token for RTC and RTM
-    val token = generateUnifiedToken(channelName, userId)
-    
-    // Join RTC channel
-    val options = ChannelMediaOptions().apply {
-        clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-        publishMicrophoneTrack = true
-        autoSubscribeAudio = true
-    }
-    rtcEngine.joinChannel(token, channelName, userId, options)
-    
-    // Login RTM
-    rtmClient.login(token) { error ->
-        if (error == null) {
-            // RTM login successful
-        }
-    }
-}
-```
-
-2. **启动 Agent**：
+   2. 在 `AgentStarter.kt` 中配置本地服务器 URL：
+   ```kotlin
+   object AgentStarter {
+       // Switch between local server and Agora API by commenting/uncommenting the lines below
+   //    private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+       private const val AGORA_API_BASE_URL = "http://10.0.2.2:8080"  // Android Emulator
+   //    private const val AGORA_API_BASE_URL = "http://192.168.1.100:8080"  // Physical device (replace with your computer IP)
+   }
+   ```
    
-   在连接成功后（RTC 和 RTM 都已连接），自动启动 Agent：
-```kotlin
-fun startAgent() {
-    // Generate token for agent
-    val agentToken = generateToken(channelName, agentUid)
-    
-    // Start agent via RESTful API
-    AgentStarter.startAgentAsync(
-        channelName = channelName,
-        agentRtcUid = agentUid.toString(),
-        token = agentToken
-    ).fold(
-        onSuccess = { agentId ->
-            // Agent started successfully
-            this.agentId = agentId
-        },
-        onFailure = { exception ->
-            // Handle error
-        }
-    )
-}
-```
-
-3. **订阅 RTM 消息**：
+   **IP 地址说明**：
+   - **Android 模拟器**：使用 `http://10.0.2.2:8080`（`10.0.2.2` 是模拟器访问主机 localhost 的特殊 IP）
+   - **真机**：使用 `http://<你的电脑IP>:8080`（查找电脑 IP：`ifconfig en0 | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'`）
    
-   订阅频道消息以接收 AI Agent 的状态和转录：
-```kotlin
-conversationalAIAPI?.subscribeMessage(channelName) { result ->
-    if (result.isSuccess) {
-        // Handle subscription success
-    }
-}
-```
-
-4. **注册事件处理器**：
+   **方式二：直接调用 Agora API 模式**（推荐用于生产环境）
    
-   实现 `IConversationalAIAPIEventHandler` 接口，处理各种事件：
-```kotlin
-conversationalAIAPI?.addHandler(object : IConversationalAIAPIEventHandler {
-    override fun onTranscript(transcript: Transcript) {
-        // Update transcript list
-        _transcriptList.value = _transcriptList.value + transcript
-    }
-    
-    override fun onStateChange(event: StateChangeEvent) {
-        // Update agent state
-        _agentState.value = event.state
-    }
-    
-    override fun onError(error: ModuleError) {
-        // Handle errors
-    }
-})
-```
-
-5. **实现 Compose UI 状态观察**：
+   不需要启动 Python 服务器，Android 应用直接调用 Agora API。
    
-   在 Compose 中观察 Agent 状态，控制说话状态指示器：
-```kotlin
-@Composable
-fun AgentSpeakingIndicator(agentState: AgentState?) {
-    val infiniteTransition = rememberInfiniteTransition(label = "speaking")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "scale"
-    )
-    
-    if (agentState == AgentState.SPEAKING) {
-        Icon(
-            imageVector = Icons.Default.Mic,
-            contentDescription = "Speaking",
-            modifier = Modifier.scale(scale)
-        )
-    }
-}
-```
+   在 `AgentStarter.kt` 中配置：
+   ```kotlin
+   object AgentStarter {
+       // Switch between local server and Agora API by commenting/uncommenting the lines below
+       private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+   //    private const val AGORA_API_BASE_URL = "http://10.0.2.2:8080"  // Local server
+   }
+   ```
+   
+   **注意**：URL 切换在 `AgentStarter.kt` 中完成，不再使用 `env.properties` 中的 `agentServerUrl` 配置。
 
-   观察转录列表，实现字幕显示：
-```kotlin
-@Composable
-fun TranscriptList(transcriptList: List<Transcript>) {
-    LazyColumn {
-        items(transcriptList) { transcript ->
-            TranscriptItem(transcript = transcript)
-        }
-    }
-    
-    LaunchedEffect(transcriptList.size) {
-        // Auto scroll to bottom when new transcript is added
-    }
-}
-```
+## 测试验证
 
-### 步骤3：测试验证
+1. **启动 Python HTTP 服务器**（如果使用 HTTP 服务器模式）：
+   
+   ```bash
+   cd ../server-python
+   python agora_http_server.py
+   ```
+   
+   服务器启动后，Android 应用会自动通过 `AgentStarter.kt` 中配置的地址调用服务器来启动 Agent。
+   
+   **注意**：
+   - 如果使用虚拟环境，请先激活虚拟环境：
+     ```bash
+     source venv/bin/activate  # macOS/Linux
+     # 或
+     venv\Scripts\activate  # Windows
+     ```
+   - 确保 Android 设备和电脑在同一局域网内（真机）或使用模拟器的特殊 IP（`10.0.2.2`）
+   - 如果端口被占用，可以修改服务器端口和 Android 代码中的端口号
 
-1. **运行 Android 应用**：
+2. **运行 Android 应用**：
    - 在 Android Studio 中运行应用
    - 在 Agent Configuration 页面查看配置信息（App ID 和 Pipeline ID）
    - 点击"Start"按钮开始连接
-
-2. **自动启动流程**：
    - 应用会自动生成随机的 channelName
    - 自动加入 RTC 频道并登录 RTM
    - 连接成功后自动导航到 Voice Assistant 页面
    - 自动启动 AI Agent（通过 RESTful API）
    - Agent 启动成功后即可开始对话
 
-3. **使用本地代理服务器（可选）**：
-   
-   如果需要使用本地代理服务器进行开发调试：
-   - 参考 [server-python](../server-python/README.md) 的说明启动本地服务器
-   - 在 `AgentStarter.kt` 中修改 `AGORA_API_BASE_URL`：
-     ```kotlin
-     // 注释掉 Agora API 地址
-     // private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
-     // 使用本地服务器地址
-     private const val AGORA_API_BASE_URL = "http://10.0.2.2:8080"  // Android 模拟器
-     // 或
-     private const val AGORA_API_BASE_URL = "http://<your-local-ip>:8080"  // 物理设备
-     ```
-   - 重新编译并运行应用
-
-4. **验证功能**：
+3. **验证功能**：
    - ✅ 检查是否成功加入 RTC 频道
    - ✅ 检查是否成功登录 RTM
    - ✅ 检查 Agent 是否成功启动（查看状态消息）
@@ -298,50 +173,45 @@ fun TranscriptList(transcriptList: List<Transcript>) {
    - ✅ 验证 Agent 说话状态指示器（VoiceWaveView）是否正常显示动画
    - ✅ 测试与 AI Agent 的对话交互
 
-## 扩展功能
+## 项目结构
 
-### Jetpack Compose 特性
-
-本示例展示了如何在 Compose 中集成 Conversational AI：
-
-- **声明式 UI**：使用 Compose 函数式 UI 构建界面
-- **状态管理**：使用 `remember`、`mutableStateOf` 和 ViewModel 管理状态
-- **动画效果**：使用 Compose Animation API 实现 Agent 说话状态指示器
-- **列表显示**：使用 `LazyColumn` 显示转录列表
-- **Material 3**：使用 Material 3 设计系统构建现代化 UI
-
-### 高级配置
-
-本示例展示了基础的 Conversational AI 集成方式。更多高级功能请参考 [ConversationalAI API 组件文档](./app/src/main/java/io/agora/convoai/convoaiApi/README.md)，包括：
-
-- **自定义音频参数**：配置不同的音频场景（标准模式、数字人模式等）
-- **自定义转录渲染模式**：支持文本模式和逐词模式
-- **发送消息给 AI Agent**：发送文本消息、图片消息，支持优先级控制
-- **打断 Agent**：实现打断 AI Agent 的功能
-- **消息状态跟踪**：处理消息发送成功/失败的回调
-- **事件处理**：处理 Agent 状态变化、错误、指标等事件
-
-### 性能优化
-
-- 使用 `AUDIO_SCENARIO_AI_CLIENT` 场景以获得最佳 AI 对话质量
-- 根据网络状况调整音频编码参数
-- 及时清理不再使用的 Transcript 数据
-- 使用 `LazyColumn` 优化长列表性能
-- 使用 `remember` 和 `derivedStateOf` 优化 Compose 重组
-- 实现 Token 自动刷新机制
-- 处理网络断开重连逻辑
-
-### 最佳实践
-
-- 实现完善的错误处理机制，包括网络错误、Token 过期等
-- 使用 StateFlow 和 Compose State 统一管理 UI 状态
-- 将业务逻辑与 UI 分离，使用 ViewModel 管理状态
-- 在 Compose 中正确使用 `remember` 和 `LaunchedEffect`
-- 在加入频道前检查并请求麦克风权限
-- 正确管理 RTC Engine 和 RTM Client 的生命周期
-- 在 Activity/Composable 销毁时清理资源
-- 启用 API 日志以便调试：`enableLog = true`
-
+```
+android-compose/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── io/agora/convoai/example/compose/voiceassistant/
+│   │   │   │       ├── AgentApp.kt              # Application 类
+│   │   │   │       ├── KeyCenter.kt            # 配置中心
+│   │   │   │       ├── MainActivity.kt          # 主 Activity
+│   │   │   │       ├── ui/
+│   │   │   │       │   ├── AgentConfigScreen.kt  # Agent 配置界面（Compose）
+│   │   │   │       │   ├── VoiceAssistantScreen.kt # 语音助手界面（Compose）
+│   │   │   │       │   ├── ConversationViewModel.kt # 对话 ViewModel
+│   │   │   │       │   ├── VoiceWaveView.kt     # 语音波形动画组件
+│   │   │   │       │   └── theme/               # Compose 主题配置
+│   │   │   │       │       ├── Color.kt
+│   │   │   │       │       ├── Theme.kt
+│   │   │   │       │       └── Type.kt
+│   │   │   │       ├── rtc/
+│   │   │   │       │   ├── RtcManager.kt       # RTC 管理器
+│   │   │   │       │   └── RtmManager.kt        # RTM 管理器
+│   │   │   │       ├── tools/
+│   │   │   │       │   ├── AgentStarter.kt      # Agent 启动器
+│   │   │   │       │   ├── TokenGenerator.kt    # Token 生成器
+│   │   │   │       │   ├── PermissionHelp.kt    # 权限帮助类
+│   │   │   │       │   └── Base64Encoding.kt    # Base64 编码工具
+│   │   │   │       └── net/
+│   │   │   │           ├── SecureOkHttpClient.kt # 安全 HTTP 客户端
+│   │   │   │           └── HttpLogger.kt        # HTTP 日志记录器
+│   │   │   └── res/                             # 资源文件
+│   │   └── convoaiApi/                          # Conversational AI API（Kotlin）
+│   └── build.gradle
+├── env.properties                                # 环境配置（需要创建）
+├── env.example.properties                        # 环境配置示例
+└── README.md                                     # 本文档
+```
 
 ## 相关资源
 

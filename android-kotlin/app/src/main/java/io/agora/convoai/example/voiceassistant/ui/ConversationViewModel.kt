@@ -3,7 +3,7 @@ package io.agora.convoai.example.voiceassistant.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.agora.convoai.example.voiceassistant.rtc.CovRtmManager
+import io.agora.convoai.example.voiceassistant.rtc.RtmManager
 import io.agora.convoai.example.voiceassistant.rtc.IRtmManagerListener
 import io.agora.convoai.example.voiceassistant.rtc.RtcManager
 import io.agora.convoai.example.voiceassistant.tools.AgentStarter
@@ -213,9 +213,9 @@ class ConversationViewModel : ViewModel() {
             Log.d(TAG, "Initializing RTC engine and RTM client...")
 
             val rtcEngine = RtcManager.createRtcEngine(rtcEventHandler)
-            val rtmClient = CovRtmManager.createRtmClient(userId)
+            val rtmClient = RtmManager.createRtmClient(userId)
             // Setup RTM listener
-            CovRtmManager.addListener(rtmListener)
+            RtmManager.addListener(rtmListener)
 
             initializeAPIs(rtcEngine, rtmClient)
 
@@ -382,7 +382,7 @@ class ConversationViewModel : ViewModel() {
                 RtcManager.joinChannel(token, channelName, userId)
 
                 // Login RTM with the same unified token
-                CovRtmManager.login(token) { exception ->
+                RtmManager.login(token) { exception ->
                     viewModelScope.launch {
                         if (exception == null) {
                             rtmLoggedIn = true
@@ -500,7 +500,7 @@ class ConversationViewModel : ViewModel() {
                 }
 
                 RtcManager.leaveChannel()
-                CovRtmManager.logout()
+                RtmManager.logout()
                 rtcJoined = false
                 rtmLoggedIn = false
                 _uiState.value = _uiState.value.copy(
@@ -518,7 +518,7 @@ class ConversationViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         RtcManager.leaveChannel()
-        CovRtmManager.logout()
+        RtmManager.logout()
         // Note: RtcEngine.destroy() should be called carefully as it's a global operation
         // Consider managing RTC engine lifecycle at Application level
     }

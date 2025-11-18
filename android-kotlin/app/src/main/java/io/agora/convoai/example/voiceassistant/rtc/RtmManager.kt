@@ -33,8 +33,8 @@ interface IRtmManagerListener {
     fun onPresenceEvent(event: PresenceEvent){}
 }
 
-object CovRtmManager : RtmEventListener {
-    private val TAG = "CovRtmManager"
+object RtmManager : RtmEventListener {
+    private val TAG = "RtmManager"
 
     @Volatile
     private var isRtmLogin = false

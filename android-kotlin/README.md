@@ -56,7 +56,39 @@ cd Agora-AI-Recipes-Starter/android-kotlin
    - 使用 Android Studio 打开项目
    - 等待 Gradle 同步完成
 
-3. **配置 Agent 启动方式**：
+3. **配置 Agora Key**：
+   
+   1. 复制 `env.example.properties` 文件为 `env.properties`：
+   ```bash
+   cp env.example.properties env.properties
+   ```
+   
+   2. 编辑 `env.properties` 文件，填入你的实际配置值：
+   ```properties
+   agora.appId=your_app_id
+   agora.appCertificate=your_app_certificate
+   agora.restKey=your_rest_key
+   agora.restSecret=your_rest_secret
+   agora.pipelineId=your_pipeline_id
+   ```
+   
+   **配置项说明**：
+   - `agora.appId`：你的 Agora App ID（必需）
+   - `agora.appCertificate`：你的 App Certificate（必需，用于 Token 生成）
+   - `agora.restKey`：REST API Key（必需，用于启动 Agent）
+   - `agora.restSecret`：REST API Secret（必需，用于启动 Agent）
+   - `agora.pipelineId`：Pipeline ID（必需，用于启动 Agent）
+   
+   **获取方式**：
+   - App ID 和 App Certificate：在 [Agora Console](https://console.shengwang.cn/) 中创建项目后获取
+   - REST Key 和 REST Secret：在 Agora Console 的项目设置中获取
+   - Pipeline ID：在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 中创建 Pipeline 后获取
+   
+   **注意**：
+   - `env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+   - 每次启动时会自动生成随机的 channelName，无需手动配置。
+
+4. **配置 Agent 启动方式**：
    
    有两种方式启动 Agent，在 `AgentStarter.kt` 中直接切换：
    
@@ -97,169 +129,9 @@ cd Agora-AI-Recipes-Starter/android-kotlin
    }
    ```
    
-   在 `env.properties` 中配置 REST API 凭证：
-   ```properties
-   agora.restKey=your_rest_key
-   agora.restSecret=your_rest_secret
-   agora.pipelineId=your_pipeline_id
-   ```
-
-### 配置说明
-
-1. **配置 App ID 和 App Certificate**：
-   
-   1. 复制 `env.example.properties` 文件为 `env.properties`：
-   ```bash
-   cp env.example.properties env.properties
-   ```
-   
-   2. 编辑 `env.properties` 文件，填入你的实际配置值：
-   - `agora.appId`：你的 Agora App ID
-   - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
-   - `agora.restKey`：REST API Key（直接 API 模式必需，HTTP 服务器模式也需要）
-   - `agora.restSecret`：REST API Secret（直接 API 模式必需，HTTP 服务器模式也需要）
-   - `agora.pipelineId`：Pipeline ID（直接 API 模式必需，HTTP 服务器模式也需要）
-   
    **注意**：URL 切换在 `AgentStarter.kt` 中完成，不再使用 `env.properties` 中的 `agentServerUrl` 配置。
 
-2. **权限配置**：
-   
-   确保 `AndroidManifest.xml` 中包含以下权限：
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.RECORD_AUDIO" />
-<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-```
-
-## 实现步骤
-
-### 步骤1：基础设置
-
-1. **初始化 RTC Engine**：
-   
-   在 `RtcManager.kt` 中创建 RTC Engine 实例：
-```kotlin
-val config = RtcEngineConfig()
-config.mContext = context
-config.mAppId = appId
-config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
-config.mAudioScenario = Constants.AUDIO_SCENARIO_DEFAULT
-config.mEventHandler = rtcEventHandler
-val rtcEngine = RtcEngine.create(config) as RtcEngineEx
-rtcEngine.enableVideo()
-```
-
-2. **初始化 RTM Client**：
-   
-   在 `RtmManager.kt` 中创建 RTM Client 实例：
-```kotlin
-val rtmConfig = RtmConfig.Builder(appId, userId.toString()).build()
-val rtmClient = RtmClient.create(rtmConfig)
-rtmClient.addEventListener(rtmEventListener)
-```
-
-3. **配置 ConversationalAI API**：
-   
-   在 `ConversationViewModel.kt` 中初始化 API：
-```kotlin
-val config = ConversationalAIAPIConfig(
-    rtcEngine = rtcEngine,
-    rtmClient = rtmClient,
-    enableLog = true,
-    renderMode = TranscriptRenderMode.Text
-)
-conversationalAIAPI = ConversationalAIAPIImpl(config)
-```
-
-### 步骤2：核心实现
-
-1. **加入频道和登录 RTM**：
-   
-   实现 `joinChannelAndLogin()` 方法，依次加入 RTC 频道和登录 RTM：
-```kotlin
-fun joinChannelAndLogin(channelName: String) {
-    // Generate unified token for RTC and RTM
-    val token = generateUnifiedToken(channelName, userId)
-    
-    // Join RTC channel
-    val options = ChannelMediaOptions().apply {
-        clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-        publishMicrophoneTrack = true
-        autoSubscribeAudio = true
-    }
-    rtcEngine.joinChannel(token, channelName, userId, options)
-    
-    // Login RTM
-    rtmClient.login(token) { error ->
-        if (error == null) {
-            // RTM login successful
-        }
-    }
-}
-```
-
-2. **订阅 RTM 消息**：
-   
-   订阅频道消息以接收 AI Agent 的状态和转录：
-```kotlin
-conversationalAIAPI?.subscribeMessage(channelName) { result ->
-    if (result.isSuccess) {
-        // Handle subscription success
-    }
-}
-```
-
-3. **注册事件处理器**：
-   
-   实现 `IConversationalAIAPIEventHandler` 接口，处理各种事件：
-```kotlin
-conversationalAIAPI?.addHandler(object : IConversationalAIAPIEventHandler {
-    override fun onTranscript(transcript: Transcript) {
-        // Update transcript list
-        _transcriptList.value = _transcriptList.value + transcript
-    }
-    
-    override fun onStateChange(event: StateChangeEvent) {
-        // Update agent state
-        _agentState.value = event.state
-    }
-    
-    override fun onError(error: ModuleError) {
-        // Handle errors
-    }
-})
-```
-
-4. **实现 UI 状态观察**：
-   
-   在 `VoiceAssistantFragment.kt` 中观察 Agent 状态，控制说话状态指示器：
-```kotlin
-lifecycleScope.launch {
-    viewModel.agentState.collect { agentState ->
-        agentState?.let {
-            if (agentState == AgentState.SPEAKING) {
-                agentSpeakingIndicator.startAnimation()
-            } else {
-                agentSpeakingIndicator.stopAnimation()
-            }
-        }
-    }
-}
-```
-
-   观察转录列表，实现字幕显示：
-```kotlin
-viewLifecycleOwner.lifecycleScope.launch {
-    viewModel.transcriptList.collect { transcriptList ->
-        transcriptAdapter.submitList(transcriptList) 
-        if (autoScrollToBottom) {
-            scrollToBottom()
-            }
-    }
-}
-```
-
-### 步骤3：测试验证
+## 测试验证
 
 1. **启动 Python HTTP 服务器**（如果使用 HTTP 服务器模式）：
    
@@ -282,18 +154,65 @@ viewLifecycleOwner.lifecycleScope.launch {
 
 2. **运行 Android 应用**：
    - 在 Android Studio 中运行应用
-   - 输入频道名称
-   - 点击"Start"按钮
-   - 应用会自动启动 Agent 并加入频道
+   - 在 Agent Configuration 页面查看配置信息（App ID 和 Pipeline ID）
+   - 点击"Start"按钮开始连接
+   - 应用会自动生成随机的 channelName
+   - 自动加入 RTC 频道并登录 RTM
+   - 连接成功后自动导航到 Voice Assistant 页面
+   - 自动启动 AI Agent（通过 RESTful API）
+   - Agent 启动成功后即可开始对话
 
 3. **验证功能**：
    - ✅ 检查是否成功加入 RTC 频道
    - ✅ 检查是否成功登录 RTM
+   - ✅ 检查 Agent 是否成功启动（查看状态消息）
    - ✅ 验证音频传输是否正常
    - ✅ 测试静音/取消静音功能
    - ✅ 验证转录功能是否正常显示
-   - ✅ 验证 Agent 说话状态指示器是否正常显示动画
+   - ✅ 验证 Agent 说话状态指示器（VoiceWaveView）是否正常显示动画
    - ✅ 测试与 AI Agent 的对话交互
+
+## 项目结构
+
+```
+android-kotlin/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── io/agora/convoai/example/voiceassistant/
+│   │   │   │       ├── AgentApp.kt              # Application 类
+│   │   │   │       ├── KeyCenter.kt             # 配置中心
+│   │   │   │       ├── ui/
+│   │   │   │       │   ├── MainActivity.kt       # 主 Activity
+│   │   │   │       │   ├── AgentConfigFragment.kt    # Agent 配置界面
+│   │   │   │       │   ├── VoiceAssistantFragment.kt # 语音助手界面
+│   │   │   │       │   ├── ConversationViewModel.kt # 对话 ViewModel
+│   │   │   │       │   ├── CommonDialog.kt      # 通用对话框
+│   │   │   │       │   └── common/              # 通用 UI 组件
+│   │   │   │       │       ├── BaseActivity.kt
+│   │   │   │       │       ├── BaseFragment.kt
+│   │   │   │       │       ├── BaseDialogFragment.kt
+│   │   │   │       │       ├── SnackbarHelper.kt
+│   │   │   │       │       └── VoiceWaveView.kt
+│   │   │   │       ├── rtc/
+│   │   │   │       │   ├── RtcManager.kt        # RTC 管理器
+│   │   │   │       │   └── RtmManager.kt        # RTM 管理器
+│   │   │   │       ├── tools/
+│   │   │   │       │   ├── AgentStarter.kt      # Agent 启动器
+│   │   │   │       │   ├── TokenGenerator.kt # Token 生成器
+│   │   │   │       │   ├── PermissionHelp.kt    # 权限帮助类
+│   │   │   │       │   └── Base64Encoding.kt    # Base64 编码工具
+│   │   │   │       └── net/
+│   │   │   │           ├── SecureOkHttpClient.kt # 安全 HTTP 客户端
+│   │   │   │           └── HttpLogger.kt        # HTTP 日志记录器
+│   │   │   └── res/                              # 资源文件
+│   │   └── convoaiApi/                          # Conversational AI API（Kotlin）
+│   └── build.gradle
+├── env.properties                                # 环境配置（需要创建）
+├── env.example.properties                        # 环境配置示例
+└── README.md                                     # 本文档
+```
 
 ## 相关资源
 

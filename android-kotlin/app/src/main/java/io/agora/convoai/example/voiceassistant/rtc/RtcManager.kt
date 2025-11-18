@@ -18,7 +18,7 @@ import kotlin.apply
 
 object RtcManager {
 
-    private const val TAG = "CovAgoraManager"
+    private const val TAG = "RtcManager"
 
     private var rtcEngine: RtcEngineEx? = null
 
