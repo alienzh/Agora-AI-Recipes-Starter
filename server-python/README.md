@@ -40,27 +40,7 @@ pip install -r requirements.txt
 
 ## 配置
 
-### 方式一：使用环境变量
-
-```bash
-export AGORA_APP_ID=your_app_id_here
-```
-
-### 方式二：使用 .env.local 文件（推荐）
-
-1. **创建 `.env.local` 文件**：
-```bash
-# Agora App ID (Project ID)
-AGORA_APP_ID=your_app_id_here
-```
-
-### 方式三：使用命令行参数
-
-```bash
-python agora_http_server.py --appid YOUR_APP_ID
-```
-
-**注意**：HTTP 服务器采用透传模式，所有其他参数（如 `pipeline_id`、`channel_name`、`token`、`Authorization` header 等）都由客户端提供，服务器不需要配置。
+**注意**：HTTP 服务器采用透传模式，服务器本身不需要配置任何 Agora 相关参数（如 App ID、Pipeline ID 等）。所有参数（包括 `pipeline_id`、`channel_name`、`token`、`Authorization` header 等）都由客户端在请求中提供，服务器直接透传给 Agora RESTful API。
 
 ## 启动服务器
 
@@ -74,15 +54,7 @@ python agora_http_server.py
 
 ### 自定义端口和主机
 
-```bash
-# 使用环境变量
-PORT=5000 python agora_http_server.py
-HOST=127.0.0.1 PORT=5000 python agora_http_server.py
-
-# 使用命令行参数
-python agora_http_server.py --port 5000
-python agora_http_server.py --host 127.0.0.1 --port 5000
-```
+服务器默认运行在 `http://0.0.0.0:8080`。如需修改，请直接编辑 `agora_http_server.py` 文件中的 `host` 和 `port` 变量。
 
 ### 使用虚拟环境（推荐）
 
@@ -146,6 +118,32 @@ Authorization: Basic <base64_encoded_credentials>
   }
 }
 ```
+
+**DataStream 模式**（可选）：
+如果使用 RTC DataStream 进行消息传递（如 HarmonyOS），需要在 `properties` 中添加以下配置：
+```json
+{
+  "name": "agent_name",
+  "pipeline_id": "pipeline_id",
+  "properties": {
+    "channel": "channel_name",
+    "agent_rtc_uid": "1009527",
+    "remote_rtc_uids": ["*"],
+    "token": "token_string",
+    "parameters": {
+      "data_channel": "datastream"
+    },
+    "advanced_features": {
+      "enable_rtm": false
+    }
+  }
+}
+```
+
+**注意**：
+- 服务器采用透传模式，所有参数（包括 dataStream 配置）都需要客户端在请求体中提供
+- 服务器不做任何修改，直接透传给 Agora RESTful API
+- 对于使用 RTM 的场景（如 Android、iOS），不需要添加 `parameters` 和 `advanced_features` 字段
 
 **响应**（与 Agora API 格式一致）：
 ```json

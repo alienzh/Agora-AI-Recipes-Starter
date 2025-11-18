@@ -36,6 +36,7 @@ def start_agent(project_id: str):
     """
     Start an Agora conversational AI agent
     Unified interface: same format as Agora API
+    Transparent proxy mode: all data is passed through as-is
     
     Request body (JSON):
     {
@@ -45,7 +46,14 @@ def start_agent(project_id: str):
             "channel": "channel_name",
             "agent_rtc_uid": "1009527",
             "remote_rtc_uids": ["*"],
-            "token": "token_string"
+            "token": "token_string",
+            // Optional: for dataStream mode, add these fields:
+            "parameters": {
+                "data_channel": "datastream"
+            },
+            "advanced_features": {
+                "enable_rtm": false
+            }
         }
     }
     
