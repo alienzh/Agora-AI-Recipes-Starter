@@ -71,6 +71,7 @@ export class MessageParser {
             throw new Error(`Missing part ${i}`);
           }
           completeMessage += part;
+          messageParts.clear()
         }
 
         // Decode Base64 to bytes and convert to string
@@ -86,11 +87,14 @@ export class MessageParser {
           const errorMessage = e instanceof Error ? e.message : 'Unknown error';
           throw new Error(`Failed to decode Base64 or UTF-8 string: ${errorMessage}`);
         }
-        console.debug(`alien parser ${jsonString}`)
 
         // Parse JSON using parseJsonToMap method
         const result = this.parseJsonToMap(jsonString);
-        if (!result) {
+
+        if (result) {
+          // Use JSON.stringify to properly print Record/Map object
+
+        } else {
           throw new Error('Failed to parse JSON or result is not an object');
         }
 

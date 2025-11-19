@@ -386,7 +386,7 @@ export interface IConversationalAIAPI {
    * rtcEngine.joinChannel(token, channelName, null, userId);
    * ```
    */
-  loadAudioSettings(scenario?: number): void;
+  loadAudioSettings(): void;
 
   /**
    * Register callback for receiving RTC data stream messages.

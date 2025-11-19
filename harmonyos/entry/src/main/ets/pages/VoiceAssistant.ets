@@ -1,4 +1,4 @@
-import { ConversationViewModel, ConnectionState, ConversationUiState } from '../viewmodel/ConversationViewModel';
+import { ConversationViewModel, ConnectionState, ConversationUiState } from './ConversationViewModel';
 import { Transcript, AgentState, TranscriptType, TranscriptStatus } from '../convoaiApi/IConversationalAIAPI';
 import { VoiceWaveView } from './common/VoiceWaveView';
 import { TranscriptDataSource } from './common/TranscriptDataSource';
@@ -247,7 +247,7 @@ export struct VoiceAssistant {
   buildAgentIndicator() {
     Column() {
       VoiceWaveView()
-        .scale({ x: 4.0, y: 4.0 }) // Scale up 4x - apply scale to VoiceWaveView itself, not the container
+        .scale({ x: 3, y: 3.0 }) // Scale up 4x - apply scale to VoiceWaveView itself, not the container
     }
     .width('100%')
     .layoutWeight(1) // Same as transcript list to occupy the same space
@@ -272,64 +272,89 @@ export struct VoiceAssistant {
   buildControlButtons() {
     Row() {
       // Mute button
-      Button() {
-        Text(this.uiState.isMuted ? '🔇' : '🎤')
-          .fontSize(24)
-          .fontColor(Color.White)
-      }
-      .width(64)
-      .height(64)
-      .borderRadius(32)
-      .backgroundColor(this.uiState.isMuted ? '#F44336' : '#4CAF50')
-      .onClick(() => {
-        this.viewModel.toggleMute();
-      })
+      Column() {
+        Stack({ alignContent: Alignment.Center }) {
+          Circle({ width: 72, height: 72 })
+            .fill('#4CAF50')
 
-      Blank()
+          // Microphone icon
+          Image(this.uiState.isMuted ? $r('app.media.icon_mic_off') : $r('app.media.icon_mic_on'))
+            .width(32)
+            .height(32)
+            .fillColor(Color.White)
+        }
+        .width(72)
+        .height(72)
+        .onClick(() => {
+          this.viewModel.toggleMute();
+        })
+        .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.EaseInOut }))
+        
+        Text(this.uiState.isMuted ? '静音' : '麦克风')
+          .fontSize(12)
+          .fontColor('#666666')
+          .margin({ top: 8 })
+      }
+      .alignItems(HorizontalAlign.Center)
+      .layoutWeight(1)
 
       // Transcript toggle button
-      Button() {
-        Text(this.uiState.isTranscriptEnabled ? '📝' : '📄')
-          .fontSize(24)
-          .fontColor(Color.White)
-      }
-      .width(64)
-      .height(64)
-      .borderRadius(32)
-      .backgroundColor('#2196F3')
-      .onClick(() => {
-        this.viewModel.toggleTranscript();
-      })
+      Column() {
+        Stack({ alignContent: Alignment.Center }) {
+          Circle({ width: 72, height: 72 })
+            .fill('#2196F3')
 
-      Blank()
+          // Subtitles/Transcript icon
+          Image(this.uiState.isTranscriptEnabled ? $r('app.media.icon_transcript_on') : $r('app.media.icon_transcript_off'))
+            .width(32)
+            .height(32)
+            .fillColor(Color.White)
+        }
+        .width(72)
+        .height(72)
+        .onClick(() => {
+          this.viewModel.toggleTranscript();
+        })
+        .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.EaseInOut }))
+        
+        Text('字幕')
+          .fontSize(12)
+          .fontColor('#666666')
+          .margin({ top: 8 })
+      }
+      .alignItems(HorizontalAlign.Center)
+      .layoutWeight(1)
 
       // Hangup button
-      Button() {
-        Text('📞')
-          .fontSize(24)
-          .fontColor(Color.White)
+      Column() {
+        Stack({ alignContent: Alignment.Center }) {
+          Circle({ width: 72, height: 72 })
+            .fill('#F44336')
+
+          // Phone hangup icon
+          Image($r('app.media.icon_hangup'))
+            .width(32)
+            .height(32)
+            .fillColor(Color.White)
+        }
+        .width(72)
+        .height(72)
+        .onClick(() => {
+          this.handleHangup();
+        })
+        .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.EaseInOut }))
+        
+        Text('挂断')
+          .fontSize(12)
+          .fontColor('#666666')
+          .margin({ top: 8 })
       }
-      .width(64)
-      .height(64)
-      .borderRadius(32)
-      .backgroundColor('#F44336')
-      .onClick(() => {
-        this.handleHangup();
-      })
+      .alignItems(HorizontalAlign.Center)
+      .layoutWeight(1)
     }
     .width('100%')
-    .height(80)
-    .justifyContent(FlexAlign.SpaceEvenly)
-    .padding({ left: 32, right: 32, top: 16, bottom: 16 })
-    .backgroundColor('#FFFFFF')
-    .borderRadius(32)
+    .padding({ left: 24, right: 24, top: 24, bottom: 24 })
     .margin({ left: 16, right: 16, bottom: 32 })
-    .shadow({
-      radius: 8,
-      color: '#1F000000',
-      offsetX: 0,
-      offsetY: 2
-    })
   }
 
   /**
@@ -455,4 +480,5 @@ export struct VoiceAssistant {
   }
 
 }
+
 

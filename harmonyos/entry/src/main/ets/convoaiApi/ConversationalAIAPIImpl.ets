@@ -1,5 +1,5 @@
 import {
-  RtcEngineEx, Constants
+  RtcEngineEx, Constants, RtcEngine
 } from '@shengwang/rtc-full';
 import {
   IConversationalAIAPI,
@@ -30,9 +30,8 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
   private config: ConversationalAIAPIConfig;
   private messageParser: MessageParser;
   private transcriptController: TranscriptController;
-  private channelName: string | null = null;
   private conversationalAIHandlerHelper: ObservableHelper<IConversationalAIAPIEventHandler>;
-  private audioRouting: number = 0; // Audio routing, default to 0
+  private audioRouting: number = Constants.AudioRouteTypes.AUDIO_ROUTE_DEFAULT;
   private stateChangeEvent: StateChangeEvent | null = null;
   private dataStreamId: number = 0; // RTC datastream ID
 
@@ -45,9 +44,11 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
     this.conversationalAIHandlerHelper = new ObservableHelper<IConversationalAIAPIEventHandler>();
 
     // Initialize transcript controller
+    // Note: HarmonyOS RTC SDK does not fully support word-level rendering,
+    // so we only support Text mode
     const transcriptConfig = new TranscriptConfig(
       config.rtcEngine,
-      config.renderMode || TranscriptRenderMode.Word,
+      TranscriptRenderMode.Text, // Force Text mode for HarmonyOS
       {
         onTranscriptUpdated: (agentUserId: string, transcript: Transcript) => {
           this.conversationalAIHandlerHelper.notifyEventHandlers((handler) => {
@@ -264,7 +265,6 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
     );
 
     this.transcriptController.reset();
-    this.channelName = channelName;
     this.stateChangeEvent = null;
 
     // RTC datastream messages are automatically received via onStreamMessage callback
@@ -274,7 +274,6 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
       this.createDataStream();
       if (this.dataStreamId === 0) {
         // Failed to create datastream
-        this.channelName = null;
         this.stateChangeEvent = null;
         ConversationalAIUtils.runOnMainThread(() => {
           completion(new ConversationalAIAPIError(-1, 'Failed to create datastream'));
@@ -292,7 +291,6 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
   }
 
   unsubscribeMessage(channelName: string, completion: (error: ConversationalAIAPIError | null) => void): void {
-    this.channelName = null;
     const traceId = this.genTraceId();
     this.callMessagePrint(
       TAG,
@@ -436,11 +434,11 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
     }
   }
 
-  loadAudioSettings(scenario?: number): void {
+  loadAudioSettings(): void {
     // Default audio scenario for AI client, adjust based on actual SDK constants
-    const defaultScenario = scenario || 12; // AUDIO_SCENARIO_AI_CLIENT typically 12
-    this.callMessagePrint(TAG, `>>> [loadAudioSettings] scenario:${defaultScenario}`);
-    this.config.rtcEngine.setAudioScenario(defaultScenario);
+    const defaultScenario = Constants.AudioScenarioType.CHORUS;
+    this.callMessagePrint(TAG, `>>> [loadAudioSettings] scenario:${defaultScenario} ${RtcEngine.getSdkVersion()}}`);
+    this.config.rtcEngine.setAudioScenario(Constants.AudioScenarioType.CHORUS);
     this.setAudioConfigParameters(this.audioRouting);
   }
 
@@ -455,7 +453,7 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
   destroy(): void {
     this.callMessagePrint(TAG, '>>> [destroy]');
     this.conversationalAIHandlerHelper.unSubscribeAll();
-    this.transcriptController.release();
+    this.transcriptController.reset();
     this.dataStreamId = 0;
   }
 
@@ -464,10 +462,7 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
    * You should set it before joinChannel and when audio route changed
    */
   private setAudioConfigParameters(routing: number): void {
-    this.callMessagePrint(
-      TAG,
-      `setAudioConfigParameters routing:${routing}`
-    );
+    this.callMessagePrint(TAG, `setAudioConfigParameters routing:${routing}`);
     this.audioRouting = routing;
 
     const rtcEngine = this.config.rtcEngine;

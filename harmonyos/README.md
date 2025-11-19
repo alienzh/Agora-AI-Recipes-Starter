@@ -56,7 +56,54 @@ cd Agora-AI-Recipes-Starter/harmonyos
    - 使用 DevEco Studio 打开项目
    - 等待依赖同步完成
 
-3. **配置 Agent 启动方式**：
+3. **配置 Agora Key**：
+   
+   1. 复制 `env.example.json` 文件为 `env.json`：
+   ```bash
+   cp env.example.json env.json
+   ```
+   
+   2. 编辑 `env.json` 文件，填入你的实际配置值：
+   ```json
+   {
+     "appId": "your_app_id_here",
+     "appCertificate": "your_app_certificate_here",
+     "restKey": "your_rest_key_here",
+     "restSecret": "your_rest_secret_here",
+     "pipelineId": "your_pipeline_id_here"
+   }
+   ```
+   
+   **配置项说明**：
+   - `appId`：你的 Agora App ID（必需）
+   - `appCertificate`：你的 App Certificate（必需，用于 Token 生成）
+   - `restKey`：REST API Key（必需，用于启动 Agent）
+   - `restSecret`：REST API Secret（必需，用于启动 Agent）
+   - `pipelineId`：Pipeline ID（必需，用于启动 Agent）
+   
+   **获取方式**：
+   - App ID 和 App Certificate：在 [Agora Console](https://console.shengwang.cn/) 中创建项目后获取
+   - REST Key 和 REST Secret：在 Agora Console 的项目设置中获取
+   - Pipeline ID：在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 中创建 Pipeline 后获取
+   
+   **注意**：
+   - `env.json` 文件包含敏感信息，已在 `.gitignore` 中，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+   - 构建项目时，构建脚本会自动读取 `env.json` 并生成配置文件：
+     - 构建脚本（`entry/hvigorfile.ts`）会在构建时读取 `harmonyos/env.json`
+     - 自动生成 `entry/src/main/ets/common/KeyCenterConfig.ets`
+     - 配置会被编译到应用中
+   - 如果 `env.json` 文件不存在或字段缺失，构建时会生成空字符串作为默认值
+   - 每次启动时会自动生成随机的 channelName，无需手动配置。
+   
+   **⚠️ 安全说明**：
+   - 配置会在构建时从 `env.json` 读取并编译到应用中
+   - 生成的 `KeyCenterConfig.ets` 会被编译到应用中，可以通过反编译查看
+   - **生产环境建议**：
+     - 使用 HarmonyOS HUKS（通用密钥库）安全存储敏感信息
+     - 从安全的后端服务器动态获取凭证
+     - 使用加密存储，密钥由用户输入或从安全服务器获取
+
+4. **配置 Agent 启动方式**：
    
    有两种方式启动 Agent，在 `AgentStarter.ets` 中直接切换：
    
@@ -95,215 +142,10 @@ cd Agora-AI-Recipes-Starter/harmonyos
    //  private static readonly AGORA_API_BASE_URL = 'http://<你的电脑IP>:8080';  // Local server
    }
    ```
+   
+   **注意**：URL 切换在 `AgentStarter.ets` 中完成，不再使用 `env.json` 中的 `agentServerUrl` 配置。
 
-### 配置说明
-
-1. **配置 App ID 和 App Certificate**：
-   
-   1. 复制 `env.example.json` 文件为 `env.json`：
-   ```bash
-   cp env.example.json env.json
-   ```
-   
-   2. 编辑 `env.json` 文件，填入你的实际配置值：
-   ```json
-   {
-     "appId": "your_app_id_here",
-     "appCertificate": "your_app_certificate_here",
-     "restKey": "your_rest_key_here",
-     "restSecret": "your_rest_secret_here",
-     "pipelineId": "your_pipeline_id_here"
-   }
-   ```
-   
-   3. 构建项目时，构建脚本会自动读取 `env.json` 并生成配置文件：
-      - 构建脚本（`entry/hvigorfile.ts`）会在构建时读取 `harmonyos/env.json`
-      - 自动生成 `entry/src/main/ets/common/KeyCenterConfig.ets`
-      - 配置会被编译到应用中
-   
-   **注意**：
-   - `appId`：你的 Agora App ID
-   - `appCertificate`：你的 App Certificate（可选，用于 Token 生成）
-   - `restKey`：REST API Key（直接 API 模式必需，HTTP 服务器模式也需要）
-   - `restSecret`：REST API Secret（直接 API 模式必需，HTTP 服务器模式也需要）
-   - `pipelineId`：Pipeline ID（直接 API 模式必需，HTTP 服务器模式也需要）
-   - URL 切换在 `AgentStarter.ets` 中完成
-   - `env.json` 文件已在 `.gitignore` 中，不会被提交到代码仓库
-   - 如果 `env.json` 文件不存在或字段缺失，构建时会生成空字符串作为默认值
-   - 使用 JSON 格式是 HarmonyOS 推荐的方式
-   - 构建时会自动生成 `KeyCenterConfig.ets`，该文件也在 `.gitignore` 中
-   
-   **⚠️ 安全说明**：
-   - 配置会在构建时从 `env.json` 读取并编译到应用中
-   - `env.json` 文件已在 `.gitignore` 中，不会被提交到代码仓库
-   - 生成的 `KeyCenterConfig.ets` 会被编译到应用中，可以通过反编译查看
-   - **生产环境建议**：
-     - 使用 HarmonyOS HUKS（通用密钥库）安全存储敏感信息
-     - 从安全的后端服务器动态获取凭证
-     - 使用加密存储，密钥由用户输入或从安全服务器获取
-
-2. **权限配置**：
-   
-   确保 `module.json5` 中包含以下权限（已配置）：
-   ```json
-   {
-     "requestPermissions": [
-       {
-         "name": "ohos.permission.INTERNET"
-       },
-       {
-         "name": "ohos.permission.MICROPHONE"
-       },
-       {
-         "name": "ohos.permission.MODIFY_AUDIO_SETTINGS"
-       }
-     ]
-   }
-   ```
-
-## 实现步骤
-
-### 步骤1：基础设置
-
-1. **初始化 RTC Engine**：
-   
-   在 `RtcManager.ets` 中创建 RTC Engine 实例：
-   ```typescript
-   import { RtcEngineEx, RtcEngineConfig, IRtcEngineEventHandler } from '@shengwang/rtc-full';
-   
-   static createRtcEngine(context: Context, appId: string, rtcEventHandler: IRtcEngineEventHandler): RtcEngineEx {
-     const config = new RtcEngineConfig();
-     config.appId = appId;
-     config.context = context;
-     config.eventHandler = rtcEventHandler;
-     return RtcEngineEx.create(config) as RtcEngineEx;
-   }
-   ```
-
-2. **配置 ConversationalAI API**：
-   
-   在 `ConversationViewModel.ets` 中初始化 API：
-   ```typescript
-   import { ConversationalAIAPIConfig, TranscriptRenderMode, createConversationalAIAPI } from '../convoaiApi/IConversationalAIAPI';
-   
-   // Create ConversationalAI API
-   const apiConfig = new ConversationalAIAPIConfig(
-     rtcEngine,
-     TranscriptRenderMode.Word,  // or TranscriptRenderMode.Text
-     true  // enableLog
-   );
-   conversationalAIAPI = createConversationalAIAPI(apiConfig);
-   
-   // Add event handler
-   conversationalAIAPI.addHandler(eventHandler);
-   ```
-   
-   **注意**：HarmonyOS 版本的 ConversationalAI API 使用 RTC DataStream 进行消息传递，不需要单独的 RTM Client。
-
-### 步骤2：核心实现
-
-1. **加入频道**：
-   
-   实现 `joinChannelAndLogin()` 方法，加入 RTC 频道：
-   ```typescript
-   async joinChannelAndLogin(channelName: string): Promise<void> {
-     // Generate token for RTC
-     const token = await TokenGenerator.generateTokensAsync(channelName, userId.toString());
-     
-     // Join RTC channel
-     RtcManager.joinChannel(token, channelName, userId);
-     
-     // Subscribe to messages via ConversationalAI API (uses RTC DataStream internally)
-     this.conversationalAIAPI?.subscribeMessage(channelName);
-   }
-   ```
-   
-   **注意**：HarmonyOS 版本使用 RTC DataStream 进行消息传递，不需要单独的 RTM 登录。
-
-2. **订阅消息**：
-   
-   订阅频道消息以接收 AI Agent 的状态和转录（通过 RTC DataStream）：
-   ```typescript
-   conversationalAIAPI?.subscribeMessage(channelName, (result) => {
-     if (result.isSuccess) {
-       // Handle subscription success
-     }
-   });
-   ```
-   
-   **注意**：消息通过 RTC DataStream 传递，在加入频道后会自动接收消息。
-
-3. **注册事件处理器**：
-   
-   实现 `IConversationalAIAPIEventHandler` 接口，处理各种事件：
-   ```typescript
-   conversationalAIAPI?.addHandler({
-     onTranscript: (transcript: Transcript) => {
-       // Update transcript list
-       this._transcriptList = [...this._transcriptList, transcript];
-       this.notifyTranscriptListChanged();
-     },
-     
-     onStateChange: (event: StateChangeEvent) => {
-       // Update agent state
-       this._agentState = event.state;
-       this.notifyAgentStateChanged();
-     },
-     
-     onError: (error: ModuleError) => {
-       // Handle errors
-       console.error('ConversationalAIAPI Error:', error);
-     }
-   });
-   ```
-
-4. **实现 UI 状态观察**：
-   
-   在 `VoiceAssistant.ets` 中观察 Agent 状态和 UI 状态：
-   ```typescript
-   @State agentState: AgentState | null = null;
-   @State uiState: ConversationUiState;
-   
-   aboutToAppear() {
-     // Subscribe to agent state changes
-     this.viewModel.subscribeAgentState((state) => {
-       this.agentState = state;
-       // Agent state is always displayed in info card
-       // VoiceWaveView animation is shown when transcript is hidden
-     });
-     
-     // Subscribe to UI state changes (including transcript enabled state)
-     this.viewModel.subscribeUiState((state) => {
-       this.uiState = state;
-       // UI will automatically switch between transcript list and animation based on isTranscriptEnabled
-     });
-   }
-   ```
-   
-   实现字幕显示/隐藏切换：
-   ```typescript
-   build() {
-     Column() {
-       this.buildInfoCard()  // Always show info card at top
-       
-       // Conditionally show transcript list or agent animation
-       if (this.uiState.isTranscriptEnabled) {
-         this.buildTranscriptList()  // Show transcript list
-       } else {
-         this.buildAgentIndicator()  // Show VoiceWaveView animation (only when SPEAKING)
-       }
-       
-       this.buildControlButtons()
-     }
-   }
-   ```
-   
-   **注意**：
-   - 字幕显示时：显示转录列表，Agent 状态在 info card 中显示
-   - 字幕隐藏时：显示 VoiceWaveView 动画（仅在 Agent 状态为 SPEAKING 时），Agent 状态仍在 info card 中显示
-   - 动画区域与字幕区域完全重叠，不会遮挡头部信息
-
-### 步骤3：测试验证
+## 测试验证
 
 1. **启动 Python HTTP 服务器**（如果使用 HTTP 服务器模式）：
    
@@ -326,17 +168,22 @@ cd Agora-AI-Recipes-Starter/harmonyos
 
 2. **运行 HarmonyOS 应用**：
    - 在 DevEco Studio 中运行应用
-   - 输入频道名称
-   - 点击"Start"按钮
-   - 应用会自动启动 Agent 并加入频道
+   - 在 Agent Configuration 页面查看配置信息（App ID 和 Pipeline ID）
+   - 点击"Start"按钮开始连接
+   - 应用会自动生成随机的 channelName
+   - 自动加入 RTC 频道并订阅消息（通过 RTC DataStream）
+   - 连接成功后自动导航到 Voice Assistant 页面
+   - 自动启动 AI Agent（通过 RESTful API）
+   - Agent 启动成功后即可开始对话
 
 3. **验证功能**：
    - ✅ 检查是否成功加入 RTC 频道
    - ✅ 检查是否成功订阅消息（通过 RTC DataStream）
+   - ✅ 检查 Agent 是否成功启动（查看状态消息）
    - ✅ 验证音频传输是否正常
    - ✅ 测试静音/取消静音功能
    - ✅ 验证转录功能是否正常显示
-   - ✅ 验证 Agent 说话状态指示器是否正常显示动画
+   - ✅ 验证 Agent 说话状态指示器（VoiceWaveView）是否正常显示动画
    - ✅ 测试与 AI Agent 的对话交互
 
 ## 项目结构
@@ -376,83 +223,19 @@ harmonyos/
 │           │       └── EntryBackupAbility.ets
 │           ├── module.json5                   # 模块配置
 │           └── resources/                     # 资源文件
-└── README.md                                  # 本文档
+├── env.json                                    # 环境配置（需要创建）
+├── env.example.json                            # 环境配置示例
+└── README.md                                   # 本文档
 ```
 
 ## 重要说明
 
-### ⚠️ 当前状态
+### HarmonyOS 版本特性
 
-本项目是 HarmonyOS 平台的完整实现，包含：
-- ✅ 完整的业务逻辑和 UI 实现
-- ✅ Agora RTC HarmonyOS SDK 集成
-- ✅ Conversational AI API 适配实现（使用 RTC DataStream 进行消息传递）
-- ✅ Agent 启动功能（支持本地服务器和 Agora API 两种模式）
-- ✅ 权限管理
-- ✅ 页面导航
-- ✅ 构建时配置生成（从 env.json 自动生成配置）
-
-### 已实现的功能
-
-1. **Agora RTC HarmonyOS SDK 集成**：
-   - ✅ 在 `RtcManager.ets` 中实现了 RTC Engine 初始化和管理
-   - ✅ 支持加入/离开频道、音频控制等功能
-
-2. **消息传递**：
-   - ✅ 通过 RTC DataStream 实现消息传递（在 `ConversationalAIAPIImpl.ets` 中实现）
-   - ✅ 支持消息订阅、转录接收等功能
-   - ✅ **注意**：HarmonyOS 版本使用 RTC DataStream，不需要单独的 RTM SDK
-
-3. **ConversationalAI API 适配**：
-   - ✅ 已实现完整的 ConversationalAI API 适配
-   - ✅ 支持转录、状态变化、错误处理等事件
-   - ✅ 位置：`entry/src/main/ets/convoaiApi/`
-
-4. **权限管理**：
-   - ✅ 在 `PermissionHelper.ets` 中实现了权限请求逻辑
-   - ✅ 在 `AgentConfig.ets` 中集成了权限请求
-
-5. **页面导航**：
-   - ✅ 实现了从 `AgentConfig` 到 `VoiceAssistant` 的页面导航
-   - ✅ 使用 HarmonyOS 的路由 API
-
-6. **UI 功能**：
-   - ✅ 实现了字幕显示/隐藏切换功能
-   - ✅ 实现了 Agent 状态实时显示（在 info card 中）
-   - ✅ 实现了 VoiceWaveView 动画显示（字幕隐藏时，仅在 SPEAKING 状态）
-   - ✅ 实现了静音/取消静音功能
-   - ✅ 实现了转录列表自动滚动功能
-
-## 扩展功能
-
-### 高级配置
-
-本示例展示了基础的 Conversational AI 集成方式。更多高级功能包括：
-
-- **自定义音频参数**：配置不同的音频场景（标准模式、数字人模式等）
-- **自定义转录渲染模式**：支持文本模式和逐词模式
-- **发送消息给 AI Agent**：发送文本消息、图片消息，支持优先级控制
-- **打断 Agent**：实现打断 AI Agent 的功能
-- **消息状态跟踪**：处理消息发送成功/失败的回调
-- **事件处理**：处理 Agent 状态变化、错误、指标等事件
-
-### 性能优化
-
-- 使用 `AUDIO_SCENARIO_AI_CLIENT` 场景以获得最佳 AI 对话质量
-- 根据网络状况调整音频编码参数
-- 及时清理不再使用的 Transcript 数据
-- 实现 Token 自动刷新机制
-- 处理网络断开重连逻辑
-
-### 最佳实践
-
-- 实现完善的错误处理机制，包括网络错误、Token 过期等
-- 使用状态管理统一管理 UI 状态
-- 将业务逻辑与 UI 分离，使用 ViewModel 管理状态
-- 在加入频道前检查并请求麦克风权限
-- 正确管理 RTC Engine 的生命周期
-- 在页面销毁时清理资源
-- 启用 API 日志以便调试
+- **消息传递方式**：HarmonyOS 版本使用 RTC DataStream 进行消息传递，**不需要**单独开通 RTM 功能
+- **配置方式**：使用 JSON 格式配置文件（`env.json`），构建时自动生成配置
+- **构建时配置**：构建脚本（`entry/hvigorfile.ts`）会在构建时读取 `harmonyos/env.json` 并自动生成 `entry/src/main/ets/common/KeyCenterConfig.ets`
+- **字幕渲染模式**：由于 HarmonyOS RTC SDK 能力限制，**仅支持 Text 模式渲染字幕**，不支持 Word 模式（逐词渲染）
 
 ## 相关资源
 
@@ -476,4 +259,5 @@ harmonyos/
 **注意**：
 - HarmonyOS 版本使用 RTC DataStream 进行消息传递，**不需要**单独开通 RTM 功能
 - 配置会在构建时从 `env.json` 读取并编译到应用中，确保构建前已正确配置 `env.json`
+- 每次启动时会自动生成随机的 channelName，无需手动配置
 

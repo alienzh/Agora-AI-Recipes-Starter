@@ -1,4 +1,4 @@
-import { ConversationViewModel, ConnectionState } from '../viewmodel/ConversationViewModel';
+import { ConversationViewModel, ConnectionState } from './ConversationViewModel';
 import { KeyCenter } from '../common/KeyCenter';
 import PermissionHelper from '../common/PermissionHelper';
 import { common } from '@kit.AbilityKit';

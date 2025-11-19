@@ -46,10 +46,10 @@ Main implementation of the Conversational AI API:
 
 ### 3. TranscriptController.ets
 Manages transcript rendering:
-- Supports word-level and text-level rendering modes
+- **Only supports text-level rendering mode** (Word mode is not supported due to HarmonyOS RTC SDK limitations)
 - Handles agent and user messages
 - Manages interrupt events
-- Updates transcript display based on audio presentation time
+- Updates transcript display with complete message text
 
 ### 4. MessageParser.ets
 Parses stream messages that may be split into multiple parts:
@@ -69,9 +69,10 @@ import { TranscriptRenderMode } from './convoaiApi/subRender/TranscriptConfig';
 import { RtcManager } from '../rtc/RtcManager';
 
 // Create API instance
+// Note: HarmonyOS version only supports Text mode, Word mode is not supported
 const config: ConversationalAIAPIConfig = {
   rtcEngine: RtcManager.getRtcEngine()!,
-  renderMode: TranscriptRenderMode.Word,
+  renderMode: TranscriptRenderMode.Text, // Only Text mode is supported
   enableLog: true
 };
 
@@ -168,9 +169,9 @@ This implementation uses RTC datastream for message transmission:
 - Audio parameters are automatically adjusted when audio route changes
 
 ### 4. Transcript Rendering
-- Word-level rendering requires audio frame observer to get presentation time
+- **HarmonyOS version only supports Text mode** - Word mode is not supported due to RTC SDK limitations
 - Text-level rendering directly displays complete messages
-- The render mode is auto-detected based on whether word-level data is available
+- The render mode is forced to Text mode regardless of configuration
 
 ### 5. Error Handling
 - All operations use completion callbacks with error handling
@@ -184,6 +185,7 @@ This implementation uses RTC datastream for message transmission:
 3. **JSON Parsing**: Gson → Native JSON.parse()
 4. **Coroutines**: Kotlin Coroutines → setInterval (for ticker)
 5. **Type System**: Kotlin sealed classes → TypeScript classes/interfaces
+6. **Transcript Rendering**: **Only Text mode is supported** - Word mode is not available due to HarmonyOS RTC SDK limitations
 
 ## Message Types
 
@@ -215,7 +217,6 @@ Messages are identified by the `object` field in the parsed JSON:
 - [ ] Replace setTimeout with TaskDispatcher for main thread operations
 - [ ] Add message filtering by UID if point-to-point messaging is needed
 - [ ] Add unit tests for MessageParser
-- [ ] Optimize performance for word-level transcript rendering
 - [ ] Add message size validation and error handling
 
 ## References

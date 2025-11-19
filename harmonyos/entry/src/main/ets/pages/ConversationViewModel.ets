@@ -2,7 +2,7 @@ import { RtcManager } from '../rtc/RtcManager';
 import { TokenGenerator } from '../common/TokenGenerator';
 import { KeyCenter } from '../common/KeyCenter';
 import { AgentStarter } from '../common/AgentStarter';
-import { IRtcEngineEventHandler, RtcEngineEx } from '@shengwang/rtc-full';
+import { Constants, IRtcEngineEventHandler, RtcEngineEx } from '@shengwang/rtc-full';
 import {
   IConversationalAIAPI,
   IConversationalAIAPIEventHandler,
@@ -15,7 +15,7 @@ import {
   InterruptEvent
 } from '../convoaiApi/IConversationalAIAPI';
 import { createConversationalAIAPI } from '../convoaiApi/ConversationalAIAPIImpl';
-import { TranscriptDataSource } from '../pages/common/TranscriptDataSource';
+import { TranscriptDataSource } from './common/TranscriptDataSource';
 
 /**
  * Connection state enum
@@ -319,6 +319,9 @@ export class ConversationViewModel {
       // Get token if not available
       const token = this.unifiedToken || await this.fetchToken();
 
+      if (this.conversationalAIAPI) {
+        this.conversationalAIAPI.loadAudioSettings()
+      }
       // Join RTC channel
       RtcManager.joinChannel(token, channelName, ConversationViewModel.userId);
 

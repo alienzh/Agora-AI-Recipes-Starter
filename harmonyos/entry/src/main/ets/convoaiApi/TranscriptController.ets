@@ -6,7 +6,6 @@ import {
   TranscriptType,
   Transcript,
   InterruptEvent,
-  getMessageTypeFromValue
 } from './IConversationalAIAPI';
 
 /**
@@ -63,67 +62,8 @@ export class TranscriptConfig {
   }
 }
 
-/**
- * Internal data class representing individual word information
- * Used by the producer side of the subtitle pipeline
- */
-class TurnWordInfo {
-  /** The actual word text */
-  word: string;
-  /** Timestamp when the word started (in milliseconds) */
-  startMs: number;
-  /** Current status of the word */
-  status: TranscriptStatus;
-
-  constructor(word: string, startMs: number, status: TranscriptStatus = TranscriptStatus.IN_PROGRESS) {
-    this.word = word;
-    this.startMs = startMs;
-    this.status = status;
-  }
-}
-
-/**
- * Internal data class representing a complete turn message
- * Used by the producer side of the subtitle pipeline
- */
-class TurnMessageInfo {
-  /** Agent user ID */
-  agentUserId: string;
-  /** User identifier for this turn */
-  userId: string;
-  /** Unique identifier for this turn */
-  turnId: number;
-  /** Start timestamp of the turn (in milliseconds) */
-  startMs: number;
-  /** Complete text of the turn */
-  text: string;
-  /** Current status of the turn */
-  status: TranscriptStatus;
-  /** List of individual words in the turn */
-  words: TurnWordInfo[];
-
-  constructor(agentUserId: string, userId: string, turnId: number, startMs: number, text: string,
-    status: TranscriptStatus, words: TurnWordInfo[]) {
-    this.agentUserId = agentUserId;
-    this.userId = userId;
-    this.turnId = turnId;
-    this.startMs = startMs;
-    this.text = text;
-    this.status = status;
-    this.words = words;
-  }
-}
-
 const TAG = '[Transcript]';
 const TAG_UI = '[Transcript-UI]';
-
-/**
- * Type alias for available turn with filtered words
- */
-interface AvailableTurn {
-  turn: TurnMessageInfo;
-  words: TurnWordInfo[];
-}
 
 /**
  * Transcript Rendering Controller
@@ -131,20 +71,18 @@ interface AvailableTurn {
  */
 export class TranscriptController {
   private config: TranscriptConfig;
-  private renderMode: TranscriptRenderMode | null = null;
+  private renderMode: TranscriptRenderMode = TranscriptRenderMode.Text;
   private presentationMs: number = 0;
-  private agentTurnQueue: TurnMessageInfo[] = [];
   private lastInterruptEvent: InterruptEvent | null = null;
-  private currentTranscript: Transcript | null = null;
-  private lastDequeuedTurn: TurnMessageInfo | null = null;
-  private tickerTimer: number | null = null;
 
   constructor(config: TranscriptConfig) {
     this.config = config;
+    // Force Text mode for HarmonyOS (Word mode is not supported due to RTC SDK limitations)
+    this.renderMode = TranscriptRenderMode.Text;
 
     config.rtcEngine.setPlaybackAudioFrameBeforeMixingParameters(44100, 1);
 
-    this.callMessagePrint(TAG, `init RenderMode:${config.renderMode}`);
+    this.callMessagePrint(TAG, `init RenderMode:${this.renderMode} (Word mode not supported on HarmonyOS)`);
   }
 
 
@@ -186,55 +124,7 @@ export class TranscriptController {
    */
   reset(): void {
     this.callMessagePrint(TAG, '>>> [reset]');
-    this.renderMode = null;
-    this.stopSubtitleTicker();
-  }
-
-  /**
-   * Release transcript controller
-   */
-  release(): void {
-    this.reset();
-    this.callMessagePrint(TAG, '>>> [release]');
-    if (this.tickerTimer !== null) {
-      clearInterval(this.tickerTimer);
-      this.tickerTimer = null;
-    }
-  }
-
-  /**
-   * Start subtitle ticker for word-level rendering
-   */
-  private startSubtitleTicker(): void {
-    this.callMessagePrint(TAG, 'startSubtitleTicker');
-    this.lastDequeuedTurn = null;
-    this.currentTranscript = null;
     this.lastInterruptEvent = null;
-
-    if (this.tickerTimer !== null) {
-      clearInterval(this.tickerTimer);
-    }
-
-    // Use setInterval to simulate ticker (200ms interval)
-    this.tickerTimer = setInterval(() => {
-      this.updateSubtitleDisplay();
-    }, 200);
-  }
-
-  /**
-   * Stop subtitle ticker
-   */
-  private stopSubtitleTicker(): void {
-    this.callMessagePrint(TAG, 'stopSubtitleTicker');
-    this.currentTranscript = null;
-    this.lastDequeuedTurn = null;
-    this.lastInterruptEvent = null;
-    this.agentTurnQueue = [];
-
-    if (this.tickerTimer !== null) {
-      clearInterval(this.tickerTimer);
-      this.tickerTimer = null;
-    }
     this.presentationMs = 0;
   }
 
@@ -260,18 +150,6 @@ export class TranscriptController {
       TAG,
       `<<< [onInterrupted] pts:${this.presentationMs} ${agentUserId} ${JSON.stringify(interruptEvent)}`
     );
-
-    if (this.renderMode === TranscriptRenderMode.Word) {
-      this.handleAgentWordMessage(
-        agentUserId,
-        '',
-        turnId,
-        startMs,
-        '',
-        null,
-        TranscriptStatus.INTERRUPTED
-      );
-    }
   }
 
   /**
@@ -345,65 +223,10 @@ export class TranscriptController {
       return;
     }
 
-    // Parse words array
-    // words is a list where each element is a Map<String, Any>
-    const wordsValue = msg['words'];
-    const wordsArray = Array.isArray(wordsValue)
-      ? wordsValue as Record<string, Object>[]
-      : null;
-    const words = this.parseWords(wordsArray);
-    this.autoTranscriptRenderMode(words);
-
     if (this.renderMode === TranscriptRenderMode.Text) {
       this.handleAgentTextMessage(agentUserId, userId, turnId, text, status);
     } else {
-      this.handleAgentWordMessage(agentUserId, userId, turnId, startMs, text, words, status);
-    }
-  }
-
-  /**
-   * Parse words array
-   * Convert words array (List<Map<String, Any>>) to TurnWordInfo list
-   * Each element in the array is a Map containing word information
-   */
-  private parseWords(wordsArray: Record<string, Object>[] | null | undefined): TurnWordInfo[] | null {
-    if (!wordsArray || wordsArray.length === 0) {
-      return null;
-    }
-
-    // Convert words array to TurnWordInfo list
-    // Each wordMap is a Map<String, Any> from the list
-    const wordsList: TurnWordInfo[] = wordsArray.map((wordMap: Record<string, Object>) => {
-      const word = (wordMap['word'] as string) || '';
-      const startMs = (wordMap['start_ms'] ?? 0) as number;
-      return new TurnWordInfo(word, startMs);
-    });
-
-    // Return immutable array (arrays in ArkTS are already immutable in terms of length)
-    return wordsList;
-  }
-
-  /**
-   * Auto-detect transcript render mode
-   */
-  private autoTranscriptRenderMode(words: TurnWordInfo[] | null): void {
-    if (this.renderMode === null) {
-      this.agentTurnQueue = [];
-      this.renderMode =
-        this.config.renderMode === TranscriptRenderMode.Word
-          ? words !== null
-          ? TranscriptRenderMode.Word
-          : TranscriptRenderMode.Text
-          : TranscriptRenderMode.Text;
-
-      this.callMessagePrint(
-        TAG,
-        `RenderMode:${this.renderMode}`
-      );
-
-      if (this.renderMode === TranscriptRenderMode.Word) {
-        this.startSubtitleTicker();
-      }
+      this.callMessagePrint(TAG, 'only support text render mode');
     }
   }
 
@@ -440,315 +263,6 @@ export class TranscriptController {
     this.runOnMainThread(() => {
       callback?.onTranscriptUpdated?.(agentUserId, transcript);
     });
-  }
-
-  /**
-   * Handle agent word message
-   */
-  private handleAgentWordMessage(
-    agentUserId: string,
-    userId: string,
-    turnId: number,
-    startMs: number,
-    text: string,
-    words: TurnWordInfo[] | null,
-    status: TranscriptStatus
-  ): void {
-    // Word mode processing
-    const newWords = words ? [...words] : [];
-
-    // Thread-safe queue operations (simulated with array operations)
-    // Check if this turn is older than the latest turn in queue
-    const lastTurn = this.agentTurnQueue.length > 0
-      ? this.agentTurnQueue[this.agentTurnQueue.length - 1]
-      : null;
-
-    if (lastTurn !== null && turnId < lastTurn.turnId) {
-      this.callMessagePrint(TAG, `Discarding old turn: received=${turnId} latest=${lastTurn.turnId}`);
-      return;
-    }
-
-    // The last turn to be dequeued
-    if (this.lastDequeuedTurn !== null) {
-      if (turnId <= this.lastDequeuedTurn.turnId) {
-        this.callMessagePrint(
-          TAG,
-          `Discarding the turn has already been processed: received=${turnId} latest=${this.lastDequeuedTurn.turnId}`
-        );
-        return;
-      }
-    }
-
-    // Remove and get existing info in one operation
-    const existingInfoIndex = this.agentTurnQueue.findIndex((info) => info.turnId === turnId);
-    const existingInfo = existingInfoIndex >= 0 ? this.agentTurnQueue[existingInfoIndex] : null;
-
-    if (existingInfo !== null) {
-      if (status === TranscriptStatus.INTERRUPTED && existingInfo.status === TranscriptStatus.INTERRUPTED) {
-        return;
-      }
-
-      // Remove existing info
-      this.agentTurnQueue.splice(existingInfoIndex, 1);
-
-      if (status === TranscriptStatus.INTERRUPTED) {
-        // The actual effective timestamp for interruption, using the minimum of startMs and mPresentationMs
-        const interruptMarkMs = Math.min(startMs, this.presentationMs);
-        this.callMessagePrint(
-          TAG,
-          `interruptMarkMs:${interruptMarkMs} startMs:${startMs} mPresentationMs:${this.presentationMs}`
-        );
-
-        // Interrupt all words from the last one before interruptMarkMs to the end of the word list
-        let lastBeforeStartMs: TurnWordInfo | null = null;
-        const mergedWords: TurnWordInfo[] = [...existingInfo.words];
-
-        for (const word of mergedWords) {
-          if (word.startMs <= interruptMarkMs) {
-            lastBeforeStartMs = word;
-          }
-          if (word.startMs >= interruptMarkMs) {
-            word.status = TranscriptStatus.INTERRUPTED;
-          }
-        }
-
-        if (lastBeforeStartMs !== null) {
-          lastBeforeStartMs.status = TranscriptStatus.INTERRUPTED;
-        }
-
-        const newInfo = new TurnMessageInfo(
-          agentUserId,
-          userId,
-          turnId,
-          existingInfo.startMs,
-          existingInfo.text,
-          status,
-          mergedWords
-        );
-        this.agentTurnQueue.push(newInfo);
-      } else {
-        // Reset end flag of existing words if needed
-        const lastWord = existingInfo.words.length > 0
-          ? existingInfo.words[existingInfo.words.length - 1]
-          : null;
-        if (lastWord !== null && lastWord.status === TranscriptStatus.END) {
-          lastWord.status = TranscriptStatus.IN_PROGRESS;
-        }
-
-        // Use new data if the new message has a later timestamp
-        const useNewData = startMs >= existingInfo.startMs;
-
-        // Merge words and sort by timestamp
-        const mergedWords = [...existingInfo.words];
-        newWords.forEach((newWord) => {
-          // Check if a word with the same startMs already exists
-          if (existingInfo.words.every((w) => w.startMs !== newWord.startMs)) {
-            mergedWords.push(newWord);
-          }
-        });
-
-        const sortedMergedWords = mergedWords.sort((a, b) => a.startMs - b.startMs);
-
-        // Traverse sortedMergedWords, set the status of the word after the first Interrupted word to Interrupted
-        let foundInterrupted = false;
-        sortedMergedWords.forEach((word) => {
-          if (foundInterrupted || word.status === TranscriptStatus.INTERRUPTED) {
-            word.status = TranscriptStatus.INTERRUPTED;
-            foundInterrupted = true;
-          }
-        });
-
-        const newInfo = new TurnMessageInfo(
-          useNewData ? agentUserId : existingInfo.agentUserId,
-          userId,
-          turnId,
-          useNewData ? startMs : existingInfo.startMs,
-          useNewData ? text : existingInfo.text,
-          useNewData ? status : existingInfo.status,
-          sortedMergedWords
-        );
-
-        // Mark the last word as end if this is the final message
-        if (newInfo.status === TranscriptStatus.END && sortedMergedWords.length > 0) {
-          sortedMergedWords[sortedMergedWords.length - 1].status = TranscriptStatus.END;
-        }
-
-        this.agentTurnQueue.push(newInfo);
-      }
-    } else {
-      // No existing message, use new message directly
-      const newInfo = new TurnMessageInfo(
-        agentUserId,
-        userId,
-        turnId,
-        startMs,
-        text,
-        status,
-        newWords
-      );
-
-      if (status === TranscriptStatus.END && newWords.length > 0) {
-        newWords[newWords.length - 1].status = TranscriptStatus.END;
-      }
-
-      this.agentTurnQueue.push(newInfo);
-    }
-
-    // Cleanup old turns
-    while (this.agentTurnQueue.length > 5) {
-      const removed = this.agentTurnQueue.shift();
-      if (removed) {
-        this.callMessagePrint(TAG, `Removed old turn: ${removed.turnId}`);
-      }
-    }
-  }
-
-  /**
-   * Update subtitle display
-   */
-  private updateSubtitleDisplay(): void {
-    // Audio callback PTS is not assigned
-    if (this.presentationMs <= 0) {
-      return;
-    }
-    if (this.renderMode !== TranscriptRenderMode.Word) {
-      return;
-    }
-
-    // Thread-safe queue operations (simulated with array operations)
-    // Get all turns that meet display conditions
-    const availableTurns: AvailableTurn[] = [];
-
-    for (const turn of this.agentTurnQueue) {
-      const words = turn.words.filter((w) => w.startMs <= this.presentationMs);
-
-      if (words.length > 0 && words[words.length - 1].status === TranscriptStatus.INTERRUPTED) {
-        // Handle interrupted turn
-        const interruptedText = words.map((w) => w.word).join('');
-        const interruptedTranscript: Transcript = {
-          turnId: turn.turnId,
-          userId: turn.userId,
-          text: interruptedText,
-          status: TranscriptStatus.INTERRUPTED,
-          type: TranscriptType.AGENT,
-          renderMode: TranscriptRenderMode.Word
-        };
-
-        const agentUserId = turn.agentUserId;
-        this.callMessagePrint(
-          TAG_UI,
-          `<<< [interrupt1] pts:${this.presentationMs} ${agentUserId} ${JSON.stringify(interruptedTranscript)}`
-        );
-
-        this.runOnMainThread(() => {
-          this.config.callback?.onTranscriptUpdated?.(agentUserId, interruptedTranscript);
-        });
-
-        // Remove the turn if interrupt condition is met
-        this.lastDequeuedTurn = turn;
-        const index = this.agentTurnQueue.indexOf(turn);
-        if (index >= 0) {
-          this.agentTurnQueue.splice(index, 1);
-        }
-        this.currentTranscript = null;
-        this.callMessagePrint(TAG, `Removed interrupted turn:${turn.turnId}`);
-      } else {
-        if (words.length > 0) {
-          const availableTurn: AvailableTurn = {
-            turn: turn,
-            words: words
-          };
-          availableTurns.push(availableTurn);
-        }
-      }
-    }
-
-    if (availableTurns.length === 0) {
-      return;
-    }
-
-    // Find the latest turn to display
-    const latestValidTurn = availableTurns[availableTurns.length - 1];
-    const targetTurn = latestValidTurn.turn;
-    const targetWords = latestValidTurn.words;
-    const targetIsEnd = targetWords[targetWords.length - 1].status === TranscriptStatus.END;
-
-    // Interrupt all previous turns
-    if (availableTurns.length > 1) {
-      // Iterate through all turns except the last one
-      for (let i = 0; i < availableTurns.length - 1; i++) {
-        const turn = availableTurns[i].turn;
-        if (this.currentTranscript && this.currentTranscript.turnId === turn.turnId) {
-          const agentUserId = turn.agentUserId;
-          const interruptedTranscript: Transcript = {
-            turnId: this.currentTranscript.turnId,
-            userId: this.currentTranscript.userId,
-            text: this.currentTranscript.text,
-            status: TranscriptStatus.INTERRUPTED,
-            type: this.currentTranscript.type,
-            renderMode: this.currentTranscript.renderMode
-          };
-
-          this.callMessagePrint(
-            TAG_UI,
-            `<<< [interrupt2] pts:${this.presentationMs} ${agentUserId} ${JSON.stringify(interruptedTranscript)}`
-          );
-
-          this.runOnMainThread(() => {
-            this.config.callback?.onTranscriptUpdated?.(agentUserId, interruptedTranscript);
-          });
-        }
-
-        this.lastDequeuedTurn = turn;
-        // Remove the interrupted turn from queue
-        const index = this.agentTurnQueue.indexOf(turn);
-        if (index >= 0) {
-          this.agentTurnQueue.splice(index, 1);
-        }
-      }
-      this.currentTranscript = null;
-    }
-
-    const agentUserId = targetTurn.agentUserId;
-
-    // Display the latest turn
-    const newTranscript: Transcript = {
-      turnId: targetTurn.turnId,
-      userId: targetTurn.userId,
-      text: targetIsEnd
-        ? targetTurn.text
-        : targetWords.map((w) => w.word).join(''),
-      status: targetIsEnd ? TranscriptStatus.END : TranscriptStatus.IN_PROGRESS,
-      type: TranscriptType.AGENT,
-      renderMode: TranscriptRenderMode.Word
-    };
-
-    if (targetIsEnd) {
-      this.callMessagePrint(
-        TAG_UI,
-        `<<< [end] pts:${this.presentationMs} ${agentUserId} ${JSON.stringify(newTranscript)}`
-      );
-    } else {
-      this.callMessagePrint(
-        TAG_UI,
-        `<<< [progress] pts:${this.presentationMs} ${agentUserId} ${JSON.stringify(newTranscript)}`
-      );
-    }
-
-    this.runOnMainThread(() => {
-      this.config.callback?.onTranscriptUpdated?.(agentUserId, newTranscript);
-    });
-
-    if (targetIsEnd) {
-      this.lastDequeuedTurn = targetTurn;
-      const index = this.agentTurnQueue.indexOf(targetTurn);
-      if (index >= 0) {
-        this.agentTurnQueue.splice(index, 1);
-      }
-      this.currentTranscript = null;
-    } else {
-      this.currentTranscript = newTranscript;
-    }
   }
 
   /**
