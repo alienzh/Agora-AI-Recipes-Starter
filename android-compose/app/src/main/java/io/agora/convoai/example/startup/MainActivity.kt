@@ -1,4 +1,4 @@
-package io.agora.convoai.example.compose.voiceassistant
+package io.agora.convoai.example.startup
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,12 +13,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.agora.convoai.example.compose.voiceassistant.tools.PermissionHelp
-import io.agora.convoai.example.compose.voiceassistant.ui.AgentConfigScreen
-import io.agora.convoai.example.compose.voiceassistant.ui.ConversationViewModel
-import io.agora.convoai.example.compose.voiceassistant.ui.VoiceAssistantScreen
-import io.agora.convoai.example.compose.voiceassistant.ui.theme.AgentstarterconvoaicomposeTheme
+import io.agora.convoai.example.startup.tools.PermissionHelp
+import io.agora.convoai.example.startup.ui.AgentHomeScreen
+import io.agora.convoai.example.startup.ui.AgentLivingScreen
+import io.agora.convoai.example.startup.ui.theme.AgentstarterconvoaicomposeTheme
 import android.util.Log
+import io.agora.convoai.example.startup.ui.ConversationViewModel
 
 class MainActivity : ComponentActivity() {
     private lateinit var permissionHelp: PermissionHelp
@@ -43,9 +43,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun VoiceAssistantApp(
-    permissionHelp: PermissionHelp
-) {
+fun VoiceAssistantApp(permissionHelp: PermissionHelp) {
     val navController = rememberNavController()
     val viewModel: ConversationViewModel = viewModel()
 
@@ -54,7 +52,7 @@ fun VoiceAssistantApp(
         startDestination = "agent_config"
     ) {
         composable("agent_config") {
-            AgentConfigScreen(
+            AgentHomeScreen(
                 viewModel = viewModel,
                 permissionHelp = permissionHelp,
                 onNavigateToVoiceAssistant = {
@@ -67,7 +65,7 @@ fun VoiceAssistantApp(
             )
         }
         composable("voice_assistant") {
-            VoiceAssistantScreen(
+            AgentLivingScreen(
                 viewModel = viewModel,
                 onNavigateBack = {
                     Log.d("VoiceAssistantApp", "[onNavigateBack] ===== CALLBACK CALLED =====")
@@ -75,7 +73,10 @@ fun VoiceAssistantApp(
                         val result = navController.popBackStack()
                         Log.d("VoiceAssistantApp", "[onNavigateBack] popBackStack() returned: $result")
                         if (!result) {
-                            Log.w("VoiceAssistantApp", "[onNavigateBack] WARNING: popBackStack() returned false - cannot navigate back!")
+                            Log.w(
+                                "VoiceAssistantApp",
+                                "[onNavigateBack] WARNING: popBackStack() returned false - cannot navigate back!"
+                            )
                         }
                     } catch (e: Exception) {
                         Log.e("VoiceAssistantApp", "[onNavigateBack] ERROR calling popBackStack(): ${e.message}", e)

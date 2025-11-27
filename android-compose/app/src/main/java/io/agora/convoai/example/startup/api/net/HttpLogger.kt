@@ -1,6 +1,7 @@
-package io.agora.convoai.example.compose.voiceassistant.net
+package io.agora.convoai.example.startup.api.net
 
 import android.util.Log
+import io.agora.convoai.example.startup.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -38,7 +39,6 @@ class HttpLogger : Interceptor {
         private val EXCLUDE_PATHS = setOf(
             "/heartbeat",  // Heartbeat API
             "/ping",       // Ping API
-            "sip/status"   // sip ping
         )
 
         // Excluded Content-Types
@@ -50,7 +50,7 @@ class HttpLogger : Interceptor {
             "audio/*",                // Audio files
             "video/*"                 // Video files
         )
-        
+
         // Paths containing these keywords will also be checked for content type exclusion
         private val SENSITIVE_PATH_KEYWORDS = setOf(
             "upload",
@@ -67,7 +67,7 @@ class HttpLogger : Interceptor {
         // Check if should completely skip logging or only log results
         val shouldSkipCompletely = shouldSkipLoggingCompletely(request)
         val logResultOnly = shouldLogResultOnly(request)
-        
+
         // If not completely skipped and not only logging results, log the request
         if (!shouldSkipCompletely && !logResultOnly) {
             val logContent = buildLogContent(request)
@@ -79,7 +79,7 @@ class HttpLogger : Interceptor {
         // Execute request
         val startNs = System.nanoTime()
         val response = chain.proceed(request)
-        
+
         // If not completely skipping logging, log the response
         if (!shouldSkipCompletely) {
             logResponse(response, startNs, url, requestId)
@@ -111,7 +111,8 @@ class HttpLogger : Interceptor {
                 if (index > 0) {
                     logContent.append(";")
                 }
-                logContent.append("$name:$value")
+                val safeValue = if (!BuildConfig.DEBUG && SENSITIVE_HEADERS.any { name.lowercase().contains(it) }) "***" else value
+                logContent.append("$name:$safeValue")
             }
             logContent.append("\"")
         }
@@ -121,8 +122,8 @@ class HttpLogger : Interceptor {
             val buffer = Buffer()
             body.writeTo(buffer)
             val charset = body.contentType()?.charset() ?: Charset.defaultCharset()
-            var bodyString = buffer.readString(charset)
-            
+            val bodyString = buffer.readString(charset)
+
             // Format JSON body
             val formattedBody = formatJsonString(bodyString)
             logContent.append(" -d '${formattedBody}'")
@@ -146,6 +147,7 @@ class HttpLogger : Interceptor {
                 input
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             input
         }
     }
@@ -157,7 +159,7 @@ class HttpLogger : Interceptor {
                 append(":").append(url.port)
             }
             append(url.encodedPath)
-            
+
             if (url.queryParameterNames.isNotEmpty()) {
                 append("?")
                 url.queryParameterNames.forEachIndexed { index, name ->
@@ -180,7 +182,7 @@ class HttpLogger : Interceptor {
         if (SENSITIVE_PATH_KEYWORDS.any { keyword -> path.contains(keyword) }) {
             return true
         }
-        
+
         request.body?.contentType()?.let { contentType ->
             val contentTypeString = contentType.toString()
             if (EXCLUDE_CONTENT_TYPES.any { type ->
@@ -193,13 +195,13 @@ class HttpLogger : Interceptor {
                 return true
             }
         }
-        
+
         return false
     }
 
     private fun logResponse(response: Response, startNs: Long, url: HttpUrl, requestId: String) {
         val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
-        val responseBody = response.body ?: return
+        val responseBody = response.body
         val contentLength = responseBody.contentLength()
         val bodySize = if (contentLength != -1L) "$contentLength-byte" else "unknown-length"
 
@@ -207,7 +209,7 @@ class HttpLogger : Interceptor {
             append("${response.code} ${response.message} for ${buildUrlString(url)}")
             append(" (${tookMs}ms")
             if (response.networkResponse != null && response.networkResponse != response) {
-                append(", ${bodySize} body")
+                append(", $bodySize body")
             }
             append(")")
 
@@ -226,7 +228,15 @@ class HttpLogger : Interceptor {
                     val charset = contentType.charset() ?: Charset.defaultCharset()
                     if (contentLength != 0L) {
                         append("\n\n")
-                        val bodyString = buffer.clone().readString(charset)
+                        var bodyString = buffer.clone().readString(charset)
+                        if (!BuildConfig.DEBUG) {
+                            SENSITIVE_PARAMS.forEach { param ->
+                                bodyString = bodyString.replace(
+                                    Regex(""""([^"]*$param[^"]*)"\s*:\s*"([^"]*)""", RegexOption.IGNORE_CASE),
+                                    """"$1":"***"""
+                                )
+                            }
+                        }
                         append(formatJsonString(bodyString))
                     }
                 }
@@ -235,4 +245,3 @@ class HttpLogger : Interceptor {
         Log.d("[$requestId]-Response", logContent)
     }
 }
-

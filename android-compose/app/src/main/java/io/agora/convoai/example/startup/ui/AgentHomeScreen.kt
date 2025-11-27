@@ -1,21 +1,23 @@
-package io.agora.convoai.example.compose.voiceassistant.ui
+package io.agora.convoai.example.startup.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.agora.convoai.example.compose.voiceassistant.KeyCenter
-import io.agora.convoai.example.compose.voiceassistant.ui.ConversationViewModel.ConnectionState
+import io.agora.convoai.example.startup.KeyCenter
+import io.agora.convoai.example.startup.tools.PermissionHelp
+import io.agora.convoai.example.startup.ui.ConversationViewModel.ConnectionState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AgentConfigScreen(
+fun AgentHomeScreen(
     viewModel: ConversationViewModel = viewModel(),
-    permissionHelp: io.agora.convoai.example.compose.voiceassistant.tools.PermissionHelp,
+    permissionHelp: PermissionHelp,
     onNavigateToVoiceAssistant: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -29,9 +31,9 @@ fun AgentConfigScreen(
         }
     }
 
-    // Navigate to voice assistant when connected
-    LaunchedEffect(uiState.connectionState) {
-        if (uiState.connectionState == ConnectionState.Connected && !hasNavigated) {
+    // Navigate to voice assistant when connected AND agent started
+    LaunchedEffect(uiState.connectionState, uiState.agentStarted) {
+        if (uiState.agentStarted && uiState.connectionState == ConnectionState.Connected && !hasNavigated) {
             hasNavigated = true
             onNavigateToVoiceAssistant()
         }
@@ -39,8 +41,17 @@ fun AgentConfigScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Agent Configuration") }
+            CenterAlignedTopAppBar(
+                title = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Startup Compose", style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            "Start your conversational AI agent",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -52,7 +63,7 @@ fun AgentConfigScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // App ID display
+            // App ID and Pipeline ID display
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -62,6 +73,7 @@ fun AgentConfigScreen(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
+                    // App ID Section
                     Text(
                         text = "App ID",
                         style = MaterialTheme.typography.labelMedium,
@@ -71,21 +83,15 @@ fun AgentConfigScreen(
                     Text(
                         text = KeyCenter.AGORA_APP_ID.take(5) + "***",
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
                     )
-                }
-            }
 
-            // Pipeline ID display
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HorizontalDivider()
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Pipeline ID Section
                     Text(
                         text = "Pipeline ID",
                         style = MaterialTheme.typography.labelMedium,
@@ -95,30 +101,8 @@ fun AgentConfigScreen(
                     Text(
                         text = KeyCenter.PIPELINE_ID.take(5) + "***",
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "Status",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = uiState.statusMessage,
-                        style = MaterialTheme.typography.bodyMedium
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
                     )
                 }
             }
@@ -146,14 +130,32 @@ fun AgentConfigScreen(
                 enabled = uiState.connectionState != ConnectionState.Connecting
             ) {
                 if (uiState.connectionState == ConnectionState.Connecting) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Connecting...")
+                    // Text only loading state as requested
+                    Text("Starting...")
                 } else {
-                    Text("Start")
+                    Text("Start Agent")
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Error message display (only show critical errors)
+            if (uiState.connectionState != ConnectionState.Connecting &&
+                uiState.statusMessage.isNotEmpty() &&
+                (uiState.statusMessage.contains("error", ignoreCase = true) ||
+                        uiState.statusMessage.contains("failed", ignoreCase = true))
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = uiState.statusMessage,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
                 }
             }
 
@@ -194,27 +196,6 @@ fun AgentConfigScreen(
                     }
                 )
             }
-
-            // Error message display
-            if (uiState.connectionState != ConnectionState.Connecting &&
-                uiState.statusMessage.isNotEmpty() &&
-                (uiState.statusMessage.contains("error", ignoreCase = true) ||
-                        uiState.statusMessage.contains("failed", ignoreCase = true))
-            ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
-                ) {
-                    Text(
-                        text = uiState.statusMessage,
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                }
-            }
         }
     }
 }
-

@@ -1,4 +1,4 @@
-package io.agora.convoai.example.compose.voiceassistant.ui
+package io.agora.convoai.example.startup.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,20 +18,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.agora.convoai.example.compose.voiceassistant.ui.ConversationViewModel.ConnectionState
-import io.agora.convoai.convoaiApi.AgentState
 import io.agora.convoai.convoaiApi.Transcript
 import io.agora.convoai.convoaiApi.TranscriptStatus
 import io.agora.convoai.convoaiApi.TranscriptType
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.first
 import android.util.Log
+import kotlinx.coroutines.flow.first
 
 private const val TAG = "VoiceAssistantScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VoiceAssistantScreen(
+fun AgentLivingScreen(
     viewModel: ConversationViewModel = viewModel(),
     onNavigateBack: () -> Unit
 ) {
@@ -39,71 +37,27 @@ fun VoiceAssistantScreen(
     val transcriptList by viewModel.transcriptList.collectAsState()
     val agentState by viewModel.agentState.collectAsState()
 
-    val statusHistory = remember { mutableStateListOf<String>() }
-    var lastStatusMessage by remember { mutableStateOf("") }
-
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
     // Track whether to automatically scroll to bottom
     var autoScrollToBottom by remember { mutableStateOf(true) }
 
-    // Track if we're in the process of hanging up to prevent re-starting agent
-    var isHangingUp by remember { mutableStateOf(false) }
-
-    // Handle hangup (similar to android-kotlin VoiceAssistantFragment.handleHangup)
+    // Handle hangup
     fun handleHangup() {
         Log.d(TAG, "[handleHangup] Called - starting hangup process")
-        isHangingUp = true
         viewModel.hangup()
 
         // Wait for hangup to complete (connectionState becomes Idle) then navigate back
         scope.launch {
             try {
                 // Wait for state to become Idle
-                viewModel.uiState.first { it.connectionState == ConnectionState.Idle }
-                isHangingUp = false
+                viewModel.uiState.first { it.connectionState == ConversationViewModel.ConnectionState.Idle }
                 onNavigateBack()
                 Log.d(TAG, "[handleHangup] onNavigateBack() completed successfully")
             } catch (e: Exception) {
                 Log.e(TAG, "[handleHangup] Error waiting for hangup or navigating: ${e.message}", e)
-                isHangingUp = false
             }
-        }
-    }
-
-    // Start agent when connected (but not if we're hanging up)
-    LaunchedEffect(uiState.connectionState, isHangingUp) {
-        Log.d(TAG, "[LaunchedEffect] connectionState changed to: ${uiState.connectionState}, isHangingUp=$isHangingUp")
-        if (uiState.connectionState == ConnectionState.Connected && !isHangingUp) {
-            viewModel.startAgent()
-        }
-    }
-
-
-    // Update status history
-    LaunchedEffect(uiState.statusMessage, uiState.connectionState) {
-        // Filter out operational messages (mute, transcript, etc.)
-        val shouldShowMessage = when {
-            uiState.statusMessage.contains("muted", ignoreCase = true) -> false
-            uiState.statusMessage.contains("unmuted", ignoreCase = true) -> false
-            uiState.statusMessage.contains("Transcript", ignoreCase = true) -> false
-            else -> true
-        }
-
-        // Add new status message to history if it should be shown and is different from the last one
-        if (shouldShowMessage &&
-            uiState.statusMessage.isNotEmpty() &&
-            uiState.statusMessage != lastStatusMessage
-        ) {
-            statusHistory.add(uiState.statusMessage)
-            lastStatusMessage = uiState.statusMessage
-        }
-
-        // Clear history when idle
-        if (uiState.connectionState == ConnectionState.Idle) {
-            statusHistory.clear()
-            lastStatusMessage = ""
         }
     }
 
@@ -141,7 +95,7 @@ fun VoiceAssistantScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Voice Assistant") },
+                title = { Text("Agent Living") },
                 navigationIcon = {
                     IconButton(onClick = {
                         handleHangup()
@@ -156,7 +110,7 @@ fun VoiceAssistantScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 4.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Channel info
@@ -168,27 +122,27 @@ fun VoiceAssistantScreen(
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     if (uiState.channelName.isNotEmpty()) {
                         Text(
                             text = "Channel: ${uiState.channelName}",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                     if (uiState.userUid != 0) {
                         Text(
                             text = "UserId: ${uiState.userUid}",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                     if (uiState.agentUid != 0) {
                         Text(
                             text = "AgentUid: ${uiState.agentUid}",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
-                    
+
                     // Agent status
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -196,88 +150,39 @@ fun VoiceAssistantScreen(
                     ) {
                         Text(
                             text = "Agent Status:",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall
                         )
                         Text(
                             text = agentState?.value ?: "Unknown",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (agentState?.value == "speaking") 
+                                MaterialTheme.colorScheme.primary 
+                            else 
+                                MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
 
-            // Status display
+            // Transcript list
             Card(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = statusHistory.joinToString("\n"),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = when {
-                            statusHistory.joinToString("\n").contains("successfully", ignoreCase = true) ||
-                                    statusHistory.joinToString("\n").contains("initialized", ignoreCase = true) ||
-                                    statusHistory.joinToString("\n").contains("joined", ignoreCase = true) -> {
-                                Color(0xFF4CAF50)
-                            }
-
-                            statusHistory.joinToString("\n").contains("error", ignoreCase = true) ||
-                                    statusHistory.joinToString("\n").contains("failed", ignoreCase = true) ||
-                                    statusHistory.joinToString("\n").contains("left", ignoreCase = true) -> {
-                                Color(0xFFF44336)
-                            }
-
-                            else -> {
-                                Color(0xFF666666)
-                            }
-                        }
-                    )
-                }
-            }
-
-            // Transcript list or voice wave indicator
-            if (uiState.isTranscriptEnabled) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(transcriptList) { transcript ->
-                            TranscriptItem(transcript = transcript)
-                        }
+                    items(transcriptList) { transcript ->
+                        TranscriptItem(transcript = transcript)
                     }
-                }
-            } else {
-                // Voice wave indicator
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    VoiceWaveView(
-                        modifier = Modifier,
-                        isAnimating = agentState == AgentState.SPEAKING,
-                        color = MaterialTheme.colorScheme.primary,
-                        scale = 4.0f // Scale up for better visibility
-                    )
                 }
             }
 
@@ -303,27 +208,6 @@ fun VoiceAssistantScreen(
                 ) {
                     Text(
                         text = if (uiState.isMuted) "🔇" else "🎤",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-
-                // Transcript toggle button
-                FloatingActionButton(
-                    onClick = { viewModel.toggleTranscript() },
-                    modifier = Modifier.weight(1f),
-                    containerColor = if (uiState.isTranscriptEnabled) {
-                        MaterialTheme.colorScheme.primaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    },
-                    contentColor = if (uiState.isTranscriptEnabled) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
-                ) {
-                    Text(
-                        text = if (uiState.isTranscriptEnabled) "📝" else "📄",
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
@@ -405,7 +289,7 @@ fun TranscriptItem(transcript: Transcript) {
             // Transcript text
             Text(
                 text = transcript.text.ifEmpty { "(empty)" },
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
@@ -447,4 +331,3 @@ private suspend fun scrollToBottom(listState: LazyListState, itemCount: Int) {
         }
     }
 }
-

@@ -1,7 +1,7 @@
-package io.agora.convoai.example.compose.voiceassistant.tools
+package io.agora.convoai.example.startup.api
 
-import io.agora.convoai.example.compose.voiceassistant.KeyCenter
-import io.agora.convoai.example.compose.voiceassistant.net.SecureOkHttpClient
+import io.agora.convoai.example.startup.KeyCenter
+import io.agora.convoai.example.startup.api.net.SecureOkHttpClient
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,9 +12,29 @@ import org.json.JSONObject
 sealed class AgoraTokenType(val value: Int) {
     data object Rtc : AgoraTokenType(1)
     data object Rtm : AgoraTokenType(2)
-    data object Chat : AgoraTokenType(3)
 }
 
+/**
+ * ⚠️ WARNING: DO NOT USE IN PRODUCTION ⚠️
+ *
+ * This TokenGenerator is for DEMO/DEVELOPMENT purposes ONLY.
+ *
+ * **CRITICAL SECURITY WARNING:**
+ * - This class directly exposes your App ID and App Certificate in client-side code
+ * - The token generation endpoint (service.apprtc.cn) is a demo service and may be shut down at any time
+ * - Using this in production will expose your credentials and cause security vulnerabilities
+ * - If the demo service is shut down, your production app will break
+ *
+ * **PRODUCTION REQUIREMENTS:**
+ * - Token generation MUST be done on your own secure backend server
+ * - Never expose App Certificate in client-side code
+ * - Implement proper authentication and authorization on your server
+ * - Use HTTPS for all token generation requests
+ *
+ * **真实业务中请不要直接使用这个接口请求 token**
+ * - 若发布到线上，我们服务端下掉将会导致你们的业务受到影响
+ * - 此接口仅用于演示和开发测试，生产环境必须使用自己的服务端生成 token
+ */
 object TokenGenerator {
     private const val TOOLBOX_SERVER_HOST = "https://service.apprtc.cn/toolbox"
 
@@ -28,6 +48,12 @@ object TokenGenerator {
     var expireSecond: Long = -1
         private set
 
+    /**
+     * Generate RTC/RTM tokens (DEMO ONLY - DO NOT USE IN PRODUCTION)
+     *
+     * ⚠️ WARNING: This method uses a demo token service and exposes credentials in client code.
+     * For production, implement token generation on your own secure backend server.
+     */
     fun generateTokens(
         channelName: String,
         uid: String,
@@ -45,6 +71,14 @@ object TokenGenerator {
         }
     }
 
+    /**
+     * Generate RTC/RTM tokens asynchronously (DEMO ONLY - DO NOT USE IN PRODUCTION)
+     *
+     * ⚠️ WARNING: This method uses a demo token service and exposes credentials in client code.
+     * For production, implement token generation on your own secure backend server.
+     *
+     * @return Result containing the token string on success, or failure with exception
+     */
     suspend fun generateTokensAsync(
         channelName: String,
         uid: String,
@@ -89,7 +123,8 @@ object TokenGenerator {
     }
 
     private fun buildHttpRequest(postBody: JSONObject): Request {
-        // Use Token007 endpoint
+        // ⚠️ WARNING: This is a DEMO endpoint - DO NOT use in production
+        // Use Token007 endpoint (demo service only)
         val url = "$TOOLBOX_SERVER_HOST/v2/token/generate"
 
         return Request.Builder()

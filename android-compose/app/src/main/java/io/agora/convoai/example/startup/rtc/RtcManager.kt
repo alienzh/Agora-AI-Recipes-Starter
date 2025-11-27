@@ -1,8 +1,8 @@
-package io.agora.convoai.example.compose.voiceassistant.rtc
+package io.agora.convoai.example.startup.rtc
 
 import android.util.Log
-import io.agora.convoai.example.compose.voiceassistant.AgentApp
-import io.agora.convoai.example.compose.voiceassistant.KeyCenter
+import io.agora.convoai.example.startup.AgentApp
+import io.agora.convoai.example.startup.KeyCenter
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
@@ -18,14 +18,14 @@ import kotlin.apply
 
 object RtcManager {
 
-    private const val TAG = "CovAgoraManager"
+    private const val TAG = "RtcManager"
 
     private var rtcEngine: RtcEngineEx? = null
 
     private var mediaPlayer: IMediaPlayer? = null
 
     // create rtc engine
-    fun createRtcEngine(rtcCallback: IRtcEngineEventHandler): RtcEngineEx {
+    fun createRtcEngine(rtcCallback: IRtcEngineEventHandler): RtcEngineEx? {
         val config = RtcEngineConfig()
         config.mContext = AgentApp.instance()
         config.mAppId = KeyCenter.AGORA_APP_ID
@@ -42,9 +42,10 @@ object RtcManager {
             Log.d(TAG, "createRtcEngine success")
         } catch (e: Exception) {
             Log.e(TAG, "createRtcEngine error: $e")
+            return null
         }
         Log.d(TAG, "current sdk version: ${RtcEngine.getSdkVersion()}")
-        return rtcEngine!!
+        return rtcEngine
     }
 
     // create media player
@@ -62,15 +63,6 @@ object RtcManager {
     // join rtc channel
     fun joinChannel(rtcToken: String, channelName: String, uid: Int) {
         Log.d(TAG, "joinChannel channelName: $channelName, localUid: $uid")
-        // Calling this API enables the onAudioVolumeIndication callback to report volume values,
-        // which can be used to drive microphone volume animation rendering
-        // If you don't need this feature, you can skip this setting
-        rtcEngine?.enableAudioVolumeIndication(100, 3, true)
-        rtcEngine?.setCameraCapturerConfiguration(CameraCapturerConfiguration(CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_REAR))
-
-        // Audio pre-dump is enabled by default in demo, you don't need to set this in your app
-        rtcEngine?.setParameters("{\"che.audio.enable.predump\":{\"enable\":\"true\",\"duration\":\"60\"}}")
-
         // join rtc channel
         channelOptions.apply {
             clientRoleType = CLIENT_ROLE_BROADCASTER
@@ -111,53 +103,6 @@ object RtcManager {
         rtcEngine?.adjustRecordingSignalVolume(if (mute) 0 else 100)
     }
 
-    // mute remote audio
-    fun muteRemoteAudio(uid: Int, mute: Boolean) {
-        Log.d(TAG, "muteRemoteAudio $uid $mute")
-        rtcEngine?.muteRemoteAudioStream(uid, mute)
-    }
-
-
-    // setup local video
-    fun setupLocalVideo(videoCanvas: VideoCanvas) {
-        rtcEngine?.setupLocalVideo(videoCanvas)
-    }
-
-    // setup remote video
-    fun setupRemoteVideo(videoCanvas: VideoCanvas) {
-        rtcEngine?.setupRemoteVideo(videoCanvas)
-    }
-
-    // publish camera track
-    fun publishCameraTrack(publish: Boolean) {
-        Log.d(TAG, "publishCameraTrack $publish")
-        channelOptions.publishCameraTrack = publish
-        rtcEngine?.updateChannelMediaOptions(channelOptions)
-        if (publish) {
-            rtcEngine?.startPreview()
-        } else {
-            rtcEngine?.stopPreview()
-        }
-    }
-
-    // switch camera
-    fun switchCamera() {
-        Log.d(TAG, "switchCamera")
-        rtcEngine?.switchCamera()
-    }
-
-    fun onAudioDump(enable: Boolean) {
-        if (enable) {
-            rtcEngine?.setParameters("{\"che.audio.apm_dump\": true}")
-        } else {
-            rtcEngine?.setParameters("{\"che.audio.apm_dump\": false}")
-        }
-    }
-
-    fun generatePreDumpFile() {
-        rtcEngine?.setParameters("{\"che.audio.start.predump\": true}")
-    }
-
     fun destroy() {
         rtcEngine?.leaveChannel()
         rtcEngine = null
@@ -165,4 +110,3 @@ object RtcManager {
         RtcEngine.destroy()
     }
 }
-

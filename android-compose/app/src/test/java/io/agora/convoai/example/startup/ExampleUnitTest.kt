@@ -1,4 +1,4 @@
-package io.agora.convoai.example.compose.voiceassistant
+package io.agora.convoai.example.startup
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package io.agora.convoai.example.compose.voiceassistant.tools
+package io.agora.convoai.example.startup.tools
 
 
 import android.Manifest

@@ -1,4 +1,4 @@
-package io.agora.convoai.example.compose.voiceassistant
+package io.agora.convoai.example.startup
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("io.agora.convoai.example.compose.voiceassistant", appContext.packageName)
+        assertEquals("io.agora.convoai.example.startup.compose", appContext.packageName)
     }
 }

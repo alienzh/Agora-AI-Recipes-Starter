@@ -1,4 +1,4 @@
-package io.agora.convoai.example.compose.voiceassistant
+package io.agora.convoai.example.startup
 
 object KeyCenter {
     // Load values from BuildConfig, which are populated from env.properties at build time

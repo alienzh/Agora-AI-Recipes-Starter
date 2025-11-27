@@ -1,7 +1,7 @@
-package io.agora.convoai.example.compose.voiceassistant.rtc
+package io.agora.convoai.example.startup.rtm
 
 import android.util.Log
-import io.agora.convoai.example.compose.voiceassistant.KeyCenter
+import io.agora.convoai.example.startup.KeyCenter
 import io.agora.rtm.ErrorInfo
 import io.agora.rtm.LinkStateEvent
 import io.agora.rtm.PresenceEvent
@@ -33,12 +33,12 @@ interface IRtmManagerListener {
     fun onPresenceEvent(event: PresenceEvent){}
 }
 
-object CovRtmManager : RtmEventListener {
-    private val TAG = "CovRtmManager"
+object RtmManager : RtmEventListener {
+    private val TAG = "RtmManager"
 
     @Volatile
     private var isRtmLogin = false
-    
+
     @Volatile
     private var isLoggingIn = false
 
@@ -54,7 +54,7 @@ object CovRtmManager : RtmEventListener {
      */
     fun createRtmClient(uid: Int): RtmClient {
         rtmClient?.let { return it }
-        
+
         val rtmConfig = RtmConfig.Builder(KeyCenter.AGORA_APP_ID, uid.toString()).build()
         try {
             rtmClient = RtmClient.create(rtmConfig)
@@ -90,13 +90,13 @@ object CovRtmManager : RtmEventListener {
      */
     fun login(rtmToken: String, completion: (Exception?) -> Unit) {
         callMessagePrint("Starting RTM login")
-        
+
         if (isLoggingIn) {
             completion.invoke(kotlin.Exception("Login already in progress"))
             callMessagePrint("Login already in progress")
             return
         }
-        
+
         if (isRtmLogin) {
             completion.invoke(null) // Already logged in
             callMessagePrint("Already logged in")
@@ -111,7 +111,7 @@ object CovRtmManager : RtmEventListener {
 
         isLoggingIn = true
         callMessagePrint("Performing logout to ensure clean environment before login")
-        
+
         // Force logout first (synchronous flag update)
         isRtmLogin = false
         rtmClient.logout(object : ResultCallback<Void> {
@@ -126,7 +126,7 @@ object CovRtmManager : RtmEventListener {
             }
         })
     }
-    
+
     private fun performLogin(rtmClient: RtmClient, rtmToken: String, completion: (Exception?) -> Unit) {
         rtmClient.login(rtmToken, object : ResultCallback<Void> {
             override fun onSuccess(p0: Void?) {
@@ -194,24 +194,24 @@ object CovRtmManager : RtmEventListener {
      */
     fun destroy() {
         callMessagePrint("RTM destroy")
-        
+
         // Cancel coroutine scope
         try {
             coroutineScope.cancel()
         } catch (e: Exception) {
             callMessagePrint("Failed to cancel coroutine scope: ${e.message}")
         }
-        
+
         // Recreate coroutine scope for potential future use
         coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        
+
         // Clear listeners
         listeners.clear()
-        
+
         // Logout and cleanup
         isRtmLogin = false
         isLoggingIn = false
-        
+
         rtmClient?.let { client ->
             try {
                 client.removeEventListener(this)
@@ -227,9 +227,9 @@ object CovRtmManager : RtmEventListener {
                 callMessagePrint("Error during RTM cleanup: ${e.message}")
             }
         }
-        
+
         rtmClient = null
-        
+
         try {
             RtmClient.release()
         } catch (e: Exception) {
@@ -286,4 +286,3 @@ object CovRtmManager : RtmEventListener {
         return "${this.operation} ${this.errorCode} ${this.errorReason}"
     }
 }
-

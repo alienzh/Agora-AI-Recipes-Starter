@@ -472,7 +472,7 @@ public class ConversationViewModel extends ViewModel {
                                             Log.e(TAG, "Failed to start agent: " + e.getMessage(), e);
                                         });
                                     }
-                                }          
+                                }
                         );
                     });
                 },

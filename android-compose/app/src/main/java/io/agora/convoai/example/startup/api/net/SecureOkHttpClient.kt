@@ -1,4 +1,4 @@
-package io.agora.convoai.example.compose.voiceassistant.net
+package io.agora.convoai.example.startup.api.net
 
 import java.security.KeyStore
 import javax.net.ssl.TrustManagerFactory
@@ -8,6 +8,7 @@ import javax.net.ssl.SSLContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 
 object SecureOkHttpClient {
     private fun createTrustManager(): X509TrustManager {
@@ -38,7 +39,7 @@ object SecureOkHttpClient {
             .hostnameVerifier { hostname, session ->
                 HttpsURLConnection.getDefaultHostnameVerifier().verify(hostname, session)
             }
-            .protocols(listOf(okhttp3.Protocol.HTTP_2, okhttp3.Protocol.HTTP_1_1))
+            .protocols(listOf(Protocol.HTTP_2, Protocol.HTTP_1_1))
             .addInterceptor(HttpLogger())
     }
 }

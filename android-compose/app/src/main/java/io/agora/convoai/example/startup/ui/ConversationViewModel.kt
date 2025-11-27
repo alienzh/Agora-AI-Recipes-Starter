@@ -1,13 +1,13 @@
-package io.agora.convoai.example.compose.voiceassistant.ui
+package io.agora.convoai.example.startup.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.agora.convoai.example.compose.voiceassistant.rtc.CovRtmManager
-import io.agora.convoai.example.compose.voiceassistant.rtc.IRtmManagerListener
-import io.agora.convoai.example.compose.voiceassistant.rtc.RtcManager
-import io.agora.convoai.example.compose.voiceassistant.tools.AgentStarter
-import io.agora.convoai.example.compose.voiceassistant.tools.TokenGenerator
+import io.agora.convoai.example.startup.rtm.RtmManager
+import io.agora.convoai.example.startup.rtm.IRtmManagerListener
+import io.agora.convoai.example.startup.rtc.RtcManager
+import io.agora.convoai.example.startup.api.AgentStarter
+import io.agora.convoai.example.startup.api.TokenGenerator
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngineEx
@@ -40,7 +40,7 @@ class ConversationViewModel : ViewModel() {
         private const val TAG = "ConversationViewModel"
         const val userId = 1001086
         const val agentUid = 1009527
-        
+
         /**
          * Generate a random channel name
          */
@@ -59,17 +59,18 @@ class ConversationViewModel : ViewModel() {
         Error
     }
 
-    // UI State - shared between AgentConfigScreen and VoiceAssistantScreen
+    // UI State - shared between AgentHomeFragment and VoiceAssistantFragment
     data class ConversationUiState constructor(
         val statusMessage: String = "",
         val isMuted: Boolean = false,
-        val isTranscriptEnabled: Boolean = false,
         // Channel and user info
         val channelName: String = "",
         val userUid: Int = 0,
         val agentUid: Int = 0,
         // Connection state
-        val connectionState: ConnectionState = ConnectionState.Idle
+        val connectionState: ConnectionState = ConnectionState.Idle,
+        // Agent state
+        val agentStarted: Boolean = false
     )
 
     private val _uiState = MutableStateFlow(ConversationUiState())
@@ -103,7 +104,7 @@ class ConversationViewModel : ViewModel() {
                     statusMessage = "Joined RTC channel successfully"
                 )
                 Log.d(TAG, "RTC joined channel: $channel, uid: $uid")
-                checkConnectionComplete()
+                checkJoinAndLoginComplete()
             }
         }
 
@@ -145,7 +146,7 @@ class ConversationViewModel : ViewModel() {
         }
 
         override fun onTokenPrivilegeWillExpire(token: String?) {
-            super.onTokenPrivilegeWillExpire(token)
+            renewToken()
         }
     }
 
@@ -154,6 +155,7 @@ class ConversationViewModel : ViewModel() {
         override fun onFailed() {
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(
+                    connectionState = ConnectionState.Error,
                     statusMessage = "RTM connection failed, attempting re-login"
                 )
                 Log.d(TAG, "RTM connection failed, attempting re-login with new token")
@@ -162,6 +164,23 @@ class ConversationViewModel : ViewModel() {
         }
 
         override fun onTokenPrivilegeWillExpire(channelName: String) {
+            renewToken()
+        }
+    }
+
+    private fun renewToken() {
+        viewModelScope.launch {
+            val token = generateUnifiedToken(isSilent = true)
+            if (token != null) {
+                RtcManager.renewRtcToken(token)
+                RtmManager.renewToken(token) { error ->
+                    if (error != null) {
+                        unifiedToken = null
+                    }
+                }
+            } else {
+                Log.e(TAG, "Failed to renew token")
+            }
         }
     }
 
@@ -180,23 +199,11 @@ class ConversationViewModel : ViewModel() {
         }
 
         override fun onAgentError(agentUserId: String, error: ModuleError) {
-            viewModelScope.launch {
-                _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Error,
-                    statusMessage = "Agent error: ${error.message}"
-                )
-                Log.e(TAG, "Agent error: ${error.message}")
-            }
+            // Handle agent error
         }
 
         override fun onMessageError(agentUserId: String, error: MessageError) {
-            viewModelScope.launch {
-                _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Error,
-                    statusMessage = "Message error: ${error.message}"
-                )
-                Log.e(TAG, "Message error: ${error.message}")
-            }
+            // Handle message error
         }
 
         override fun onTranscriptUpdated(agentUserId: String, transcript: Transcript) {
@@ -224,17 +231,22 @@ class ConversationViewModel : ViewModel() {
             Log.d(TAG, "Initializing RTC engine and RTM client...")
 
             val rtcEngine = RtcManager.createRtcEngine(rtcEventHandler)
-            val rtmClient = CovRtmManager.createRtmClient(userId)
+            val rtmClient = RtmManager.createRtmClient(userId)
             // Setup RTM listener
-            CovRtmManager.addListener(rtmListener)
+            RtmManager.addListener(rtmListener)
 
-            initializeAPIs(rtcEngine, rtmClient)
-
-            Log.d(TAG, "RTC engine and RTM client created successfully")
+            if (rtcEngine != null) {
+                initializeAPIs(rtcEngine, rtmClient)
+                Log.d(TAG, "RTC engine and RTM client created successfully")
+            } else {
+                Log.e(TAG, "Failed to create RTC engine")
+                _uiState.value = _uiState.value.copy(
+                    statusMessage = "Failed to create RTC engine"
+                )
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error creating RTC/RTM instances: ${e.message}", e)
             _uiState.value = _uiState.value.copy(
-                connectionState = ConnectionState.Error,
                 statusMessage = "Error creating RTC/RTM: ${e.message}"
             )
         }
@@ -254,26 +266,24 @@ class ConversationViewModel : ViewModel() {
     }
 
     /**
-     * Check if both RTC and RTM are connected
+     * Check if both RTC and RTM are connected, then start agent
      */
-    private fun checkConnectionComplete() {
+    private fun checkJoinAndLoginComplete() {
         if (rtcJoined && rtmLoggedIn) {
             _uiState.value = _uiState.value.copy(
-                connectionState = ConnectionState.Connected,
-                statusMessage = "RTC and RTM initialized successfully"
+                statusMessage = "RTC and RTM connected successfully"
             )
+            startAgent()
         }
     }
 
     /**
-     * Start agent (called from VoiceAssistantScreen)
+     * Start agent (called automatically after RTC and RTM are connected)
      */
     fun startAgent() {
-        Log.d(TAG, "[startAgent] Called - agentStarted=$agentStarted, agentId=$agentId, channelName=$channelName")
-        Log.d(TAG, "[startAgent] Current connectionState: ${_uiState.value.connectionState}")
         viewModelScope.launch {
             if (agentStarted) {
-                Log.d(TAG, "[startAgent] Agent already started, agentId: $agentId")
+                Log.d(TAG, "Agent already started, agentId: $agentId")
                 return@launch
             }
 
@@ -282,7 +292,7 @@ class ConversationViewModel : ViewModel() {
                     connectionState = ConnectionState.Error,
                     statusMessage = "Channel name is empty, cannot start agent"
                 )
-                Log.e(TAG, "[startAgent] Channel name is empty, cannot start agent")
+                Log.e(TAG, "Channel name is empty, cannot start agent")
                 return@launch
             }
 
@@ -322,21 +332,56 @@ class ConversationViewModel : ViewModel() {
                     this@ConversationViewModel.agentId = agentId
                     agentStarted = true
                     _uiState.value = _uiState.value.copy(
+                        connectionState = ConnectionState.Connected,
+                        agentStarted = true,
                         statusMessage = "Agent started successfully"
                     )
-                    Log.d(TAG, "[startAgent] Agent started successfully, agentId: $agentId")
-                    Log.d(TAG, "[startAgent] Agent state updated - agentStarted=$agentStarted, agentId=$agentId")
-                    Log.d(TAG, "[startAgent] Current connectionState: ${_uiState.value.connectionState}")
+                    Log.d(TAG, "Agent started successfully, agentId: $agentId")
                 },
                 onFailure = { exception ->
                     _uiState.value = _uiState.value.copy(
                         connectionState = ConnectionState.Error,
                         statusMessage = "Failed to start agent: ${exception.message}"
                     )
-                    Log.e(TAG, "[startAgent] Failed to start agent: ${exception.message}", exception)
+                    Log.e(TAG, "Failed to start agent: ${exception.message}", exception)
                 }
             )
         }
+    }
+
+    /**
+     * Generate unified token for RTC and RTM
+     *
+     * @param isSilent Whether to suppress UI status updates (default: false)
+     * @return Token string on success, null on failure (UI state is updated on failure regardless of isSilent)
+     */
+    private suspend fun generateUnifiedToken(isSilent: Boolean = false): String? {
+        if (!isSilent) {
+            _uiState.value = _uiState.value.copy(
+                statusMessage = "Getting token..."
+            )
+        }
+
+        // Get unified token for both RTC and RTM
+        val tokenResult = TokenGenerator.generateTokensAsync(
+            channelName = "",
+            uid = userId.toString(),
+        )
+
+        return tokenResult.fold(
+            onSuccess = { token ->
+                unifiedToken = token
+                token
+            },
+            onFailure = { exception ->
+                _uiState.value = _uiState.value.copy(
+                    connectionState = ConnectionState.Error,
+                    statusMessage = "Failed to get token: ${exception.message}"
+                )
+                Log.e(TAG, "Failed to get token: ${exception.message}", exception)
+                null
+            }
+        )
     }
 
     /**
@@ -367,38 +412,13 @@ class ConversationViewModel : ViewModel() {
                 )
 
                 // Get token if not available, otherwise use existing token
-                val token = unifiedToken ?: run {
-                    _uiState.value = _uiState.value.copy(
-                        statusMessage = "Getting token..."
-                    )
-
-                    // Get unified token for both RTC and RTM
-                    val tokenResult = TokenGenerator.generateTokensAsync(
-                        channelName = "",
-                        uid = userId.toString()
-                    )
-
-                    tokenResult.fold(
-                        onSuccess = { token ->
-                            unifiedToken = token
-                            token
-                        },
-                        onFailure = { exception ->
-                            _uiState.value = _uiState.value.copy(
-                                connectionState = ConnectionState.Idle,
-                                statusMessage = "Failed to get token: ${exception.message}"
-                            )
-                            Log.e(TAG, "Failed to get token: ${exception.message}", exception)
-                            return@launch
-                        }
-                    )
-                }
+                val token = unifiedToken ?: generateUnifiedToken() ?: return@launch
 
                 // Join RTC channel with the unified token
                 RtcManager.joinChannel(token, channelName, userId)
 
                 // Login RTM with the same unified token
-                CovRtmManager.login(token) { exception ->
+                RtmManager.login(token) { exception ->
                     viewModelScope.launch {
                         if (exception == null) {
                             rtmLoggedIn = true
@@ -410,10 +430,10 @@ class ConversationViewModel : ViewModel() {
                                     Log.e(TAG, "Subscribe message error: ${errorInfo}")
                                 }
                             }
-                            checkConnectionComplete()
+                            checkJoinAndLoginComplete()
                         } else {
                             _uiState.value = _uiState.value.copy(
-                                connectionState = ConnectionState.Idle,
+                                connectionState = ConnectionState.Error,
                                 statusMessage = "RTM login failed: ${exception.message}"
                             )
                             Log.e(TAG, "RTM login failed: ${exception.message}", exception)
@@ -441,18 +461,6 @@ class ConversationViewModel : ViewModel() {
         )
         RtcManager.muteLocalAudio(newMuteState)
         Log.d(TAG, "Microphone muted: $newMuteState")
-    }
-
-    /**
-     * Toggle transcript display
-     */
-    fun toggleTranscript() {
-        val newTranscriptState = !_uiState.value.isTranscriptEnabled
-        _uiState.value = _uiState.value.copy(
-            isTranscriptEnabled = newTranscriptState,
-            statusMessage = if (newTranscriptState) "Transcript enabled" else "Transcript disabled"
-        )
-        Log.d(TAG, "Transcript enabled: $newTranscriptState")
     }
 
     /**
@@ -487,22 +495,16 @@ class ConversationViewModel : ViewModel() {
      * Hang up and cleanup connections
      */
     fun hangup() {
-        Log.d(TAG, "[hangup] Called - agentStarted=$agentStarted, agentId=$agentId, channelName=$channelName")
-        Log.d(TAG, "[hangup] Current connectionState: ${_uiState.value.connectionState}")
         viewModelScope.launch {
             try {
-                Log.d(TAG, "[hangup] Inside coroutine - unsubscribing message")
                 conversationalAIAPI?.unsubscribeMessage(channelName) { errorInfo ->
                     if (errorInfo != null) {
-                        Log.e(TAG, "[hangup] Unsubscribe message error: ${errorInfo}")
-                    } else {
-                        Log.d(TAG, "[hangup] Unsubscribe message success")
+                        Log.e(TAG, "Unsubscribe message error: ${errorInfo}")
                     }
                 }
 
                 // Stop agent if it was started
                 if (agentStarted && agentId != null) {
-                    Log.d(TAG, "[hangup] Stopping agent - agentId=$agentId")
                     _uiState.value = _uiState.value.copy(
                         statusMessage = "Stopping agent..."
                     )
@@ -511,46 +513,37 @@ class ConversationViewModel : ViewModel() {
                     )
                     stopResult.fold(
                         onSuccess = {
-                            Log.d(TAG, "[hangup] Agent stopped successfully")
+                            Log.d(TAG, "Agent stopped successfully")
                         },
                         onFailure = { exception ->
-                            Log.e(TAG, "[hangup] Failed to stop agent: ${exception.message}", exception)
+                            Log.e(TAG, "Failed to stop agent: ${exception.message}", exception)
                         }
                     )
                     agentId = null
                     agentStarted = false
-                    Log.d(TAG, "[hangup] Agent state cleared - agentId=$agentId, agentStarted=$agentStarted")
-                } else {
-                    Log.d(TAG, "[hangup] Agent not started or agentId is null, skipping stop")
                 }
 
-                Log.d(TAG, "[hangup] Leaving RTC channel and logging out RTM")
                 RtcManager.leaveChannel()
-                CovRtmManager.logout()
+                RtmManager.logout()
                 rtcJoined = false
                 rtmLoggedIn = false
-                Log.d(TAG, "[hangup] RTC/RTM state cleared - rtcJoined=$rtcJoined, rtmLoggedIn=$rtmLoggedIn")
-                
-                Log.d(TAG, "[hangup] Updating UI state to Idle")
                 _uiState.value = _uiState.value.copy(
                     statusMessage = "",
-                    connectionState = ConnectionState.Idle
+                    connectionState = ConnectionState.Idle,
+                    agentStarted = false
                 )
-                Log.d(TAG, "[hangup] UI state updated - connectionState=${_uiState.value.connectionState}")
-                
                 clearTranscripts()
-                Log.d(TAG, "[hangup] Hangup completed successfully")
+                Log.d(TAG, "Hangup completed")
             } catch (e: Exception) {
-                Log.e(TAG, "[hangup] Error during hangup: ${e.message}", e)
+                Log.e(TAG, "Error during hangup: ${e.message}", e)
             }
         }
-        Log.d(TAG, "[hangup] Coroutine launched, returning from hangup()")
     }
 
     override fun onCleared() {
         super.onCleared()
         RtcManager.leaveChannel()
-        CovRtmManager.logout()
+        RtmManager.logout()
         // Note: RtcEngine.destroy() should be called carefully as it's a global operation
         // Consider managing RTC engine lifecycle at Application level
     }

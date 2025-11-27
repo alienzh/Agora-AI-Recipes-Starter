@@ -1,8 +1,10 @@
-package io.agora.convoai.example.compose.voiceassistant.tools
+package io.agora.convoai.example.startup.api
 
-import io.agora.convoai.example.compose.voiceassistant.KeyCenter
-import io.agora.convoai.example.compose.voiceassistant.net.SecureOkHttpClient
-import kotlinx.coroutines.*
+import io.agora.convoai.example.startup.KeyCenter
+import io.agora.convoai.example.startup.api.net.SecureOkHttpClient
+import io.agora.convoai.example.startup.tools.Base64Encoding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -17,9 +19,15 @@ import org.json.JSONObject
  */
 object AgentStarter {
     private const val JSON_MEDIA_TYPE = "application/json; charset=utf-8"
+    
     // Switch between local server and Agora API by commenting/uncommenting the lines below
+    
+    // Option 1: Agora RESTful API (Default, for quick experience)
     private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
-//    private const val AGORA_API_BASE_URL = "http://10.103.1.61:8080"  // Local server (for development)
+    
+    // Option 2: Local Python Server (For development testing reference)
+    // private const val AGORA_API_BASE_URL = "http://<YOUR_COMPUTER_IP>:8080"
+
     private const val DEFAULT_AGENT_RTC_UID = "1009527"
 
     private val okHttpClient: OkHttpClient by lazy {
@@ -117,12 +125,11 @@ object AgentStarter {
     private fun mapToJsonObjectWithFilter(map: Map<String, Any?>): JSONObject {
         val jsonObject = JSONObject()
         map.forEach { (key, value) ->
-            when {
-                value == null -> {
+            when (value) {
+                null -> {
                     // Skip null values
                 }
-
-                value is Map<*, *> -> {
+                is Map<*, *> -> {
                     // Handle nested Map
                     @Suppress("UNCHECKED_CAST")
                     val nestedJsonObject = mapToJsonObjectWithFilter(value as Map<String, Any?>)
@@ -131,16 +138,15 @@ object AgentStarter {
                     }
                 }
 
-                value is List<*> -> {
+                is List<*> -> {
                     // Handle List type
                     val jsonArray = JSONArray()
                     value.forEach { item ->
-                        when {
-                            item == null -> {
+                        when (item) {
+                            null -> {
                                 // Skip null values
                             }
-
-                            item is Map<*, *> -> {
+                            is Map<*, *> -> {
                                 // Handle Map in List
                                 @Suppress("UNCHECKED_CAST")
                                 jsonArray.put(mapToJsonObjectWithFilter(item as Map<String, Any?>))
@@ -203,31 +209,4 @@ object AgentStarter {
             Result.failure(e)
         }
     }
-
-    /**
-     * Check if the server is available
-     *
-     * @return Result containing true if server is available, false otherwise
-     */
-    suspend fun checkServerHealth(): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            // Health check only works for local server
-            // For Agora API, skip health check or use a different endpoint
-            if (AGORA_API_BASE_URL.startsWith("http://")) {
-                val url = "$AGORA_API_BASE_URL/health"
-                val request = Request.Builder()
-                    .url(url)
-                    .get()
-                    .build()
-                val response = okHttpClient.newCall(request).execute()
-                Result.success(response.isSuccessful)
-            } else {
-                // Agora API doesn't have a health endpoint, return success
-                Result.success(true)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 }
-
