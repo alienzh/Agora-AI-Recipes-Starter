@@ -517,6 +517,8 @@ void CMainFrame::JoinChannelAndStartAgent()
             // Join RTC channel
             if (!m_rtcManager.JoinChannel(token, m_channelName, m_userUid)) {
                 LOG_ERROR("[MainFrm] Failed to join RTC channel");
+                UpdateChannelStatus(false, _T("Join failed"));
+                UpdateAgentStatus(_T("Failed"));
                 m_btnStartStop.EnableWindow(TRUE);
                 return;
             }
