@@ -22,7 +22,6 @@
 
 ### 前置条件
 
-- Android Studio Hedgehog 或更高版本
 - Android SDK API Level 26（Android 8.0）或更高
 - Agora 开发者账号 [Console](https://console.shengwang.cn/)
 - 已在 Agora 控制台开通 **实时消息 RTM** 功能（必需）
@@ -40,43 +39,41 @@ cd Agora-AI-Recipes-Starter/android-kotlin
 ```
 
 2. **配置 Android 项目**：
-   - 使用 Android Studio 打开项目
-   - 等待 Gradle 同步完成
+    - 使用 Android Studio 打开项目
+    - 配置 Agora Key：
 
-3. **配置 Agora Key**：
-   
-   1. 复制 `env.example.properties` 文件为 `env.properties`：
-   ```bash
-   cp env.example.properties env.properties
-   ```
-   
-   2. 编辑 `env.properties` 文件，填入你的实际配置值：
-   ```properties
-   agora.appId=your_app_id
-   agora.appCertificate=your_app_certificate
-   agora.restKey=your_rest_key
-   agora.restSecret=your_rest_secret
-   agora.pipelineId=your_pipeline_id
-   ```
-   
+      复制 `env.example.properties` 文件为 `env.properties`：
+         ```bash
+         cp env.example.properties env.properties
+         ```
+
+   编辑 `env.properties` 文件，填入你的实际配置值：
+      ```properties
+      agora.appId=your_app_id
+      agora.appCertificate=your_app_certificate
+      agora.restKey=your_rest_key
+      agora.restSecret=your_rest_secret
+      agora.pipelineId=your_pipeline_id
+      ```
+
    **配置项说明**：
-   - `agora.appId`：你的 Agora App ID（必需）
-   - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
-   - `agora.restKey`：REST API Key（必需，用于启动 Agent）
-   - `agora.restSecret`：REST API Secret（必需，用于启动 Agent）
-   - `agora.pipelineId`：Pipeline ID（必需，用于启动 Agent）
-   
-   **获取方式**：
-   - App ID 和 App Certificate：在 [Agora Console](https://console.shengwang.cn/) 中创建项目后获取
-   - REST Key 和 REST Secret：在 Agora Console 的项目设置中获取
-   - Pipeline ID：在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 中创建 Pipeline 后获取
-   
-   **注意**：
-   - `env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
-   - 每次启动时会自动生成随机的 channelName，格式为 `channel_kotlin_XXXX`（XXXX 为 4 位随机数字），无需手动配置。
-   - ⚠️ **重要**：`TokenGenerator.kt` 中的 Token 生成功能仅用于演示和开发测试，**生产环境必须使用自己的服务端生成 Token**。代码中已添加详细警告说明。
+    - `agora.appId`：你的 Agora App ID（必需）
+    - `agora.appCertificate`：你的 App Certificate（可选，用于 Token 生成）
+    - `agora.restKey`：REST API Key（必需，用于启动 Agent）
+    - `agora.restSecret`：REST API Secret（必需，用于启动 Agent）
+    - `agora.pipelineId`：Pipeline ID（必需，用于启动 Agent）
 
-4. **配置 Agent 启动方式**：
+   **获取方式**：
+    - 体验声网对话式 AI 引擎前，你需要先在声网控制台创建项目并开通对话式 AI 引擎服务，获取 App ID、客户 ID 和客户密钥等调用 RESTful API 时所需的参数。[开通服务](https://doc.shengwang.cn/doc/convoai/restful/get-started/enable-service)
+    - Pipeline ID：在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 中创建 Pipeline 后获取
+
+   **注意**：
+    - `env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+    - 每次启动时会自动生成随机的 channelName，格式为 `channel_java_XXXX`（XXXX 为 4 位随机数字），无需手动配置。
+    - ⚠️ **重要**：`TokenGenerator.kt` 中的 Token 生成功能仅用于演示和开发测试，**生产环境必须使用自己的服务端生成 Token**。代码中已添加详细警告说明。
+      - 等待 Gradle 同步完成
+
+3. **配置 Agent 启动方式**：
    
    **方式一：直接调用 Agora RESTful API**（仅用于快速体验，不推荐用于生产）
    
@@ -107,6 +104,10 @@ cd Agora-AI-Recipes-Starter/android-kotlin
    **实现方式**：
    
    1. **参考实现**：`../server-python/agora_http_server.py` 展示了如何在服务端调用 Agora RESTful API
+      ```bash
+      cd ../server-python
+      python agora_http_server.py
+      ```
       - Python 服务器从环境变量或配置文件读取 REST Key 和 REST Secret
       - 服务端使用这些密钥调用 Agora API，客户端无需知道这些密钥
    
@@ -114,6 +115,7 @@ cd Agora-AI-Recipes-Starter/android-kotlin
       - 参考 Python 服务器的实现逻辑，在你的业务后台（Java、Node.js、Python 等）实现 Agent 启动接口
       - 将 REST Key 和 REST Secret 存储在服务端环境变量或配置文件中
       - 客户端请求你的业务后台接口，业务后台使用 REST Key 和 REST Secret 调用 Agora API
+
    
    3. **在 `AgentStarter.kt` 中配置本地 Python 服务器的 IP 地址**（用于本地体验测试）：
    ```kotlin
@@ -137,24 +139,6 @@ cd Agora-AI-Recipes-Starter/android-kotlin
    - **稳定性**：统一管理 API 调用，便于监控和错误处理
    - **灵活性**：可以添加缓存、限流、重试等机制
    - **合规性**：符合安全最佳实践，避免敏感信息泄露
-   
-   **开发测试参考**：
-   
-   如果想在本地测试业务后台的实现方式，可以启动 Python HTTP 服务器作为参考：
-   ```bash
-   cd ../server-python
-   python agora_http_server.py
-   ```
-   
-   然后在 `AgentStarter.kt` 中配置本地服务器地址（仅用于开发测试）：
-   ```kotlin
-   private const val AGORA_API_BASE_URL = "http://<your-computer-ip>:8080"  // Local server for development
-   ```
-   
-   ⚠️ **重要**：Python 服务器示例仅用于演示和开发测试，真实业务中需要：
-   - 将 REST Key 和 REST Secret 放在你的生产环境服务端
-   - 实现完整的权限验证和业务逻辑
-   - 使用 HTTPS 保护数据传输
    
    **注意**：
    - 生产环境必须使用自己的服务端生成 Token，不要使用 `TokenGenerator`（详见代码中的警告）

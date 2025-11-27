@@ -10,8 +10,34 @@ if (envPropertiesFile.exists()) {
     envPropertiesFile.withInputStream { envProperties.load(it) }
 }
 
+// Validate required Agora configuration properties
+def requiredProperties = [
+    "agora.appId",
+    "agora.restKey",
+    "agora.restSecret",
+    "agora.pipelineId"
+]
+
+def missingProperties = []
+requiredProperties.each { key ->
+    def value = envProperties.getProperty(key)
+    if (value == null || value.trim().isEmpty()) {
+        missingProperties.add(key)
+    }
+}
+
+if (!missingProperties.isEmpty()) {
+    def errorMessage = new StringBuilder()
+    errorMessage.append("Please configure the following required properties in env.properties:\n")
+    missingProperties.each { prop ->
+        errorMessage.append("  - ${prop}\n")
+    }
+    errorMessage.append("\nPlease refer to env.properties for configuration reference.")
+    throw new GradleException(errorMessage.toString())
+}
+
 android {
-    namespace 'io.agora.convoai.example.voiceassistant.java'
+    namespace 'io.agora.convoai.example.startup'
     compileSdk 36
 
     buildFeatures {
@@ -20,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "io.agora.agent.example.starter.java"
+        applicationId "io.agora.agent.example.startup.java"
         minSdk 26
         targetSdk 36
         versionCode 1

@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
-        android:name="io.agora.convoai.example.voiceassistant.AgentApp"
+        android:name="io.agora.convoai.example.startup.AgentApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,7 +28,7 @@
         android:theme="@style/Theme.Agentstarterconvoaiandroid">
 
         <activity
-            android:name="io.agora.convoai.example.voiceassistant.ui.MainActivity"
+            android:name="io.agora.convoai.example.startup.ui.MainActivity"
             android:exported="true"
             android:keepScreenOn="true">
             <intent-filter>
