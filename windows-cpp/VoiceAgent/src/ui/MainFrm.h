@@ -62,6 +62,7 @@ private:
     
     // Right Panel (Transcript)
     CStatic m_rightPanel;
+    CStatic m_labelTranscriptTitle; // Transcript title label
     CListCtrl m_listMessages;       // Message list
     CStatic m_labelTranscriptCount; // Transcript count label
     CButton m_btnClear;             // Clear button

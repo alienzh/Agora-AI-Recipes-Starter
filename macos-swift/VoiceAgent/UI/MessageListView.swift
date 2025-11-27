@@ -210,7 +210,7 @@ class MessageCellView: NSTableCellView {
     /// - Parameter transcript: Transcript object to display
     func configure(with transcript: Transcript) {
         // Format ID based on type
-        let typePrefix = transcript.type == .user ? "👤 User" : "🤖 Agent"
+        let typePrefix = transcript.type == .user ? "User" : "Agent"
         let idText = "\(typePrefix) • ID: \(transcript.userId) • Turn: \(transcript.turnId)"
         idLabel.stringValue = idText
         
