@@ -1,0 +1,1370 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		183C29DD6DE04D22CA29BAE61F5C530B /* AgoraRtcEngine_iOS */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 7D7BE1C7BA0A706DACAE76329822BA50 /* Build configuration list for PBXAggregateTarget "AgoraRtcEngine_iOS" */;
+			buildPhases = (
+				4ADCCF1EE25517194697A524ABEDD36C /* [CP] Copy XCFrameworks */,
+			);
+			dependencies = (
+				8F02683C4334F9EA19756219457E06B3 /* PBXTargetDependency */,
+			);
+			name = AgoraRtcEngine_iOS;
+		};
+		2F7F7AAA1C81C1ECBEECAABE3C3609AC /* AgoraInfra_iOS */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 6AC986F8353D7D8FD502D9D6E938C5AA /* Build configuration list for PBXAggregateTarget "AgoraInfra_iOS" */;
+			buildPhases = (
+				0D149E6301791F149B3D66666328CB01 /* [CP] Copy XCFrameworks */,
+			);
+			dependencies = (
+			);
+			name = AgoraInfra_iOS;
+		};
+		489753DDD12BE1CC20C36E04D802ACE9 /* AgoraRtm */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = C2823C401C2619E02AA62F55558614C5 /* Build configuration list for PBXAggregateTarget "AgoraRtm" */;
+			buildPhases = (
+				1C7FDD1FB141A303E5F805E7D10A1A65 /* [CP] Copy XCFrameworks */,
+			);
+			dependencies = (
+			);
+			name = AgoraRtm;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		06CCF15C02E29C0713B96BBDE966C1FC /* AlertToast-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = B2ED7122DBFED34A87A62C57503D921A /* AlertToast-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		506CE4DD39CA319ADCEFEB71AA500C76 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B8F37990DE75387AE728092E0A8DA9 /* BlurView.swift */; };
+		615F3B805846ADADD26DA07C37E6E18D /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC8650CDEA9CBEEBD3A2B3EF02BA7C5 /* ActivityIndicator.swift */; };
+		96452E40C3687D914F67639A451204A2 /* Pods-VoiceAgent-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = C4CA9EBDCF3FD300E37CC803C353CBB9 /* Pods-VoiceAgent-dummy.m */; };
+		C55C875B377A8399827EDEAE8F9F9304 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		D473E05C108BD813F299254A4AA49F8B /* AlertToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA86BF5E0A35BDC56C21740214C0E25 /* AlertToast.swift */; };
+		EA848DFDFDF7290EC5D5C5D96D177257 /* AlertToast-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D0A88199C8FB51AF384837DAFD2D9963 /* AlertToast-dummy.m */; };
+		EE159C48056639E30CBCCACAF724A723 /* Pods-VoiceAgent-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = BF93CB6189FDF990B30A0F114CFB1C53 /* Pods-VoiceAgent-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EE1A336C7EA29871B4FEF93A5A8547FC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		04D546313D9424F93DF444954A0B50DB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 489753DDD12BE1CC20C36E04D802ACE9;
+			remoteInfo = AgoraRtm;
+		};
+		295BE0C7BCE1024612E12F8BC3D83CFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2F7F7AAA1C81C1ECBEECAABE3C3609AC;
+			remoteInfo = AgoraInfra_iOS;
+		};
+		46E164D1B40B64147E6C9D2E8130A936 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BD9F52E07CA8CCC9E5112A7D8C1CE821;
+			remoteInfo = AlertToast;
+		};
+		836C4A2B5CC0248D9E36F5FFCA6C057C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 183C29DD6DE04D22CA29BAE61F5C530B;
+			remoteInfo = AgoraRtcEngine_iOS;
+		};
+		E2213419EB12299BCD3FDDB2B52A8E11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2F7F7AAA1C81C1ECBEECAABE3C3609AC;
+			remoteInfo = AgoraInfra_iOS;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		019343F17C709EA70A8A28859B3EBDBC /* AlertToast.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = AlertToast.modulemap; sourceTree = "<group>"; };
+		05B8F37990DE75387AE728092E0A8DA9 /* BlurView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BlurView.swift; path = Sources/AlertToast/BlurView.swift; sourceTree = "<group>"; };
+		0C53584C23993C3873C4273529D1A07C /* AgoraReplayKitExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraReplayKitExtension.xcframework; sourceTree = "<group>"; };
+		1074C2FB8F6A02517CBB9A9FB957C3A6 /* AgoraAiNoiseSuppressionExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraAiNoiseSuppressionExtension.xcframework; sourceTree = "<group>"; };
+		1614B0D706E94B65D9DC29912AD2EE8D /* AlertToast-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AlertToast-prefix.pch"; sourceTree = "<group>"; };
+		244AA1E93B71AF2FD231006617A1DCDC /* AgoraRtcEngine_iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AgoraRtcEngine_iOS.debug.xcconfig; sourceTree = "<group>"; };
+		24D37865215F5A35AA0D7D459D05A192 /* AgoraVideoSegmentationExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraVideoSegmentationExtension.xcframework; sourceTree = "<group>"; };
+		2531A152A3081321E47CB557037712DF /* AgoraFaceCaptureExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraFaceCaptureExtension.xcframework; sourceTree = "<group>"; };
+		2AEF5CE44973810E6E64412EEA210475 /* AgoraRtm.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = AgoraRtm.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		2C29929B92C74360CB407B3990E3A769 /* AgoraInfra_iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AgoraInfra_iOS.debug.xcconfig; sourceTree = "<group>"; };
+		34C6649FBAB16047E3D3838DD85F246F /* AlertToast-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "AlertToast-Info.plist"; sourceTree = "<group>"; };
+		36A6FF47B1FF41D5F3C33B94EEAF7E5D /* AgoraVideoDecoderExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraVideoDecoderExtension.xcframework; sourceTree = "<group>"; };
+		384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		401F30C736E475419C99D320236A489F /* AgoraContentInspectExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraContentInspectExtension.xcframework; sourceTree = "<group>"; };
+		427AF2609E93D522FA7C1B37CE05738E /* AgoraRtm.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AgoraRtm.debug.xcconfig; sourceTree = "<group>"; };
+		455C5672D5413DB97021FCEB3B790362 /* AgoraRtm-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "AgoraRtm-xcframeworks.sh"; sourceTree = "<group>"; };
+		48F14C82DB42D958ECF7CDBD4A7818AE /* AgoraRtm.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AgoraRtm.release.xcconfig; sourceTree = "<group>"; };
+		4A5377E5C7DB072DEA5B0C73F8B83CEF /* AgoraVideoAv1EncoderExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraVideoAv1EncoderExtension.xcframework; sourceTree = "<group>"; };
+		5410C50AEAADC810CA6FC84695DD1698 /* AgoraInfra_iOS-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "AgoraInfra_iOS-xcframeworks.sh"; sourceTree = "<group>"; };
+		55F076BCD8F7A4E60BFD37FB993081BA /* AgoraAiEchoCancellationExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraAiEchoCancellationExtension.xcframework; sourceTree = "<group>"; };
+		55F15E08F9E6121A90C790463AE55E87 /* Pods-VoiceAgent */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-VoiceAgent"; path = Pods_VoiceAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A51824DA4654E034A3553FCC1A4D5ED /* video_enc.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = video_enc.xcframework; sourceTree = "<group>"; };
+		5EA86BF5E0A35BDC56C21740214C0E25 /* AlertToast.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AlertToast.swift; path = Sources/AlertToast/AlertToast.swift; sourceTree = "<group>"; };
+		6CE7E76C5D6F29B6B4D46E9F112013F0 /* video_dec.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = video_dec.xcframework; sourceTree = "<group>"; };
+		6F567FD1F5DE66928ECFE350255BA661 /* AgoraFaceDetectionExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraFaceDetectionExtension.xcframework; sourceTree = "<group>"; };
+		7084D0C87A28B8A0EB57BDD15FAC1584 /* AgoraAudioBeautyExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraAudioBeautyExtension.xcframework; sourceTree = "<group>"; };
+		7CF8E61E74AC76E3D9B442CA5257A0FC /* AgoraSoundTouch.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraSoundTouch.xcframework; sourceTree = "<group>"; };
+		7DA0F103678207A908915CCF1DCE6A85 /* AlertToast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AlertToast.release.xcconfig; sourceTree = "<group>"; };
+		84F8CE4722025C2BBD5DE4B07760EC70 /* AgoraVideoQualityAnalyzerExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraVideoQualityAnalyzerExtension.xcframework; sourceTree = "<group>"; };
+		8DF18310DFE50A68EA8F1FCE6347E7B8 /* Agoraffmpeg.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = Agoraffmpeg.xcframework; sourceTree = "<group>"; };
+		98A65B495D88821FD4D574E3464BCAEE /* AgoraVideoEncoderExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraVideoEncoderExtension.xcframework; sourceTree = "<group>"; };
+		998DBAA142136A1A1229E5DB03C0F1AA /* AgoraRtcEngine_iOS-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "AgoraRtcEngine_iOS-xcframeworks.sh"; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9E444438431E2E7CC3116FDFCE79F573 /* AgoraAiEchoCancellationLLExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraAiEchoCancellationLLExtension.xcframework; sourceTree = "<group>"; };
+		9F011AC08A706D95F8DD2A0E876FFC54 /* AgoraClearVisionExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraClearVisionExtension.xcframework; sourceTree = "<group>"; };
+		A50F036BE0BFE618C67FA52B80377F3B /* AlertToast */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = AlertToast; path = AlertToast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB9331E833C7CA3BA88C3BA85538F3F0 /* AgoraAiNoiseSuppressionLLExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraAiNoiseSuppressionLLExtension.xcframework; sourceTree = "<group>"; };
+		AB96071EFDEE36D13CCA6E131C94BE46 /* AgoraSpatialAudioExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraSpatialAudioExtension.xcframework; sourceTree = "<group>"; };
+		ACC8650CDEA9CBEEBD3A2B3EF02BA7C5 /* ActivityIndicator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActivityIndicator.swift; path = Sources/AlertToast/ActivityIndicator.swift; sourceTree = "<group>"; };
+		AE34BEF33F4C5D7E998EDC5732B24BFA /* AgoraRtmKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = AgoraRtmKit.xcframework; path = RTMLibs/AgoraRtmKit.xcframework; sourceTree = "<group>"; };
+		AF6FCE87F75792C84CF3AD0421701E4B /* aosl.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = aosl.xcframework; sourceTree = "<group>"; };
+		B2ED7122DBFED34A87A62C57503D921A /* AlertToast-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AlertToast-umbrella.h"; sourceTree = "<group>"; };
+		BC1BD23075ACACA7037472C99709DAC0 /* AgoraLipSyncExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraLipSyncExtension.xcframework; sourceTree = "<group>"; };
+		BF93CB6189FDF990B30A0F114CFB1C53 /* Pods-VoiceAgent-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-VoiceAgent-umbrella.h"; sourceTree = "<group>"; };
+		C03CD0A942F5FE751C0AF9C4AC36A75E /* Pods-VoiceAgent-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-VoiceAgent-frameworks.sh"; sourceTree = "<group>"; };
+		C4CA9EBDCF3FD300E37CC803C353CBB9 /* Pods-VoiceAgent-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-VoiceAgent-dummy.m"; sourceTree = "<group>"; };
+		C4F8F0EE6E3722B5BA1411C60D69C3F7 /* Pods-VoiceAgent.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-VoiceAgent.modulemap"; sourceTree = "<group>"; };
+		CA5F7230805C2FDDD7B6AF9EB8BDA492 /* Pods-VoiceAgent-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VoiceAgent-Info.plist"; sourceTree = "<group>"; };
+		CFB122339CEC1D440DC28A8208A57867 /* Pods-VoiceAgent.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-VoiceAgent.debug.xcconfig"; sourceTree = "<group>"; };
+		D02C90A89A151E5B4C60FACA2E897B79 /* AgoraRtcEngine_iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AgoraRtcEngine_iOS.release.xcconfig; sourceTree = "<group>"; };
+		D0A88199C8FB51AF384837DAFD2D9963 /* AlertToast-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "AlertToast-dummy.m"; sourceTree = "<group>"; };
+		D3ECDE1303768294BFF4E5FA131CEF22 /* AgoraRtcKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraRtcKit.xcframework; sourceTree = "<group>"; };
+		D6F2CC02F24C3356F908F1538A4256EE /* AgoraInfra_iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AgoraInfra_iOS.release.xcconfig; sourceTree = "<group>"; };
+		D9CA808D04114ADF99F0B39E56C8A50C /* Pods-VoiceAgent.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-VoiceAgent.release.xcconfig"; sourceTree = "<group>"; };
+		D9F2659567CB71A799BF475C14A25C0B /* Pods-VoiceAgent-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VoiceAgent-acknowledgements.plist"; sourceTree = "<group>"; };
+		DBC5D28FCFA7D2BC71941F696E02E122 /* AgoraVideoAv1DecoderExtension.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AgoraVideoAv1DecoderExtension.xcframework; sourceTree = "<group>"; };
+		E513C97B4A5FE54AB31D35500595BA63 /* AlertToast.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AlertToast.debug.xcconfig; sourceTree = "<group>"; };
+		EF706F2F7FB115F919FD1AAF682035BD /* Pods-VoiceAgent-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-VoiceAgent-acknowledgements.markdown"; sourceTree = "<group>"; };
+		F04CC82FD9F5FEA1A419DA67B5498954 /* Agorafdkaac.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = Agorafdkaac.xcframework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EF3FCF0039E5865CB8F70CF97893E430 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE1A336C7EA29871B4FEF93A5A8547FC /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6227925C3738393A1BC9FB01B9899BF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C55C875B377A8399827EDEAE8F9F9304 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		078704BB150164CF28A72D42406952EE /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				2AEF5CE44973810E6E64412EEA210475 /* AgoraRtm.podspec */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
+		0AF5F45BD633DF2000EFAFEA4F3F6C34 /* FaceDetection */ = {
+			isa = PBXGroup;
+			children = (
+				4EE546A6B4F602841E926A67E236BE3C /* Frameworks */,
+			);
+			name = FaceDetection;
+			sourceTree = "<group>";
+		};
+		14C9A228756C9C56BB6701D143DD8072 /* AINS */ = {
+			isa = PBXGroup;
+			children = (
+				7B895A17AB410D01CE0DD0DA3524C3A5 /* Frameworks */,
+			);
+			name = AINS;
+			sourceTree = "<group>";
+		};
+		1523944503A828FCE84C05299995B9C1 /* AINSLL */ = {
+			isa = PBXGroup;
+			children = (
+				4EE3303A3BEA8CBE14832A7E446D2AB8 /* Frameworks */,
+			);
+			name = AINSLL;
+			sourceTree = "<group>";
+		};
+		1DB210D3D64A4EB979A33B3E869C80B2 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				92B131CD04389438E1680A684B1C679D /* AgoraInfra_iOS */,
+				A5A498C9B6547E46600A4E495F748689 /* AgoraRtcEngine_iOS */,
+				561DAD092D1B1367B1294951C11FE3E0 /* AlertToast */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		1EE375283ABBDAFC492407AB9CD69778 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4A5377E5C7DB072DEA5B0C73F8B83CEF /* AgoraVideoAv1EncoderExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		213EF8BE6D46B1C2CAEDD4433A9BCAF4 /* RtcBasic */ = {
+			isa = PBXGroup;
+			children = (
+				58172DF45F373AD654E0E8B16B715533 /* Frameworks */,
+			);
+			name = RtcBasic;
+			sourceTree = "<group>";
+		};
+		21FA08B7C7F1E9A66F6A31C3216E1F26 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				019343F17C709EA70A8A28859B3EBDBC /* AlertToast.modulemap */,
+				D0A88199C8FB51AF384837DAFD2D9963 /* AlertToast-dummy.m */,
+				34C6649FBAB16047E3D3838DD85F246F /* AlertToast-Info.plist */,
+				1614B0D706E94B65D9DC29912AD2EE8D /* AlertToast-prefix.pch */,
+				B2ED7122DBFED34A87A62C57503D921A /* AlertToast-umbrella.h */,
+				E513C97B4A5FE54AB31D35500595BA63 /* AlertToast.debug.xcconfig */,
+				7DA0F103678207A908915CCF1DCE6A85 /* AlertToast.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/AlertToast";
+			sourceTree = "<group>";
+		};
+		22D80C83BCFC1B30506CAD4A5CA224FE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				84F8CE4722025C2BBD5DE4B07760EC70 /* AgoraVideoQualityAnalyzerExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		298713A746930ACF7A26F20841BC14D7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A50F036BE0BFE618C67FA52B80377F3B /* AlertToast */,
+				55F15E08F9E6121A90C790463AE55E87 /* Pods-VoiceAgent */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2E3CE02CF354BAF63FC0297C8EB5B8A6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7084D0C87A28B8A0EB57BDD15FAC1584 /* AgoraAudioBeautyExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3B4D415C06DFF3D81A7948C5C85F847F /* VideoCodecDec */ = {
+			isa = PBXGroup;
+			children = (
+				3FF384813BC345B62FCD5BD4D08DD120 /* Frameworks */,
+			);
+			name = VideoCodecDec;
+			sourceTree = "<group>";
+		};
+		3E3D4BB6F8A881C8ABD746283D18361F /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				455C5672D5413DB97021FCEB3B790362 /* AgoraRtm-xcframeworks.sh */,
+				427AF2609E93D522FA7C1B37CE05738E /* AgoraRtm.debug.xcconfig */,
+				48F14C82DB42D958ECF7CDBD4A7818AE /* AgoraRtm.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "Pods/Target Support Files/AgoraRtm";
+			sourceTree = "<group>";
+		};
+		3FF384813BC345B62FCD5BD4D08DD120 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				36A6FF47B1FF41D5F3C33B94EEAF7E5D /* AgoraVideoDecoderExtension.xcframework */,
+				6CE7E76C5D6F29B6B4D46E9F112013F0 /* video_dec.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		466B28576A1FE6CCAC82B8E9CD562C31 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AE34BEF33F4C5D7E998EDC5732B24BFA /* AgoraRtmKit.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4820EBFFFAEEC9F22F70322D5122711F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				98A65B495D88821FD4D574E3464BCAEE /* AgoraVideoEncoderExtension.xcframework */,
+				5A51824DA4654E034A3553FCC1A4D5ED /* video_enc.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		48698D84A6A5FE100087BF219D2248EE /* AudioBeauty */ = {
+			isa = PBXGroup;
+			children = (
+				2E3CE02CF354BAF63FC0297C8EB5B8A6 /* Frameworks */,
+			);
+			name = AudioBeauty;
+			sourceTree = "<group>";
+		};
+		4DDDF113891E23280C552045D2CBFFB5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				401F30C736E475419C99D320236A489F /* AgoraContentInspectExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4EE3303A3BEA8CBE14832A7E446D2AB8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AB9331E833C7CA3BA88C3BA85538F3F0 /* AgoraAiNoiseSuppressionLLExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4EE546A6B4F602841E926A67E236BE3C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6F567FD1F5DE66928ECFE350255BA661 /* AgoraFaceDetectionExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		53EC036023093A5DF6859DC78EE50C01 /* AIAEC */ = {
+			isa = PBXGroup;
+			children = (
+				5BD48B769DCBEE2A381204DAFB7D7F3A /* Frameworks */,
+			);
+			name = AIAEC;
+			sourceTree = "<group>";
+		};
+		561DAD092D1B1367B1294951C11FE3E0 /* AlertToast */ = {
+			isa = PBXGroup;
+			children = (
+				ACC8650CDEA9CBEEBD3A2B3EF02BA7C5 /* ActivityIndicator.swift */,
+				5EA86BF5E0A35BDC56C21740214C0E25 /* AlertToast.swift */,
+				05B8F37990DE75387AE728092E0A8DA9 /* BlurView.swift */,
+				21FA08B7C7F1E9A66F6A31C3216E1F26 /* Support Files */,
+			);
+			name = AlertToast;
+			path = AlertToast;
+			sourceTree = "<group>";
+		};
+		58172DF45F373AD654E0E8B16B715533 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F04CC82FD9F5FEA1A419DA67B5498954 /* Agorafdkaac.xcframework */,
+				8DF18310DFE50A68EA8F1FCE6347E7B8 /* Agoraffmpeg.xcframework */,
+				D3ECDE1303768294BFF4E5FA131CEF22 /* AgoraRtcKit.xcframework */,
+				7CF8E61E74AC76E3D9B442CA5257A0FC /* AgoraSoundTouch.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5BD48B769DCBEE2A381204DAFB7D7F3A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				55F076BCD8F7A4E60BFD37FB993081BA /* AgoraAiEchoCancellationExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5D7C6322327926C26C392E8C5F9D95A3 /* LipSync */ = {
+			isa = PBXGroup;
+			children = (
+				5EB70390008A73A93AC9666DE5A616AD /* Frameworks */,
+			);
+			name = LipSync;
+			sourceTree = "<group>";
+		};
+		5EB70390008A73A93AC9666DE5A616AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BC1BD23075ACACA7037472C99709DAC0 /* AgoraLipSyncExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		67550AA01F6EB4748D3394ED24AA40CE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9E444438431E2E7CC3116FDFCE79F573 /* AgoraAiEchoCancellationLLExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6795B92BB394D79C9BF49636514FF52D /* ClearVision */ = {
+			isa = PBXGroup;
+			children = (
+				A56CEBDF3C1065867E3CD527C129558F /* Frameworks */,
+			);
+			name = ClearVision;
+			sourceTree = "<group>";
+		};
+		7579F2EAE6A969FF1F2F4CECCA8BE7F5 /* AgoraRtm */ = {
+			isa = PBXGroup;
+			children = (
+				466B28576A1FE6CCAC82B8E9CD562C31 /* Frameworks */,
+				078704BB150164CF28A72D42406952EE /* Pod */,
+				3E3D4BB6F8A881C8ABD746283D18361F /* Support Files */,
+			);
+			name = AgoraRtm;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		7846A4FE4C2BE747D381ED2C4950A939 /* VideoAv1CodecEnc */ = {
+			isa = PBXGroup;
+			children = (
+				1EE375283ABBDAFC492407AB9CD69778 /* Frameworks */,
+			);
+			name = VideoAv1CodecEnc;
+			sourceTree = "<group>";
+		};
+		79B2BF0FAADB826BF0E987D5D90B243F /* SpatialAudio */ = {
+			isa = PBXGroup;
+			children = (
+				85B2697D9F0D49D880C5D66A5620FAE2 /* Frameworks */,
+			);
+			name = SpatialAudio;
+			sourceTree = "<group>";
+		};
+		7B895A17AB410D01CE0DD0DA3524C3A5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1074C2FB8F6A02517CBB9A9FB957C3A6 /* AgoraAiNoiseSuppressionExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		810526D78790F8FF12D8E14C473B2175 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				B61816FCDD4F3A0F0C15BA4FC4AFFBFC /* Pods-VoiceAgent */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		81D89CA4932117922A9B78E684B871FA /* ContentInspect */ = {
+			isa = PBXGroup;
+			children = (
+				4DDDF113891E23280C552045D2CBFFB5 /* Frameworks */,
+			);
+			name = ContentInspect;
+			sourceTree = "<group>";
+		};
+		85B2697D9F0D49D880C5D66A5620FAE2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AB96071EFDEE36D13CCA6E131C94BE46 /* AgoraSpatialAudioExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		92B131CD04389438E1680A684B1C679D /* AgoraInfra_iOS */ = {
+			isa = PBXGroup;
+			children = (
+				A045B6EC60050A3CAA12CFE0D0C973EC /* Frameworks */,
+				FA618D76A53CB926FBA07D7EA11C5799 /* Support Files */,
+			);
+			name = AgoraInfra_iOS;
+			path = AgoraInfra_iOS;
+			sourceTree = "<group>";
+		};
+		930481212D55CEA3B06E9ABCC216520B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2531A152A3081321E47CB557037712DF /* AgoraFaceCaptureExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		986F56536AA8711C06FBEFA0F23F6DA8 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				998DBAA142136A1A1229E5DB03C0F1AA /* AgoraRtcEngine_iOS-xcframeworks.sh */,
+				244AA1E93B71AF2FD231006617A1DCDC /* AgoraRtcEngine_iOS.debug.xcconfig */,
+				D02C90A89A151E5B4C60FACA2E897B79 /* AgoraRtcEngine_iOS.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/AgoraRtcEngine_iOS";
+			sourceTree = "<group>";
+		};
+		A045B6EC60050A3CAA12CFE0D0C973EC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AF6FCE87F75792C84CF3AD0421701E4B /* aosl.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A3DE6FFA6A1AA4CC6D4401BFFC288C31 /* VideoAv1CodecDec */ = {
+			isa = PBXGroup;
+			children = (
+				C68FAF769FE50737480A71168CD790BF /* Frameworks */,
+			);
+			name = VideoAv1CodecDec;
+			sourceTree = "<group>";
+		};
+		A41FC6C1C99A4D54B417D3A3A80AB306 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				24D37865215F5A35AA0D7D459D05A192 /* AgoraVideoSegmentationExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A56CEBDF3C1065867E3CD527C129558F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9F011AC08A706D95F8DD2A0E876FFC54 /* AgoraClearVisionExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A5A498C9B6547E46600A4E495F748689 /* AgoraRtcEngine_iOS */ = {
+			isa = PBXGroup;
+			children = (
+				53EC036023093A5DF6859DC78EE50C01 /* AIAEC */,
+				D99A541AF92D508DD8AEEB365A93533C /* AIAECLL */,
+				14C9A228756C9C56BB6701D143DD8072 /* AINS */,
+				1523944503A828FCE84C05299995B9C1 /* AINSLL */,
+				48698D84A6A5FE100087BF219D2248EE /* AudioBeauty */,
+				6795B92BB394D79C9BF49636514FF52D /* ClearVision */,
+				81D89CA4932117922A9B78E684B871FA /* ContentInspect */,
+				CE7E3FE8E8A708F75590623F399897F5 /* FaceCapture */,
+				0AF5F45BD633DF2000EFAFEA4F3F6C34 /* FaceDetection */,
+				5D7C6322327926C26C392E8C5F9D95A3 /* LipSync */,
+				CB1078D899DF255EAF361D1570B18ADD /* ReplayKit */,
+				213EF8BE6D46B1C2CAEDD4433A9BCAF4 /* RtcBasic */,
+				79B2BF0FAADB826BF0E987D5D90B243F /* SpatialAudio */,
+				986F56536AA8711C06FBEFA0F23F6DA8 /* Support Files */,
+				A3DE6FFA6A1AA4CC6D4401BFFC288C31 /* VideoAv1CodecDec */,
+				7846A4FE4C2BE747D381ED2C4950A939 /* VideoAv1CodecEnc */,
+				3B4D415C06DFF3D81A7948C5C85F847F /* VideoCodecDec */,
+				EC96F4794EFF9E5F7DF60056F185EC51 /* VideoCodecEnc */,
+				B47210EBD4A0B1E4C6BCD14D2331C298 /* VirtualBackground */,
+				C7DE7E27C63311D927F41EE222796BA6 /* VQA */,
+			);
+			name = AgoraRtcEngine_iOS;
+			path = AgoraRtcEngine_iOS;
+			sourceTree = "<group>";
+		};
+		B47210EBD4A0B1E4C6BCD14D2331C298 /* VirtualBackground */ = {
+			isa = PBXGroup;
+			children = (
+				A41FC6C1C99A4D54B417D3A3A80AB306 /* Frameworks */,
+			);
+			name = VirtualBackground;
+			sourceTree = "<group>";
+		};
+		B61816FCDD4F3A0F0C15BA4FC4AFFBFC /* Pods-VoiceAgent */ = {
+			isa = PBXGroup;
+			children = (
+				C4F8F0EE6E3722B5BA1411C60D69C3F7 /* Pods-VoiceAgent.modulemap */,
+				EF706F2F7FB115F919FD1AAF682035BD /* Pods-VoiceAgent-acknowledgements.markdown */,
+				D9F2659567CB71A799BF475C14A25C0B /* Pods-VoiceAgent-acknowledgements.plist */,
+				C4CA9EBDCF3FD300E37CC803C353CBB9 /* Pods-VoiceAgent-dummy.m */,
+				C03CD0A942F5FE751C0AF9C4AC36A75E /* Pods-VoiceAgent-frameworks.sh */,
+				CA5F7230805C2FDDD7B6AF9EB8BDA492 /* Pods-VoiceAgent-Info.plist */,
+				BF93CB6189FDF990B30A0F114CFB1C53 /* Pods-VoiceAgent-umbrella.h */,
+				CFB122339CEC1D440DC28A8208A57867 /* Pods-VoiceAgent.debug.xcconfig */,
+				D9CA808D04114ADF99F0B39E56C8A50C /* Pods-VoiceAgent.release.xcconfig */,
+			);
+			name = "Pods-VoiceAgent";
+			path = "Target Support Files/Pods-VoiceAgent";
+			sourceTree = "<group>";
+		};
+		C68FAF769FE50737480A71168CD790BF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DBC5D28FCFA7D2BC71941F696E02E122 /* AgoraVideoAv1DecoderExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C7DE7E27C63311D927F41EE222796BA6 /* VQA */ = {
+			isa = PBXGroup;
+			children = (
+				22D80C83BCFC1B30506CAD4A5CA224FE /* Frameworks */,
+			);
+			name = VQA;
+			sourceTree = "<group>";
+		};
+		CB1078D899DF255EAF361D1570B18ADD /* ReplayKit */ = {
+			isa = PBXGroup;
+			children = (
+				CC50D843032992A6C70710F9AC7FF67B /* Frameworks */,
+			);
+			name = ReplayKit;
+			sourceTree = "<group>";
+		};
+		CC50D843032992A6C70710F9AC7FF67B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0C53584C23993C3873C4273529D1A07C /* AgoraReplayKitExtension.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CE7E3FE8E8A708F75590623F399897F5 /* FaceCapture */ = {
+			isa = PBXGroup;
+			children = (
+				930481212D55CEA3B06E9ABCC216520B /* Frameworks */,
+			);
+			name = FaceCapture;
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				DC5F065624C91B07F4048647D8F33B9F /* Development Pods */,
+				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
+				1DB210D3D64A4EB979A33B3E869C80B2 /* Pods */,
+				298713A746930ACF7A26F20841BC14D7 /* Products */,
+				810526D78790F8FF12D8E14C473B2175 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E4801F62A6B08CD9B5410329F1A18FDE /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D99A541AF92D508DD8AEEB365A93533C /* AIAECLL */ = {
+			isa = PBXGroup;
+			children = (
+				67550AA01F6EB4748D3394ED24AA40CE /* Frameworks */,
+			);
+			name = AIAECLL;
+			sourceTree = "<group>";
+		};
+		DC5F065624C91B07F4048647D8F33B9F /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7579F2EAE6A969FF1F2F4CECCA8BE7F5 /* AgoraRtm */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+		E4801F62A6B08CD9B5410329F1A18FDE /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		EC96F4794EFF9E5F7DF60056F185EC51 /* VideoCodecEnc */ = {
+			isa = PBXGroup;
+			children = (
+				4820EBFFFAEEC9F22F70322D5122711F /* Frameworks */,
+			);
+			name = VideoCodecEnc;
+			sourceTree = "<group>";
+		};
+		FA618D76A53CB926FBA07D7EA11C5799 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				5410C50AEAADC810CA6FC84695DD1698 /* AgoraInfra_iOS-xcframeworks.sh */,
+				2C29929B92C74360CB407B3990E3A769 /* AgoraInfra_iOS.debug.xcconfig */,
+				D6F2CC02F24C3356F908F1538A4256EE /* AgoraInfra_iOS.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/AgoraInfra_iOS";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		0C28C887DB472E44B05CBE9FE7525CEF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE159C48056639E30CBCCACAF724A723 /* Pods-VoiceAgent-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4459C1B803BED0A57C63EE6CB034085 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				06CCF15C02E29C0713B96BBDE966C1FC /* AlertToast-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		14AB0EDF7DF7F8F9311A67A196ED77D9 /* Pods-VoiceAgent */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A8D8BD964DB2B7088216E1E3C2A1079 /* Build configuration list for PBXNativeTarget "Pods-VoiceAgent" */;
+			buildPhases = (
+				0C28C887DB472E44B05CBE9FE7525CEF /* Headers */,
+				1A21738DEFF368E5DFEDEF55D636CE95 /* Sources */,
+				F6227925C3738393A1BC9FB01B9899BF /* Frameworks */,
+				491A4C4E0AF16DF83CD3608B10158296 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D7C1524F15236161267DEE629170F254 /* PBXTargetDependency */,
+				EF55FA8FACBC66D6F6199A97A5BAC03A /* PBXTargetDependency */,
+				6F69307C88E2BC6622F1B7B369EE7002 /* PBXTargetDependency */,
+				21AED7D46CFFE03ACB57A080E3145D64 /* PBXTargetDependency */,
+			);
+			name = "Pods-VoiceAgent";
+			productName = Pods_VoiceAgent;
+			productReference = 55F15E08F9E6121A90C790463AE55E87 /* Pods-VoiceAgent */;
+			productType = "com.apple.product-type.framework";
+		};
+		BD9F52E07CA8CCC9E5112A7D8C1CE821 /* AlertToast */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AEA9C3DF7876F7C61C8EE22E3EB613E7 /* Build configuration list for PBXNativeTarget "AlertToast" */;
+			buildPhases = (
+				E4459C1B803BED0A57C63EE6CB034085 /* Headers */,
+				E5E5903A6D7790EF3FAA8E329FB254F7 /* Sources */,
+				EF3FCF0039E5865CB8F70CF97893E430 /* Frameworks */,
+				280534E9DE737C155AF3BD96797B5AD4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AlertToast;
+			productName = AlertToast;
+			productReference = A50F036BE0BFE618C67FA52B80377F3B /* AlertToast */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 298713A746930ACF7A26F20841BC14D7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2F7F7AAA1C81C1ECBEECAABE3C3609AC /* AgoraInfra_iOS */,
+				183C29DD6DE04D22CA29BAE61F5C530B /* AgoraRtcEngine_iOS */,
+				489753DDD12BE1CC20C36E04D802ACE9 /* AgoraRtm */,
+				BD9F52E07CA8CCC9E5112A7D8C1CE821 /* AlertToast */,
+				14AB0EDF7DF7F8F9311A67A196ED77D9 /* Pods-VoiceAgent */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		280534E9DE737C155AF3BD96797B5AD4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		491A4C4E0AF16DF83CD3608B10158296 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0D149E6301791F149B3D66666328CB01 /* [CP] Copy XCFrameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AgoraInfra_iOS/AgoraInfra_iOS-xcframeworks-input-files.xcfilelist",
+			);
+			name = "[CP] Copy XCFrameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AgoraInfra_iOS/AgoraInfra_iOS-xcframeworks-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/AgoraInfra_iOS/AgoraInfra_iOS-xcframeworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1C7FDD1FB141A303E5F805E7D10A1A65 /* [CP] Copy XCFrameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AgoraRtm/AgoraRtm-xcframeworks-input-files.xcfilelist",
+			);
+			name = "[CP] Copy XCFrameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AgoraRtm/AgoraRtm-xcframeworks-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/AgoraRtm/AgoraRtm-xcframeworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4ADCCF1EE25517194697A524ABEDD36C /* [CP] Copy XCFrameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AgoraRtcEngine_iOS/AgoraRtcEngine_iOS-xcframeworks-input-files.xcfilelist",
+			);
+			name = "[CP] Copy XCFrameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AgoraRtcEngine_iOS/AgoraRtcEngine_iOS-xcframeworks-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/AgoraRtcEngine_iOS/AgoraRtcEngine_iOS-xcframeworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1A21738DEFF368E5DFEDEF55D636CE95 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96452E40C3687D914F67639A451204A2 /* Pods-VoiceAgent-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E5E5903A6D7790EF3FAA8E329FB254F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				615F3B805846ADADD26DA07C37E6E18D /* ActivityIndicator.swift in Sources */,
+				D473E05C108BD813F299254A4AA49F8B /* AlertToast.swift in Sources */,
+				EA848DFDFDF7290EC5D5C5D96D177257 /* AlertToast-dummy.m in Sources */,
+				506CE4DD39CA319ADCEFEB71AA500C76 /* BlurView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		21AED7D46CFFE03ACB57A080E3145D64 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AlertToast;
+			target = BD9F52E07CA8CCC9E5112A7D8C1CE821 /* AlertToast */;
+			targetProxy = 46E164D1B40B64147E6C9D2E8130A936 /* PBXContainerItemProxy */;
+		};
+		6F69307C88E2BC6622F1B7B369EE7002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AgoraRtm;
+			target = 489753DDD12BE1CC20C36E04D802ACE9 /* AgoraRtm */;
+			targetProxy = 04D546313D9424F93DF444954A0B50DB /* PBXContainerItemProxy */;
+		};
+		8F02683C4334F9EA19756219457E06B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AgoraInfra_iOS;
+			target = 2F7F7AAA1C81C1ECBEECAABE3C3609AC /* AgoraInfra_iOS */;
+			targetProxy = E2213419EB12299BCD3FDDB2B52A8E11 /* PBXContainerItemProxy */;
+		};
+		D7C1524F15236161267DEE629170F254 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AgoraInfra_iOS;
+			target = 2F7F7AAA1C81C1ECBEECAABE3C3609AC /* AgoraInfra_iOS */;
+			targetProxy = 295BE0C7BCE1024612E12F8BC3D83CFB /* PBXContainerItemProxy */;
+		};
+		EF55FA8FACBC66D6F6199A97A5BAC03A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AgoraRtcEngine_iOS;
+			target = 183C29DD6DE04D22CA29BAE61F5C530B /* AgoraRtcEngine_iOS */;
+			targetProxy = 836C4A2B5CC0248D9E36F5FFCA6C057C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		545B9496B9E51A77A34A98211B32488E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 244AA1E93B71AF2FD231006617A1DCDC /* AgoraRtcEngine_iOS.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A5B47DC8BDA0EDC2DC87E1CAA4D6C068 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48F14C82DB42D958ECF7CDBD4A7818AE /* AgoraRtm.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A74234DAAD938BE3BF6B471A9EE45A38 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D6F2CC02F24C3356F908F1538A4256EE /* AgoraInfra_iOS.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B80BE38C5F56AD40DD8988FD2805FF71 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		C2FC59A69827B574BB1ED02D972D5F53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DA0F103678207A908915CCF1DCE6A85 /* AlertToast.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/AlertToast/AlertToast-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/AlertToast/AlertToast-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/AlertToast/AlertToast.modulemap";
+				PRODUCT_MODULE_NAME = AlertToast;
+				PRODUCT_NAME = AlertToast;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 5.1;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		CCDECCEC75894E1A590B3193F43AA72E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E513C97B4A5FE54AB31D35500595BA63 /* AlertToast.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/AlertToast/AlertToast-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/AlertToast/AlertToast-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/AlertToast/AlertToast.modulemap";
+				PRODUCT_MODULE_NAME = AlertToast;
+				PRODUCT_NAME = AlertToast;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 5.1;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		D0BA3F9EF558559FA1C19DCAC1C84649 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2C29929B92C74360CB407B3990E3A769 /* AgoraInfra_iOS.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D536B7CA1960CC3E9E83821B7C7735A6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D9CA808D04114ADF99F0B39E56C8A50C /* Pods-VoiceAgent.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-VoiceAgent/Pods-VoiceAgent-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-VoiceAgent/Pods-VoiceAgent.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		D67589638836E8D0D7E9FB19CBD7A9ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CFB122339CEC1D440DC28A8208A57867 /* Pods-VoiceAgent.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-VoiceAgent/Pods-VoiceAgent-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-VoiceAgent/Pods-VoiceAgent.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		D997E4194A96734A6FE02CB6A11F2EA5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D02C90A89A151E5B4C60FACA2E897B79 /* AgoraRtcEngine_iOS.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DB7FA4C2BD30587141931CB1E887EA4B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		EE6BD2E618E1CE07760E69696CBE0E85 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 427AF2609E93D522FA7C1B37CE05738E /* AgoraRtm.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B80BE38C5F56AD40DD8988FD2805FF71 /* Debug */,
+				DB7FA4C2BD30587141931CB1E887EA4B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6AC986F8353D7D8FD502D9D6E938C5AA /* Build configuration list for PBXAggregateTarget "AgoraInfra_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0BA3F9EF558559FA1C19DCAC1C84649 /* Debug */,
+				A74234DAAD938BE3BF6B471A9EE45A38 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A8D8BD964DB2B7088216E1E3C2A1079 /* Build configuration list for PBXNativeTarget "Pods-VoiceAgent" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D67589638836E8D0D7E9FB19CBD7A9ED /* Debug */,
+				D536B7CA1960CC3E9E83821B7C7735A6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7D7BE1C7BA0A706DACAE76329822BA50 /* Build configuration list for PBXAggregateTarget "AgoraRtcEngine_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				545B9496B9E51A77A34A98211B32488E /* Debug */,
+				D997E4194A96734A6FE02CB6A11F2EA5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AEA9C3DF7876F7C61C8EE22E3EB613E7 /* Build configuration list for PBXNativeTarget "AlertToast" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CCDECCEC75894E1A590B3193F43AA72E /* Debug */,
+				C2FC59A69827B574BB1ED02D972D5F53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C2823C401C2619E02AA62F55558614C5 /* Build configuration list for PBXAggregateTarget "AgoraRtm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE6BD2E618E1CE07760E69696CBE0E85 /* Debug */,
+				A5B47DC8BDA0EDC2DC87E1CAA4D6C068 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}

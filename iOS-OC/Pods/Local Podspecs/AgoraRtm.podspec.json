@@ -1,0 +1,22 @@
+{
+  "name": "AgoraRtm",
+  "version": "2.2.6",
+  "summary": "Agora iOS SDK",
+  "description": "iOS library for agora A/V communication, broadcasting and data channel service.",
+  "homepage": "https://docs.agora.io/en/Agora%20Platform/downloads",
+  "license": {
+    "type": "Copyright",
+    "text": "Copyright 2022 agora.io. All rights reserved.n"
+  },
+  "authors": {
+    "Agora Lab": "developer@agora.io"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source": {
+    "http": "https://download.agora.io/sdk/release/AgoraRtm-2.2.3.zip"
+  },
+  "prepare_command": "rm -rf RTMLibs\nfolder=\"RTMLibs\"\nif [ ! -d \"$folder\" ]; then\n   mkdir -p \"$folder\"\nfi\ncurl -L -o RTMLibs/resource.zip https://download.agora.io/sdk/release/AgoraRtm-2.2.6.zip\nunzip -o RTMLibs/resource.zip -d RTMLibs\nrm -rf RTMLibs/aosl.xcframework\nrm -rf RTMLibs/resource.zip",
+  "vendored_frameworks": "RTMLibs/*.xcframework"
+}
