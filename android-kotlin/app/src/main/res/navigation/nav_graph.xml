@@ -3,25 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/agentConfigFragment">
+    app:startDestination="@id/agentHomeFragment">
 
     <fragment
-        android:id="@+id/agentConfigFragment"
-        android:name="io.agora.convoai.example.voiceassistant.ui.AgentConfigFragment"
-        android:label="Agent Config"
-        tools:layout="@layout/fragment_agent_config">
+        android:id="@+id/agentHomeFragment"
+        android:name="io.agora.convoai.example.startup.ui.AgentHomeFragment"
+        android:label="Agent Home"
+        tools:layout="@layout/fragment_agent_home">
 
         <action
-            android:id="@+id/action_agentConfig_to_voiceAssistant"
-            app:destination="@id/voiceAssistantFragment" />
+            android:id="@+id/action_agentHome_to_agentLiving"
+            app:destination="@id/agentLivingFragment" />
 
     </fragment>
 
     <fragment
-        android:id="@+id/voiceAssistantFragment"
-        android:name="io.agora.convoai.example.voiceassistant.ui.VoiceAssistantFragment"
-        android:label="Voice Assistant"
-        tools:layout="@layout/fragment_voice_assistant" />
+        android:id="@+id/agentLivingFragment"
+        android:name="io.agora.convoai.example.startup.ui.AgentLivingFragment"
+        android:label="Agent Living"
+        tools:layout="@layout/fragment_agent_living" />
 
 </navigation>
 
