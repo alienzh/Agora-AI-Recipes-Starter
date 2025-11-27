@@ -1,0 +1,35 @@
+//
+//  KeyCenter.swift.example
+//  VoiceAgent
+//
+//  Created on 2025
+//  Copyright © 2025 Agora. All rights reserved.
+//
+//  IMPORTANT: Copy this file to KeyCenter.swift and fill in your credentials
+//
+
+import Foundation
+
+// MARK: - Configuration Keys
+struct KeyCenter {
+    // Agora Credentials - Replace with your actual values
+    // Get your App ID from: https://console.agora.io/
+    static let AGORA_APP_ID = "YOUR_APP_ID_HERE"
+    static let AGORA_APP_CERTIFICATE = ""
+    
+    // REST API Credentials (for direct API mode)
+    // Get these from your Agora Console under RESTful API
+    static let REST_KEY = "YOUR_REST_KEY_HERE"
+    static let REST_SECRET = "YOUR_REST_SECRET_HERE"
+    
+    // Pipeline Configuration
+    // Get this from your Conversational AI Pipeline setup
+    static let PIPELINE_ID = "YOUR_PIPELINE_ID_HERE"
+    
+    // Agent Server Configuration
+    // Switch between local server and Agora API by changing this URL
+    // Local server: "http://localhost:8080"
+    // Agora API: "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+    static let AGENT_SERVER_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+}
+

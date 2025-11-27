@@ -1,0 +1,28 @@
+#pragma once
+
+// Configuration Keys and Constants
+// IMPORTANT: Copy this file to VoiceAgent/src/KeyCenter.h and fill in your credentials
+class KeyCenter {
+public:
+    // Agora Credentials - Replace with your actual values
+    // Get your App ID from: https://console.agora.io/
+    static constexpr const char* AGORA_APP_ID = "YOUR_APP_ID_HERE";
+    static constexpr const char* AGORA_APP_CERTIFICATE = "";
+    
+    // REST API Credentials (for direct API mode)
+    // Get these from your Agora Console under RESTful API
+    static constexpr const char* REST_KEY = "YOUR_REST_KEY_HERE";
+    static constexpr const char* REST_SECRET = "YOUR_REST_SECRET_HERE";
+    
+    // Pipeline Configuration
+    // Get this from your Conversational AI Pipeline setup
+    static constexpr const char* PIPELINE_ID = "YOUR_PIPELINE_ID_HERE";
+    
+    // Agent Server Configuration
+    // Switch between local server and Agora API by changing this URL
+    // Local server: "http://localhost:8080"
+    // Agora API: "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
+    static constexpr const char* AGENT_SERVER_BASE_URL = 
+        "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects";
+};
+
