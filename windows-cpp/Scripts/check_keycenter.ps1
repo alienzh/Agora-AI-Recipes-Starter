@@ -1,5 +1,5 @@
 # Script to check and create KeyCenter.h from template
-# This should be added to Visual Studio Pre-Build Event
+# This generates compiler errors that appear in Visual Studio Error List
 
 $ErrorActionPreference = "Stop"
 
@@ -12,80 +12,120 @@ $TemplateFile = Join-Path $ProjectRoot "KeyCenter.h.example"
 
 Write-Host "🔍 Checking KeyCenter.h configuration..." -ForegroundColor Cyan
 
+# Function to create error header file
+function Create-ErrorHeader {
+    param([string]$ErrorMessage, [string]$Instructions)
+    
+    $ErrorHeader = @"
+#pragma once
+
+// ============================================================================
+// ⚠️  BUILD ERROR: KeyCenter Configuration Required
+// ============================================================================
+//
+// $ErrorMessage
+//
+// Required Steps:
+$Instructions
+//
+// Get your credentials from: https://console.agora.io/
+//
+// ============================================================================
+
+#error "⚠️  BUILD FAILED: $ErrorMessage - Please configure KeyCenter.h with your Agora credentials. See instructions above."
+
+"@
+    
+    Set-Content -Path $KeyCenterFile -Value $ErrorHeader -Encoding UTF8
+}
+
 # Check if KeyCenter.h exists
 if (-not (Test-Path $KeyCenterFile)) {
     Write-Host ""
-    Write-Host "❌ ERROR: KeyCenter.h not found!" -ForegroundColor Red
+    Write-Host "❌ KeyCenter.h not found! Creating error header..." -ForegroundColor Yellow
     Write-Host ""
     
     # Check if template exists
     if (Test-Path $TemplateFile) {
-        Write-Host "📝 Creating KeyCenter.h from template..." -ForegroundColor Yellow
-        Copy-Item $TemplateFile $KeyCenterFile
+        $Instructions = @"
+//   1. Copy '$TemplateFile' to:
+//      '$KeyCenterFile'
+//   2. Open the copied file and replace the following placeholders:
+//      - YOUR_APP_ID_HERE → Your Agora App ID
+//      - YOUR_REST_KEY_HERE → Your REST API Key
+//      - YOUR_REST_SECRET_HERE → Your REST API Secret
+//      - YOUR_PIPELINE_ID_HERE → Your Pipeline ID
+//   3. Save the file and rebuild the project
+"@
+        
+        Create-ErrorHeader -ErrorMessage "KeyCenter.h is missing" -Instructions $Instructions
+        
+        Write-Host "A placeholder KeyCenter.h has been created." -ForegroundColor Yellow
+        Write-Host "The next build will show detailed instructions in the error list." -ForegroundColor Yellow
         Write-Host ""
-        Write-Host "╔════════════════════════════════════════════════════════╗" -ForegroundColor Red
-        Write-Host "║  ⚠️  BUILD FAILED: KeyCenter needs configuration     ║" -ForegroundColor Red
-        Write-Host "╚════════════════════════════════════════════════════════╝" -ForegroundColor Red
-        Write-Host ""
-        Write-Host "KeyCenter.h has been created from template at:" -ForegroundColor Yellow
-        Write-Host "  $KeyCenterFile" -ForegroundColor White
-        Write-Host ""
-        Write-Host "Please update it with your actual Agora credentials:" -ForegroundColor Yellow
-        Write-Host "  • AGORA_APP_ID" -ForegroundColor White
-        Write-Host "  • REST_KEY" -ForegroundColor White
-        Write-Host "  • REST_SECRET" -ForegroundColor White
-        Write-Host "  • PIPELINE_ID" -ForegroundColor White
-        Write-Host ""
-        Write-Host "Get your credentials from: https://console.agora.io/" -ForegroundColor Cyan
-        Write-Host ""
-        Write-Host "Then rebuild the project." -ForegroundColor Yellow
-        Write-Host ""
-        exit 1
     } else {
-        Write-Host "❌ FATAL ERROR: Template file not found!" -ForegroundColor Red
-        Write-Host ""
-        Write-Host "Expected template at: $TemplateFile" -ForegroundColor White
-        Write-Host ""
-        Write-Host "Please restore KeyCenter.h.example to project root" -ForegroundColor Yellow
-        Write-Host ""
-        exit 1
+        $Instructions = @"
+//   1. Restore 'KeyCenter.h.example' file to project root
+//   2. Copy it to: '$KeyCenterFile'
+//   3. Configure your Agora credentials
+//   4. Rebuild the project
+"@
+        
+        Create-ErrorHeader -ErrorMessage "KeyCenter.h.example template not found" -Instructions $Instructions
     }
+    
+    # Exit with success so the error shows up during compilation
+    exit 0
 }
 
 # Validate that KeyCenter.h has been properly configured
 $KeyCenterContent = Get-Content $KeyCenterFile -Raw
 
-if ($KeyCenterContent -match "YOUR_APP_ID_HERE") {
+if ($KeyCenterContent -match "#error") {
+    # Error header exists from previous run, let compilation show the error
+    Write-Host "⚠️  KeyCenter.h contains configuration errors" -ForegroundColor Yellow
+    Write-Host "Please check the Error List window after build" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "╔════════════════════════════════════════════════════════╗" -ForegroundColor Red
-    Write-Host "║  ❌ BUILD FAILED: KeyCenter not configured           ║" -ForegroundColor Red
-    Write-Host "╚════════════════════════════════════════════════════════╝" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "KeyCenter.h still contains placeholder values!" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "File location:" -ForegroundColor Yellow
-    Write-Host "  $KeyCenterFile" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Required actions:" -ForegroundColor Yellow
-    Write-Host "  1. Open KeyCenter.h" -ForegroundColor White
-    Write-Host "  2. Replace 'YOUR_APP_ID_HERE' with your actual Agora App ID" -ForegroundColor White
-    Write-Host "  3. Replace 'YOUR_REST_KEY_HERE' with your REST Key" -ForegroundColor White
-    Write-Host "  4. Replace 'YOUR_REST_SECRET_HERE' with your REST Secret" -ForegroundColor White
-    Write-Host "  5. Replace 'YOUR_PIPELINE_ID_HERE' with your Pipeline ID" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Get credentials from: https://console.agora.io/" -ForegroundColor Cyan
-    Write-Host ""
-    exit 1
+    exit 0
 }
 
-# Additional validation: check if essential fields are not empty (basic check)
+if ($KeyCenterContent -match "YOUR_APP_ID_HERE") {
+    Write-Host ""
+    Write-Host "❌ KeyCenter.h contains placeholder values! Creating error header..." -ForegroundColor Yellow
+    Write-Host ""
+    
+    $Instructions = @"
+//   1. Open: '$KeyCenterFile'
+//   2. Replace all placeholder values:
+//      - YOUR_APP_ID_HERE → Your Agora App ID (from console.agora.io)
+//      - YOUR_REST_KEY_HERE → Your REST API Key
+//      - YOUR_REST_SECRET_HERE → Your REST API Secret  
+//      - YOUR_PIPELINE_ID_HERE → Your Pipeline ID
+//   3. Save the file and rebuild
+"@
+    
+    Create-ErrorHeader -ErrorMessage "KeyCenter.h is not configured (still contains placeholders)" -Instructions $Instructions
+    
+    Write-Host "A build error will appear with detailed instructions." -ForegroundColor Yellow
+    Write-Host ""
+    exit 0
+}
+
+# Additional validation: check if essential fields are not empty
 if ($KeyCenterContent -match 'AGORA_APP_ID = ""') {
     Write-Host ""
-    Write-Host "❌ BUILD FAILED: AGORA_APP_ID is empty in KeyCenter.h" -ForegroundColor Red
+    Write-Host "❌ AGORA_APP_ID is empty! Creating error header..." -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "Please configure your Agora App ID and rebuild." -ForegroundColor Yellow
-    Write-Host ""
-    exit 1
+    
+    $Instructions = @"
+//   1. Open: '$KeyCenterFile'
+//   2. Set AGORA_APP_ID to your actual App ID (not an empty string)
+//   3. Get your App ID from: https://console.agora.io/
+//   4. Save and rebuild
+"@
+    
+    Create-ErrorHeader -ErrorMessage "AGORA_APP_ID is empty in KeyCenter.h" -Instructions $Instructions
+    exit 0
 }
 
 Write-Host "✅ KeyCenter.h validation passed" -ForegroundColor Green
