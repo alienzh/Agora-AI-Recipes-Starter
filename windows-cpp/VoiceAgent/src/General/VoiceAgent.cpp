@@ -6,8 +6,8 @@
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 #include "VoiceAgent.h"
-#include "../Scene/MainFrm.h"
-#include "../utils/Logger.h"
+#include "../ui/MainFrm.h"
+#include "../tools/Logger.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

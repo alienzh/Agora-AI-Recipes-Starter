@@ -6,7 +6,7 @@
 #include "AgentManager.h"
 #include "HttpClient.h"
 #include "../KeyCenter.h"
-#include "../utils/Logger.h"
+#include "../tools/Logger.h"
 
 #include <nlohmann/json.hpp>
 #include <sstream>

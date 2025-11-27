@@ -1,7 +1,30 @@
 #pragma once
 
+//==============================================================================
+// CONFIGURATION REQUIRED: Please configure your Agora credentials below
+//==============================================================================
+//
+// This is a template file. To use it:
+//
+// 1. This file has been copied to: VoiceAgent/src/KeyCenter.h
+//
+// 2. Open VoiceAgent/src/KeyCenter.h and replace the placeholder values:
+//    - YOUR_APP_ID_HERE       -> Your Agora App ID
+//    - YOUR_REST_KEY_HERE     -> Your REST API Key
+//    - YOUR_REST_SECRET_HERE  -> Your REST API Secret
+//    - YOUR_PIPELINE_ID_HERE  -> Your Pipeline ID
+//
+// 3. Get your credentials from: https://console.agora.io/
+//
+// 4. After replacing all values, DELETE THE #error LINE BELOW (around line 26)
+//
+// 5. Save and rebuild the project
+//
+//==============================================================================
+
+#error "CONFIGURATION REQUIRED: Open this file (KeyCenter.h), replace YOUR_APP_ID_HERE and other placeholders with your actual credentials, then DELETE this #error line. Get credentials at https://console.agora.io/"
+
 // Configuration Keys and Constants
-// IMPORTANT: Copy this file to VoiceAgent/src/KeyCenter.h and fill in your credentials
 class KeyCenter {
 public:
     // Agora Credentials - Replace with your actual values
@@ -25,4 +48,3 @@ public:
     static constexpr const char* AGENT_SERVER_BASE_URL = 
         "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects";
 };
-

@@ -6,10 +6,10 @@
 #include "MainFrm.h"
 #include "../../resources/Resource.h"
 #include "../KeyCenter.h"
-#include "../utils/Logger.h"
-#include "../utils/StringUtils.h"
-#include "../Network/TokenGenerator.h"
-#include "../Network/AgentManager.h"
+#include "../tools/Logger.h"
+#include "../tools/StringUtils.h"
+#include "../api/TokenGenerator.h"
+#include "../api/AgentManager.h"
 #include <sstream>
 #include <iomanip>
 
@@ -246,9 +246,22 @@ void CMainFrame::SetupRightPanel(const CRect& rect)
     m_rightPanel.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_LEFT,
         rect, this, (UINT)IDC_STATIC);
     
-    // Message List (will be replaced with custom control later)
+    // Transcript Title Label (top left)
+    m_labelTranscriptTitle.Create(_T("Conversation Transcript"), 
+        WS_CHILD | WS_VISIBLE | SS_LEFT,
+        CRect(rect.left + PADDING, PADDING, rect.right - 100, PADDING + 25),
+        this, IDC_STATIC);
+    m_labelTranscriptTitle.SetFont(&m_boldFont);
+    
+    // Clear Button (top right)
+    m_btnClear.Create(_T("Clear"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+        CRect(rect.right - 90, PADDING, rect.right - PADDING, PADDING + 28),
+        this, IDC_BTN_CLEAR);
+    m_btnClear.SetFont(&m_normalFont);
+    
+    // Message List (below title)
     m_listMessages.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_NOCOLUMNHEADER,
-        CRect(rect.left + PADDING, PADDING, 
+        CRect(rect.left + PADDING, PADDING + 35, 
               rect.right - PADDING, rect.bottom - 60),
         this, IDC_LIST_MESSAGES);
     m_listMessages.SetFont(&m_normalFont);
@@ -257,18 +270,12 @@ void CMainFrame::SetupRightPanel(const CRect& rect)
     // Add column for messages
     m_listMessages.InsertColumn(0, _T("Messages"), LVCFMT_LEFT, rect.Width() - PADDING * 2 - 20);
     
-    // Transcript Count Label
+    // Transcript Count Label (bottom)
     m_labelTranscriptCount.Create(_T("Total: 0 messages"), 
         WS_CHILD | WS_VISIBLE | SS_LEFT,
-        CRect(rect.left + PADDING, rect.bottom - 40, rect.right - 120, rect.bottom - 20),
+        CRect(rect.left + PADDING, rect.bottom - 40, rect.right - PADDING, rect.bottom - 20),
         this, IDC_STATIC_TRANSCRIPT_COUNT);
     m_labelTranscriptCount.SetFont(&m_normalFont);
-    
-    // Clear Button
-    m_btnClear.Create(_T("Clear"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-        CRect(rect.right - 100, rect.bottom - 42, rect.right - PADDING, rect.bottom - 10),
-        this, IDC_BTN_CLEAR);
-    m_btnClear.SetFont(&m_normalFont);
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
@@ -292,12 +299,26 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
     m_rightPanel.MoveWindow(&rightRect);
     
     // Reposition controls in right panel
+    if (::IsWindow(m_labelTranscriptTitle.GetSafeHwnd()))
+    {
+        m_labelTranscriptTitle.MoveWindow(
+            rightRect.left + PADDING, PADDING,
+            rightRect.Width() - 110, 25);
+    }
+    
+    if (::IsWindow(m_btnClear.GetSafeHwnd()))
+    {
+        m_btnClear.MoveWindow(
+            rightRect.right - 90, PADDING,
+            80, 28);
+    }
+    
     if (::IsWindow(m_listMessages.GetSafeHwnd()))
     {
         m_listMessages.MoveWindow(
-            rightRect.left + PADDING, PADDING,
+            rightRect.left + PADDING, PADDING + 35,
             rightRect.Width() - PADDING * 2, 
-            rightRect.Height() - 60);
+            rightRect.Height() - 95);
         
         // Update column width
         m_listMessages.SetColumnWidth(0, rightRect.Width() - PADDING * 2 - 20);
@@ -307,14 +328,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
     {
         m_labelTranscriptCount.MoveWindow(
             rightRect.left + PADDING, rightRect.bottom - 40,
-            rightRect.Width() - 120, 20);
-    }
-    
-    if (::IsWindow(m_btnClear.GetSafeHwnd()))
-    {
-        m_btnClear.MoveWindow(
-            rightRect.right - 100, rightRect.bottom - 42,
-            80, BUTTON_HEIGHT);
+            rightRect.Width() - PADDING * 2, 20);
     }
 }
 
@@ -517,6 +531,8 @@ void CMainFrame::JoinChannelAndStartAgent()
             // Join RTC channel
             if (!m_rtcManager.JoinChannel(token, m_channelName, m_userUid)) {
                 LOG_ERROR("[MainFrm] Failed to join RTC channel");
+                UpdateChannelStatus(false, _T("Join failed"));
+                UpdateAgentStatus(_T("Failed"));
                 m_btnStartStop.EnableWindow(TRUE);
                 return;
             }

@@ -4,9 +4,9 @@
 
 #include "../General/pch.h"
 #include "ConversationalAIAPI.h"
-#include "../Managers/RtmManager.h"
-#include "../utils/Logger.h"
-#include "../utils/StringUtils.h"
+#include "../rtm/RtmManager.h"
+#include "../tools/Logger.h"
+#include "../tools/StringUtils.h"
 
 #include <nlohmann/json.hpp>
 #include <sstream>

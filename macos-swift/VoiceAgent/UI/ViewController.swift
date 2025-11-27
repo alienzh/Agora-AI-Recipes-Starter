@@ -736,7 +736,7 @@ extension ViewController {
         view.addSubview(rightPanel)
         
         // Title
-        let titleLabel = NSTextField(labelWithString: "💬 Conversation Transcript")
+        let titleLabel = NSTextField(labelWithString: "Conversation Transcript")
         titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         titleLabel.isBordered = false
         titleLabel.isEditable = false

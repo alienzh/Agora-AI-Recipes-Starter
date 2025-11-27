@@ -14,8 +14,8 @@ class RtmManager;
 class ConversationalAIAPI;
 
 // Include necessary headers for interfaces
-#include "../Managers/RtcManager.h"
-#include "../Managers/RtmManager.h"
+#include "../rtc/RtcManager.h"
+#include "../rtm/RtmManager.h"
 #include "../ConversationalAIAPI/ConversationalAIAPI.h"
 
 // MainFrame - Main application window
@@ -62,6 +62,7 @@ private:
     
     // Right Panel (Transcript)
     CStatic m_rightPanel;
+    CStatic m_labelTranscriptTitle; // Transcript title label
     CListCtrl m_listMessages;       // Message list
     CStatic m_labelTranscriptCount; // Transcript count label
     CButton m_btnClear;             // Clear button
