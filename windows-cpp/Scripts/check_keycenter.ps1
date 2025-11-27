@@ -63,12 +63,26 @@ After configuration, rebuild the project.
     if (-not (Test-Path $KeyCenterFile)) {
         Write-Host "⚠️  KeyCenter.h not found" -ForegroundColor Yellow
         
-        $Steps = @"
-  1. Copy the template file:
+        # Try to copy from template
+        if (Test-Path $TemplateFile) {
+            Write-Host "📝 Copying from template..." -ForegroundColor Cyan
+            try {
+                $KeyCenterDir = Split-Path -Parent $KeyCenterFile
+                if (-not (Test-Path $KeyCenterDir)) {
+                    New-Item -ItemType Directory -Path $KeyCenterDir -Force | Out-Null
+                }
+                Copy-Item $TemplateFile $KeyCenterFile -Force
+                Write-Host "✓ Copied template to $KeyCenterFile" -ForegroundColor Green
+                # Continue to validation (will detect placeholders and create error header)
+            }
+            catch {
+                Write-Host "✗ Failed to copy template: $_" -ForegroundColor Red
+                $Steps = @"
+  1. Manually copy the template file:
      From: $TemplateFile
      To:   $KeyCenterFile
   
-  2. Edit $KeyCenterFile and replace these values:
+  2. Edit the copied file and replace these values:
      • YOUR_APP_ID_HERE       → Your Agora App ID
      • YOUR_REST_KEY_HERE     → Your REST API Key  
      • YOUR_REST_SECRET_HERE  → Your REST API Secret
@@ -76,9 +90,24 @@ After configuration, rebuild the project.
   
   3. Save the file and rebuild
 "@
-        
-        Create-ErrorHeader -Message "KeyCenter.h file is missing" -Steps $Steps
-        exit 0
+                Create-ErrorHeader -Message "Failed to copy KeyCenter.h.example template" -Steps $Steps
+                exit 0
+            }
+        }
+        else {
+            Write-Host "✗ Template file not found: $TemplateFile" -ForegroundColor Red
+            $Steps = @"
+  1. Restore the template file: $TemplateFile
+  
+  2. Copy it to: $KeyCenterFile
+  
+  3. Edit and configure your credentials
+  
+  4. Rebuild
+"@
+            Create-ErrorHeader -Message "KeyCenter.h.example template file is missing" -Steps $Steps
+            exit 0
+        }
     }
     
     # Read KeyCenter.h content
