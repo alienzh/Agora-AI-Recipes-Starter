@@ -14,8 +14,8 @@ class RtmManager;
 class ConversationalAIAPI;
 
 // Include necessary headers for interfaces
-#include "../Managers/RtcManager.h"
-#include "../Managers/RtmManager.h"
+#include "../rtc/RtcManager.h"
+#include "../rtm/RtmManager.h"
 #include "../ConversationalAIAPI/ConversationalAIAPI.h"
 
 // MainFrame - Main application window

@@ -6,10 +6,10 @@
 #include "MainFrm.h"
 #include "../../resources/Resource.h"
 #include "../KeyCenter.h"
-#include "../utils/Logger.h"
-#include "../utils/StringUtils.h"
-#include "../Network/TokenGenerator.h"
-#include "../Network/AgentManager.h"
+#include "../tools/Logger.h"
+#include "../tools/StringUtils.h"
+#include "../api/TokenGenerator.h"
+#include "../api/AgentManager.h"
 #include <sstream>
 #include <iomanip>
 

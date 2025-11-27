@@ -6,7 +6,7 @@
 #include <thread>
 #include <sstream>
 #include "HttpClient.h"
-#include "../utils/Logger.h"
+#include "../tools/Logger.h"
 #include <curl/curl.h>
 
 // RAII wrapper for CURL cleanup
