@@ -1,7 +1,7 @@
 {
   "src": [
     "pages/Index",
-    "pages/AgentConfig",
-    "pages/VoiceAssistant"
+    "pages/AgentHome",
+    "pages/AgentLiving"
   ]
 }

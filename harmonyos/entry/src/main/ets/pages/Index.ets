@@ -1,11 +1,11 @@
-import { AgentConfig } from './AgentConfig';
+import { AgentHome } from './AgentHome';
 
 @Entry
 @Component
 export struct Index {
   build() {
     Column() {
-      AgentConfig()
+      AgentHome()
     }
     .width('100%')
     .height('100%')

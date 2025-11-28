@@ -1,7 +1,6 @@
 import { RtcEngineEx } from '@shengwang/rtc-full';
 import {
   MessageType,
-  TranscriptRenderMode,
   TranscriptStatus,
   TranscriptType,
   Transcript,
@@ -40,8 +39,6 @@ export interface IConversationTranscriptCallback {
 export class TranscriptConfig {
   /** RTC engine instance */
   rtcEngine: RtcEngineEx;
-  /** Transcript rendering mode */
-  renderMode: TranscriptRenderMode;
   /** Callback for transcript events */
   callback: IConversationTranscriptCallback;
 
@@ -53,11 +50,9 @@ export class TranscriptConfig {
    */
   constructor(
     rtcEngine: RtcEngineEx,
-    renderMode: TranscriptRenderMode,
     callback: IConversationTranscriptCallback
   ) {
     this.rtcEngine = rtcEngine;
-    this.renderMode = renderMode;
     this.callback = callback;
   }
 }
@@ -71,18 +66,14 @@ const TAG_UI = '[Transcript-UI]';
  */
 export class TranscriptController {
   private config: TranscriptConfig;
-  private renderMode: TranscriptRenderMode = TranscriptRenderMode.Text;
   private presentationMs: number = 0;
   private lastInterruptEvent: InterruptEvent | null = null;
 
   constructor(config: TranscriptConfig) {
     this.config = config;
-    // Force Text mode for HarmonyOS (Word mode is not supported due to RTC SDK limitations)
-    this.renderMode = TranscriptRenderMode.Text;
-
     config.rtcEngine.setPlaybackAudioFrameBeforeMixingParameters(44100, 1);
 
-    this.callMessagePrint(TAG, `init RenderMode:${this.renderMode} (Word mode not supported on HarmonyOS)`);
+    this.callMessagePrint(TAG, `init TranscriptController`);
   }
 
 
@@ -172,7 +163,6 @@ export class TranscriptController {
       text: text,
       status: isFinal ? TranscriptStatus.END : TranscriptStatus.IN_PROGRESS,
       type: TranscriptType.USER,
-      renderMode: this.renderMode || this.config.renderMode
     };
 
     this.callMessagePrint(
@@ -223,11 +213,7 @@ export class TranscriptController {
       return;
     }
 
-    if (this.renderMode === TranscriptRenderMode.Text) {
-      this.handleAgentTextMessage(agentUserId, userId, turnId, text, status);
-    } else {
-      this.callMessagePrint(TAG, 'only support text render mode');
-    }
+    this.handleAgentTextMessage(agentUserId, userId, turnId, text, status);
   }
 
   /**
@@ -250,8 +236,7 @@ export class TranscriptController {
       userId: userId,
       text: text,
       status: status,
-      type: TranscriptType.AGENT,
-      renderMode: TranscriptRenderMode.Text
+      type: TranscriptType.AGENT
     };
 
     this.callMessagePrint(

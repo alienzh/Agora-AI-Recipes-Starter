@@ -1,14 +1,11 @@
 import { RtcManager } from '../rtc/RtcManager';
-import { TokenGenerator } from '../common/TokenGenerator';
-import { KeyCenter } from '../common/KeyCenter';
-import { AgentStarter } from '../common/AgentStarter';
+import { TokenGenerator } from '../api/TokenGenerator';
+import { AgentStarter } from '../api/AgentStarter';
 import { Constants, IRtcEngineEventHandler, RtcEngineEx } from '@shengwang/rtc-full';
 import {
   IConversationalAIAPI,
   IConversationalAIAPIEventHandler,
   ConversationalAIAPIConfig,
-  TranscriptRenderMode,
-  TranscriptType,
   Transcript,
   AgentState,
   StateChangeEvent,
@@ -33,11 +30,11 @@ export enum ConnectionState {
 export interface ConversationUiState {
   statusMessage: string;
   isMuted: boolean;
-  isTranscriptEnabled: boolean;
   channelName: string;
   userUid: number;
   agentUid: number;
   connectionState: ConnectionState;
+  agentStarted: boolean;
 }
 
 // Transcript and AgentState are now imported from IConversationalAIAPI.ets
@@ -86,11 +83,11 @@ export class ConversationViewModel {
   private _uiState: ConversationUiState = {
     statusMessage: '',
     isMuted: false,
-    isTranscriptEnabled: false,
     channelName: '',
     userUid: 0,
     agentUid: 0,
-    connectionState: ConnectionState.Idle
+    connectionState: ConnectionState.Idle,
+    agentStarted: false
   };
   // Transcript list
   private _transcriptList: Transcript[] = [];
@@ -103,11 +100,12 @@ export class ConversationViewModel {
   private rtcEngine: RtcEngineEx | null = null;
   private conversationalAIEventHandler: IConversationalAIAPIEventHandler;
   private agentId: string | null = null;
+  private agentStarted: boolean = false;
   // Event handlers
   private uiStateChangeCallbacks: ((state: ConversationUiState) => void)[] = [];
   private agentStateChangeCallbacks: ((state: AgentState | null) => void)[] = [];
   
-  // Transcript data source (set by VoiceAssistant)
+  // Transcript data source (set by AgentLiving)
   private transcriptDataSource: TranscriptDataSource | undefined;
 
   /**
@@ -125,11 +123,7 @@ export class ConversationViewModel {
       }
 
       // Create ConversationalAI API
-      const apiConfig = new ConversationalAIAPIConfig(
-        this.rtcEngine,
-        TranscriptRenderMode.Word,
-        true
-      );
+      const apiConfig = new ConversationalAIAPIConfig(this.rtcEngine, true);
       this.conversationalAIAPI = createConversationalAIAPI(apiConfig);
 
       // Add event handler for ConversationalAI API
@@ -203,7 +197,7 @@ export class ConversationViewModel {
       onTokenPrivilegeWillExpire: (token: string) => {
         // Handle token expiration
         console.info(ConversationViewModel.TAG, 'RTC token will expire');
-        // TODO: Implement token renewal logic
+        this.renewToken();
       },
 
       onStreamMessage: (uid: number, streamId: number, data: Uint8Array) => {
@@ -222,23 +216,35 @@ export class ConversationViewModel {
   }
 
   /**
-   * Check if RTC is connected
+   * Check if RTC is connected and message subscription is complete
+   * Similar to Kotlin: checkJoinAndLoginComplete()
+   * Note: HarmonyOS uses RTC DataStream instead of RTM
+   * This method may be called multiple times (from onJoinChannelSuccess and subscribeMessage callback),
+   * but startAgent() has guard to prevent duplicate calls
    */
   private checkConnectionComplete(): void {
     if (this.rtcJoined) {
       this.updateUiState({
-        connectionState: ConnectionState.Connected,
-        statusMessage: 'RTC initialized successfully'
+        statusMessage: 'RTC channel joined and message subscription completed'
       });
+      // Automatically start agent after RTC is connected and message subscription is complete
+      // startAgent() has guard (agentStarted check) to prevent duplicate calls
+      this.startAgent();
     }
   }
 
   /**
-   * Start agent after RTC and RTM are connected
+   * Start agent after RTC is connected and message subscription is complete
    * Similar to Kotlin: viewModel.startAgent()
+   * Note: HarmonyOS uses RTC DataStream instead of RTM
    */
   async startAgent(): Promise<void> {
     try {
+      if (this.agentStarted) {
+        console.info(ConversationViewModel.TAG, `Agent already started, agentId: ${this.agentId}`);
+        return;
+      }
+
       if (!this.channelName || this.channelName.trim().length === 0) {
         this.updateUiState({
           connectionState: ConnectionState.Error,
@@ -250,7 +256,7 @@ export class ConversationViewModel {
 
       // Generate token for agentUid (not unifiedToken which is for userId)
       this.updateUiState({
-        statusMessage: 'Getting agent token...'
+        statusMessage: 'Generating agent token...'
       });
 
       let agentToken: string;
@@ -269,6 +275,10 @@ export class ConversationViewModel {
         return;
       }
 
+      this.updateUiState({
+        statusMessage: 'Starting agent...'
+      });
+
       // Start agent using AgentStarter with agent token
       const agentId = await AgentStarter.startAgentAsync(
         this.channelName,
@@ -277,10 +287,13 @@ export class ConversationViewModel {
       );
 
       this.agentId = agentId;
+      this.agentStarted = true;
       this.updateUiState({
-        statusMessage: `Agent started successfully: ${agentId}`
+        agentStarted: true,
+        connectionState: ConnectionState.Connected,
+        statusMessage: 'Agent started successfully'
       });
-      console.info(ConversationViewModel.TAG, `Agent started successfully: ${agentId}`);
+      console.info(ConversationViewModel.TAG, `Agent started successfully, agentId: ${agentId}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
       this.updateUiState({
@@ -325,24 +338,25 @@ export class ConversationViewModel {
       // Join RTC channel
       RtcManager.joinChannel(token, channelName, ConversationViewModel.userId);
 
-      // Subscribe to messages for ConversationalAI API
+      // Subscribe to messages for ConversationalAI API (via RTC DataStream)
       if (this.conversationalAIAPI) {
         this.conversationalAIAPI.subscribeMessage(channelName, (error) => {
           if (error) {
             console.error(ConversationViewModel.TAG, `Failed to subscribe message: ${error.message}`);
             this.updateUiState({
+              connectionState: ConnectionState.Error,
               statusMessage: `Failed to subscribe message: ${error.message}`
             });
           } else {
-            console.info(ConversationViewModel.TAG, 'Subscribed to ConversationalAI messages');
-            this.updateUiState({
-              statusMessage: 'RTC channel joined successfully'
-            });
+            console.info(ConversationViewModel.TAG, 'Subscribed to ConversationalAI messages (via RTC DataStream)');
+            // After subscription success, check if RTC is also joined
+            this.checkConnectionComplete();
           }
         });
+      } else {
+        // If no API, just check connection
+        this.checkConnectionComplete();
       }
-
-      this.checkConnectionComplete();
     } catch (error) {
       this.updateUiState({
         connectionState: ConnectionState.Error,
@@ -353,12 +367,17 @@ export class ConversationViewModel {
   }
 
   /**
-   * Fetch token from server
+   * Generate unified token for RTC
+   * Similar to Kotlin: generateUnifiedToken(isSilent)
+   * @param isSilent Whether to suppress UI status updates (default: false)
+   * @returns Token string on success, null on failure
    */
-  private async fetchToken(): Promise<string> {
-    this.updateUiState({
-      statusMessage: 'Getting token...'
-    });
+  private async generateUnifiedToken(isSilent: boolean = false): Promise<string | null> {
+    if (!isSilent) {
+      this.updateUiState({
+        statusMessage: 'Getting token...'
+      });
+    }
 
     try {
       const token = await TokenGenerator.generateTokensAsync(
@@ -368,12 +387,44 @@ export class ConversationViewModel {
       this.unifiedToken = token;
       return token;
     } catch (error) {
-      this.updateUiState({
-        connectionState: ConnectionState.Error,
-        statusMessage: `Failed to get token: ${JSON.stringify(error)}`
-      });
+      if (!isSilent) {
+        this.updateUiState({
+          connectionState: ConnectionState.Error,
+          statusMessage: `Failed to get token: ${JSON.stringify(error)}`
+        });
+      }
       console.error(ConversationViewModel.TAG, `Failed to get token: ${JSON.stringify(error)}`);
-      throw new Error(`Failed to get token: ${JSON.stringify(error)}`);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch token from server (alias for generateUnifiedToken with isSilent=false)
+   */
+  private async fetchToken(): Promise<string> {
+    const token = await this.generateUnifiedToken(false);
+    if (token === null) {
+      throw new Error('Failed to get token');
+    }
+    return token;
+  }
+
+  /**
+   * Renew RTC token when it's about to expire
+   * Similar to Kotlin: renewToken()
+   * Note: HarmonyOS uses RTC DataStream instead of RTM, so only RTC token needs renewal
+   */
+  private async renewToken(): Promise<void> {
+    try {
+      const token = await this.generateUnifiedToken(true); // Silent mode to avoid UI updates
+      if (token !== null) {
+        RtcManager.renewRtcToken(token);
+        console.info(ConversationViewModel.TAG, 'RTC token renewed successfully');
+      } else {
+        console.error(ConversationViewModel.TAG, 'Failed to renew token');
+      }
+    } catch (error) {
+      console.error(ConversationViewModel.TAG, `Failed to renew token: ${JSON.stringify(error)}`);
     }
   }
 
@@ -391,19 +442,7 @@ export class ConversationViewModel {
   }
 
   /**
-   * Toggle transcript display
-   */
-  toggleTranscript(): void {
-    const newTranscriptState = !this._uiState.isTranscriptEnabled;
-    this.updateUiState({
-      isTranscriptEnabled: newTranscriptState,
-      statusMessage: newTranscriptState ? 'Transcript enabled' : 'Transcript disabled'
-    });
-    console.info(ConversationViewModel.TAG, `Transcript enabled: ${newTranscriptState}`);
-  }
-
-  /**
-   * Set transcript data source (called by VoiceAssistant)
+   * Set transcript data source (called by AgentLiving)
    */
   setTranscriptDataSource(dataSource: TranscriptDataSource): void {
     this.transcriptDataSource = dataSource;
@@ -482,13 +521,15 @@ export class ConversationViewModel {
       this.rtcJoined = false;
       this.channelName = ''; // Reset channel name
       this.agentId = null; // Already set above, but ensure it's null
+      this.agentStarted = false; // Reset agent started flag
 
       this.updateUiState({
         statusMessage: '',
         connectionState: ConnectionState.Idle,
         channelName: '',
         userUid: 0,
-        agentUid: 0
+        agentUid: 0,
+        agentStarted: false
       });
 
       this.clearTranscripts();
@@ -509,9 +550,6 @@ export class ConversationViewModel {
     if (updates.isMuted !== undefined) {
       this._uiState.isMuted = updates.isMuted;
     }
-    if (updates.isTranscriptEnabled !== undefined) {
-      this._uiState.isTranscriptEnabled = updates.isTranscriptEnabled;
-    }
     if (updates.channelName !== undefined) {
       this._uiState.channelName = updates.channelName;
     }
@@ -523,6 +561,9 @@ export class ConversationViewModel {
     }
     if (updates.connectionState !== undefined) {
       this._uiState.connectionState = updates.connectionState;
+    }
+    if (updates.agentStarted !== undefined) {
+      this._uiState.agentStarted = updates.agentStarted;
     }
     this.notifyUiStateChange();
   }
@@ -590,11 +631,11 @@ export class ConversationViewModel {
     return {
       statusMessage: this._uiState.statusMessage,
       isMuted: this._uiState.isMuted,
-      isTranscriptEnabled: this._uiState.isTranscriptEnabled,
       channelName: this._uiState.channelName,
       userUid: this._uiState.userUid,
       agentUid: this._uiState.agentUid,
-      connectionState: this._uiState.connectionState
+      connectionState: this._uiState.connectionState,
+      agentStarted: this._uiState.agentStarted
     };
   }
 

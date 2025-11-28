@@ -1,39 +1,36 @@
 import { ConversationViewModel, ConnectionState, ConversationUiState } from './ConversationViewModel';
 import { Transcript, AgentState, TranscriptType, TranscriptStatus } from '../convoaiApi/IConversationalAIAPI';
-import { VoiceWaveView } from './common/VoiceWaveView';
 import { TranscriptDataSource } from './common/TranscriptDataSource';
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 
 /**
- * Voice Assistant page
- * Main interface for voice conversation with AI agent
+ * Agent Living page
+ * Fragment for displaying voice assistant UI and transcript list
+ * This fragment only handles UI display, agent is started in AgentHome
  */
 @Entry
 @Component
 @Preview
-export struct VoiceAssistant {
+export struct AgentLiving {
   @State viewModel: ConversationViewModel = ConversationViewModel.getInstance();
   @State uiState: ConversationUiState = {
     statusMessage: '',
     isMuted: false,
-    isTranscriptEnabled: false,
     channelName: '',
     userUid: 0,
     agentUid: 0,
-    connectionState: ConnectionState.Idle
+    connectionState: ConnectionState.Idle,
+    agentStarted: false
   };
   @State transcriptList: Transcript[] = [];
   @State agentState: AgentState | null = null;
   @State autoScrollToBottom: boolean = true;
   @State isScrollBottom: boolean = false;
-  @State statusHistory: string[] = [];
-  @State lastStatusMessage: string = '';
-  @State statusDisplayText: string = 'Waiting for conversation...';
   private transcriptListRef: ListScroller = new ListScroller();
   private transcriptDataSource: TranscriptDataSource = new TranscriptDataSource();
 
   aboutToAppear(): void {
-    // Get current state immediately (ViewModel is already initialized in AgentConfig)
+    // Get current state immediately (ViewModel is already initialized in AgentHome)
     const currentState = this.viewModel.getUiState();
     this.uiState = currentState;
     this.agentState = this.viewModel.getAgentState();
@@ -48,13 +45,22 @@ export struct VoiceAssistant {
     }
     this.transcriptList = initialList;
     
-    // Update status display from current state
-    this.updateStatusMessage(currentState);
-
     // Subscribe to UI state changes
     this.viewModel.subscribeUiState((state) => {
       this.uiState = state;
-      this.updateStatusMessage(state);
+      
+      // Show error message if connection failed (similar to Kotlin Snackbar)
+      if (state.connectionState === ConnectionState.Error && state.statusMessage) {
+        promptAction.showToast({
+          message: state.statusMessage,
+          duration: 3000
+        });
+      }
+      
+      // Auto scroll to bottom when new transcript is added
+      if (this.autoScrollToBottom) {
+        this.scrollToBottom();
+      }
     });
 
     // Subscribe to agent state changes
@@ -64,11 +70,8 @@ export struct VoiceAssistant {
       // VoiceWaveView animation is shown when transcript is hidden
     });
 
-    // Start agent when page appears (after RTC and RTM are connected)
-    // Only start if not already started and connection is established
-    if (this.uiState.connectionState === ConnectionState.Connected) {
-      this.viewModel.startAgent();
-    }
+    // Note: Agent is automatically started in ConversationViewModel after RTC connection
+    // No need to manually start agent here (similar to Kotlin AgentLivingFragment)
   }
 
   aboutToDisappear(): void {
@@ -80,16 +83,7 @@ export struct VoiceAssistant {
       // Top Info Card
       this.buildInfoCard()
 
-      // Transcript List or Agent Speaking Indicator
-      // Show transcript list when enabled, otherwise show agent speaking indicator
-      if (this.uiState.isTranscriptEnabled) {
-        // Transcript List
-        // Always render List to ensure LazyForEach listener is registered
-        this.buildTranscriptList()
-      } else {
-        // Agent Speaking Indicator (shown when transcript is hidden)
-        this.buildAgentIndicator()
-      }
+      this.buildTranscriptList()
 
       // Control Buttons
       this.buildControlButtons()
@@ -98,7 +92,7 @@ export struct VoiceAssistant {
     .height('100%')
     .backgroundColor('#F5F5F5')
     .onAppear(() => {
-      console.info('VoiceAssistant', `[Thread] build() onAppear, isTranscriptEnabled:${this.uiState.isTranscriptEnabled}, dataSource totalCount:${this.transcriptDataSource.totalCount()}`);
+      console.info('AgentLiving', `[Thread] build() onAppear, dataSource totalCount:${this.transcriptDataSource.totalCount()}`);
     })
   }
 
@@ -139,18 +133,6 @@ export struct VoiceAssistant {
       }
       .width('100%')
       .justifyContent(FlexAlign.Start)
-      .margin({ top: 12 })
-      
-      // Scrollable status message with max height
-      Scroll() {
-        Text(this.statusDisplayText)
-          .fontSize(14)
-          .fontColor(this.getStatusTextColor())
-          .width('100%')
-          .textAlign(TextAlign.Start)
-      }
-      .height(80) // Approximately 4-5 lines
-      .scrollBar(BarState.Auto)
       .margin({ top: 12 })
     }
     .width('100%')
@@ -239,33 +221,6 @@ export struct VoiceAssistant {
   }
 
   /**
-   * Build agent speaking indicator (shown when transcript is hidden)
-   * Always shows VoiceWaveView animation when transcript is hidden
-   * This should overlap with the transcript list area, not cover the info card
-   */
-  @Builder
-  buildAgentIndicator() {
-    Column() {
-      VoiceWaveView()
-        .scale({ x: 3, y: 3.0 }) // Scale up 4x - apply scale to VoiceWaveView itself, not the container
-    }
-    .width('100%')
-    .layoutWeight(1) // Same as transcript list to occupy the same space
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
-    .margin({ left: 16, right: 16, top: 12, bottom: 16 }) // Add top margin to prevent covering info card
-    .backgroundColor('#FFFFFF')
-    .borderRadius(20)
-    .clip(true) // Clip content to prevent overflow beyond container bounds
-    .shadow({
-      radius: 6,
-      color: '#1F000000',
-      offsetX: 0,
-      offsetY: 2
-    })
-  }
-
-  /**
    * Build control buttons
    */
   @Builder
@@ -291,33 +246,6 @@ export struct VoiceAssistant {
         .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.EaseInOut }))
         
         Text(this.uiState.isMuted ? '静音' : '麦克风')
-          .fontSize(12)
-          .fontColor('#666666')
-          .margin({ top: 8 })
-      }
-      .alignItems(HorizontalAlign.Center)
-      .layoutWeight(1)
-
-      // Transcript toggle button
-      Column() {
-        Stack({ alignContent: Alignment.Center }) {
-          Circle({ width: 72, height: 72 })
-            .fill('#2196F3')
-
-          // Subtitles/Transcript icon
-          Image(this.uiState.isTranscriptEnabled ? $r('app.media.icon_transcript_on') : $r('app.media.icon_transcript_off'))
-            .width(32)
-            .height(32)
-            .fillColor(Color.White)
-        }
-        .width(72)
-        .height(72)
-        .onClick(() => {
-          this.viewModel.toggleTranscript();
-        })
-        .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.EaseInOut }))
-        
-        Text('字幕')
           .fontSize(12)
           .fontColor('#666666')
           .margin({ top: 8 })
@@ -362,36 +290,8 @@ export struct VoiceAssistant {
    */
   private async handleHangup(): Promise<void> {
     await this.viewModel.hangup();
-    // Navigate back to AgentConfig page
+    // Navigate back to AgentHome page
     router.back();
-  }
-
-  /**
-   * Update status message - accumulate status messages for history
-   * Only show important connection/agent status, hide operational messages
-   */
-  private updateStatusMessage(state: ConversationUiState): void {
-    // Filter out operational messages (mute, transcript, etc.)
-    const shouldShowMessage = !state.statusMessage.toLowerCase().includes('muted') &&
-      !state.statusMessage.toLowerCase().includes('unmuted') &&
-      !state.statusMessage.toLowerCase().includes('transcript');
-
-    // Add new status message to history if it should be shown and is different from the last one
-    if (shouldShowMessage &&
-      state.statusMessage.length > 0 &&
-      state.statusMessage !== this.lastStatusMessage) {
-      this.statusHistory.push(state.statusMessage);
-      this.lastStatusMessage = state.statusMessage;
-    }
-
-    // Clear history when disconnected or idle
-    if (state.connectionState === ConnectionState.Idle) {
-      this.statusHistory = [];
-      this.lastStatusMessage = '';
-      this.statusDisplayText = 'Waiting for conversation...';
-    } else {
-      this.statusDisplayText = this.statusHistory.join('\n') || 'Waiting for conversation...';
-    }
   }
 
   /**
@@ -407,30 +307,13 @@ export struct VoiceAssistant {
   }
 
   /**
-   * Get status text color based on message content
-   */
-  private getStatusTextColor(): ResourceColor {
-    const displayMessage = this.statusDisplayText.toLowerCase();
-    if (displayMessage.includes('successfully') ||
-      displayMessage.includes('initialized') ||
-      displayMessage.includes('joined')) {
-      return '#4CAF50';
-    } else if (displayMessage.includes('error') ||
-      displayMessage.includes('failed') ||
-      displayMessage.includes('left')) {
-      return '#F44336';
-    } else {
-      return '#666666';
-    }
-  }
-
-  /**
    * Get status text for transcript item
+   * Match Kotlin version format: "IN PROGRESS", "END", "INTERRUPTED", "UNKNOWN"
    */
   private getTranscriptStatusText(status: TranscriptStatus): string {
     switch (status) {
       case TranscriptStatus.IN_PROGRESS:
-        return 'IN_PROGRESS';
+        return 'IN PROGRESS';
       case TranscriptStatus.END:
         return 'END';
       case TranscriptStatus.INTERRUPTED:
@@ -480,5 +363,4 @@ export struct VoiceAssistant {
   }
 
 }
-
 

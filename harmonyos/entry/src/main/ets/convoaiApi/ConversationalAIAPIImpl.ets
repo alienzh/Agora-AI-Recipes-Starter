@@ -15,7 +15,7 @@ import {
   ConversationalAIAPIError
 } from './IConversationalAIAPI';
 import { TranscriptConfig, TranscriptController } from './TranscriptController';
-import { TranscriptRenderMode, Transcript, InterruptEvent } from './IConversationalAIAPI';
+import { Transcript, InterruptEvent } from './IConversationalAIAPI';
 import { MessageParser } from './MessageParser';
 import { ConversationalAIUtils, ObservableHelper } from './ConversationalAIUtils';
 import util from '@ohos.util';
@@ -48,7 +48,6 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
     // so we only support Text mode
     const transcriptConfig = new TranscriptConfig(
       config.rtcEngine,
-      TranscriptRenderMode.Text, // Force Text mode for HarmonyOS
       {
         onTranscriptUpdated: (agentUserId: string, transcript: Transcript) => {
           this.conversationalAIHandlerHelper.notifyEventHandlers((handler) => {
@@ -170,37 +169,37 @@ export class ConversationalAIAPIImpl implements IConversationalAIAPI {
   private handleAgentState(publisherId: string, msg: Record<string, Object>): void {
     // Get state string from message
     const state = (msg['state'] as string) || '';
-    
+
     // Get turn_id
     const turnId = (msg['turn_id'] as number) || 0;
     // Check if turnId is less than current stateChangeEvent turnId, if so return
     if (turnId < (this.stateChangeEvent?.turnId || 0)) {
       return;
     }
-    
+
     // Get timestamp (ts_ms)
     const ts = (msg['ts_ms'] as number) || 0;
     // Check if ts is less than or equal to current stateChangeEvent timestamp, if so return
     if (ts <= (this.stateChangeEvent?.timestamp || 0)) {
       return;
     }
-    
+
     // Convert state string to AgentState enum
     const aiState = getAgentStateFromValue(state);
-    
+
     // Create StateChangeEvent
     const changeEvent: StateChangeEvent = {
       state: aiState,
       turnId: turnId,
       timestamp: ts
     };
-    
+
     // Update stateChangeEvent
     this.stateChangeEvent = changeEvent;
-    
+
     // Log the state change
     this.callMessagePrint(TAG, `<<< [onAgentStateChanged] ${publisherId} ${JSON.stringify(changeEvent)}`);
-    
+
     // Notify all event handlers
     this.conversationalAIHandlerHelper.notifyEventHandlers((handler) => {
       handler.onAgentStateChanged(publisherId, changeEvent);

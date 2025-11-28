@@ -1,5 +1,5 @@
 import http from '@ohos.net.http';
-import { KeyCenter } from './KeyCenter';
+import { KeyCenter } from '../common/KeyCenter';
 
 /**
  * Token type enum

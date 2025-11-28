@@ -143,7 +143,6 @@ export class TranscriptDataSource extends BasicDataSource {
           text: data.text,
           status: data.status,
           type: data.type,
-          renderMode: data.renderMode
         };
         this.dataArray[index] = newTranscript;
         this.notifyDataChange(index);

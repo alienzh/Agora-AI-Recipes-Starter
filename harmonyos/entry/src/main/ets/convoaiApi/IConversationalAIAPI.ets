@@ -163,17 +163,6 @@ export function getMessageTypeFromValue(value: string): MessageType {
 }
 
 /**
- * Defines different modes for transcript rendering.
- */
-export enum TranscriptRenderMode {
-  /** Word-by-word transcript rendering */
-  Word,
-
-  /** Full text transcript rendering */
-  Text
-}
-
-/**
  * Transcript type enum.
  */
 export enum TranscriptType {
@@ -219,9 +208,6 @@ export interface Transcript {
 
   /** Transcript type (AGENT/USER) */
   type: TranscriptType;
-
-  /** Real render mode */
-  renderMode: TranscriptRenderMode;
 }
 
 /**
@@ -248,15 +234,11 @@ export interface InterruptEvent {
 export class ConversationalAIAPIConfig {
   /** RTC engine instance for audio/video communication */
   rtcEngine: RtcEngineEx;
-  /** Transcript rendering mode, default is Text level */
-  renderMode: TranscriptRenderMode;
   /** Whether to enable logging, default is true. When true, logs will be written to the RTC SDK log file. */
   enableLog: boolean;
 
-  constructor(rtcEngine: RtcEngineEx, renderMode: TranscriptRenderMode = TranscriptRenderMode.Text,
-    enableLog: boolean = true) {
+  constructor(rtcEngine: RtcEngineEx, enableLog: boolean = true) {
     this.rtcEngine = rtcEngine;
-    this.renderMode = renderMode;
     this.enableLog = enableLog;
   }
 }

@@ -1,6 +1,6 @@
 import http from '@ohos.net.http';
 import util from '@ohos.util';
-import { KeyCenter } from './KeyCenter';
+import { KeyCenter } from '../common/KeyCenter';
 
 /**
  * Agent Starter
