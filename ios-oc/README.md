@@ -1,10 +1,10 @@
-# iOS Agent Starter
+# iOS Objective-C Agent Starter
 
 ## 功能概述
 
 ### 解决的问题
 
-本示例项目展示了如何在 iOS 应用中集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
+本示例项目展示了如何在 iOS Objective-C 应用中集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
 
 - **实时语音交互**：通过 Agora RTC SDK 实现与 AI 代理的实时音频通信
 - **消息传递**：通过 Agora RTM SDK 实现与 AI 代理的消息交互和状态同步
@@ -36,7 +36,7 @@
 
 ```bash
 git clone https://github.com/alienzh/Agora-AI-Recipes-Starter.git
-cd Agora-AI-Recipes-Starter/ios-swift
+cd Agora-AI-Recipes-Starter/ios-oc
 ```
 
 2. **安装 CocoaPods 依赖**：
@@ -49,16 +49,34 @@ pod install
    - 使用 Xcode 打开 `VoiceAgent.xcworkspace`（注意：不是 `.xcodeproj`）
    - 配置 Agora Key：
 
-   编辑 `VoiceAgent/KeyCenter.swift` 文件，填入你的实际配置值：
+   编辑 `VoiceAgent/KeyCenter.m` 文件，填入你的实际配置值：
 
-   ```swift
-   class KeyCenter {
-       static let AG_APP_ID: String = "your_app_id"
-       static let AG_APP_CERTIFICATE: String = "your_app_certificate"
-       static let AG_BASIC_AUTH_KEY: String = "your_rest_key"
-       static let AG_BASIC_AUTH_SECRET: String = "your_rest_secret"
-       static let AG_PIPELINE_ID: String = "your_pipeline_id"
+   ```objc
+   #import "KeyCenter.h"
+
+   @implementation KeyCenter
+
+   + (NSString *)AG_APP_ID {
+       return @"your_app_id";
    }
+
+   + (NSString *)AG_APP_CERTIFICATE {
+       return @"your_app_certificate";
+   }
+
+   + (NSString *)AG_BASIC_AUTH_KEY {
+       return @"your_rest_key";
+   }
+
+   + (NSString *)AG_BASIC_AUTH_SECRET {
+       return @"your_rest_secret";
+   }
+
+   + (NSString *)AG_PIPELINE_ID {
+       return @"your_pipeline_id";
+   }
+
+   @end
    ```
 
    **配置项说明**：
@@ -117,28 +135,30 @@ pod install
 ## 项目结构
 
 ```
-ios-swift/
+ios-oc/
 ├── VoiceAgent/
-│   ├── AppDelegate.swift              # 应用入口
-│   ├── SceneDelegate.swift            # Scene 代理
-│   ├── KeyCenter.swift                # 配置中心（需要填写）
-│   ├── ViewController.swift           # Agent Home 页面
-│   ├── Chat/                          # 聊天相关 UI
-│   │   ├── ChatViewController.swift   # Agent Living 页面
-│   │   └── AgentStateView.swift       # Agent 状态视图
-│   ├── ConversationalAIAPI/           # Conversational AI API（Swift）
+│   ├── main.m                           # 应用入口
+│   ├── AppDelegate.h/.m                 # 应用代理
+│   ├── SceneDelegate.h/.m               # Scene 代理
+│   ├── KeyCenter.h/.m                   # 配置中心（需要填写）
+│   ├── ViewController.h/.m              # Agent Home 页面
+│   ├── Chat/                            # 聊天相关 UI
+│   │   ├── ChatViewController.h/.m     # Agent Living 页面
+│   │   ├── AgentStateView.h/.m          # Agent 状态视图
+│   │   └── TranscriptCell.h/.m          # 转录单元格
+│   ├── ConversationalAIAPI/             # Conversational AI API（Swift，通过桥接使用）
 │   │   ├── ConversationalAIAPI.swift
 │   │   ├── ConversationalAIAPIImpl.swift
 │   │   └── Transcript/
-│   ├── Tools/                         # 工具类
-│   │   ├── AgentManager.swift         # Agent 管理器
-│   │   └── NetworkManager.swift       # 网络管理器
-│   ├── Assets.xcassets/               # 资源文件
-│   └── Info.plist                     # 应用配置
-├── Podfile                            # CocoaPods 依赖配置
-├── Podfile.lock                       # CocoaPods 锁定文件
-├── VoiceAgent.xcworkspace/            # Xcode 工作空间
-└── README.md                          # 本文档
+│   ├── Tools/                           # 工具类
+│   │   ├── AgentManager.h/.m            # Agent 管理器
+│   ├── Assets.xcassets/                 # 资源文件
+│   ├── Base.lproj/                      # Storyboard 文件
+│   └── Info.plist                       # 应用配置
+├── Podfile                              # CocoaPods 依赖配置
+├── Podfile.lock                         # CocoaPods 锁定文件
+├── VoiceAgent.xcworkspace/              # Xcode 工作空间
+└── README.md                            # 本文档
 ```
 
 ## 相关资源

@@ -1,10 +1,10 @@
-# iOS Agent Starter
+# iOS SwiftUI Agent Starter
 
 ## 功能概述
 
 ### 解决的问题
 
-本示例项目展示了如何在 iOS 应用中集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
+本示例项目展示了如何在 iOS SwiftUI 应用中集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
 
 - **实时语音交互**：通过 Agora RTC SDK 实现与 AI 代理的实时音频通信
 - **消息传递**：通过 Agora RTM SDK 实现与 AI 代理的消息交互和状态同步
@@ -22,7 +22,7 @@
 
 ### 前置条件
 
-- iOS 13.0 或更高版本
+- iOS 17.0 或更高版本
 - Xcode 14.0 或更高版本
 - CocoaPods 1.11.0 或更高版本
 - Agora 开发者账号 [Console](https://console.shengwang.cn/)
@@ -36,7 +36,7 @@
 
 ```bash
 git clone https://github.com/alienzh/Agora-AI-Recipes-Starter.git
-cd Agora-AI-Recipes-Starter/ios-swift
+cd Agora-AI-Recipes-Starter/ios-swiftui
 ```
 
 2. **安装 CocoaPods 依赖**：
@@ -49,7 +49,7 @@ pod install
    - 使用 Xcode 打开 `VoiceAgent.xcworkspace`（注意：不是 `.xcodeproj`）
    - 配置 Agora Key：
 
-   编辑 `VoiceAgent/KeyCenter.swift` 文件，填入你的实际配置值：
+   创建 `VoiceAgent/KeyCenter.swift` 文件，填入你的实际配置值：
 
    ```swift
    class KeyCenter {
@@ -85,13 +85,13 @@ pod install
 
 ### 快速体验流程
 
-1. **Agent Home 页面**（`ViewController`）：
+1. **Agent Home 页面**（`EntranceView`）：
    - 运行应用，进入 Agent Home 页面
    - 输入频道名称（channelName）
    - 点击"Start"按钮
    - 跳转到 Agent Living 页面
 
-2. **Agent Living 页面**（`ChatViewController`）：
+2. **Agent Living 页面**（`ChatView`）：
    - 生成用户token
    - 启动RTM
    - 启动RTC
@@ -117,28 +117,30 @@ pod install
 ## 项目结构
 
 ```
-ios-swift/
+ios-swiftui/
 ├── VoiceAgent/
-│   ├── AppDelegate.swift              # 应用入口
-│   ├── SceneDelegate.swift            # Scene 代理
-│   ├── KeyCenter.swift                # 配置中心（需要填写）
-│   ├── ViewController.swift           # Agent Home 页面
-│   ├── Chat/                          # 聊天相关 UI
-│   │   ├── ChatViewController.swift   # Agent Living 页面
-│   │   └── AgentStateView.swift       # Agent 状态视图
-│   ├── ConversationalAIAPI/           # Conversational AI API（Swift）
+│   ├── VoiceAgentApp.swift              # SwiftUI 应用入口
+│   ├── KeyCenter.swift                  # 配置中心（需要创建并填写）
+│   ├── Entrance/                        # 入口页面
+│   │   ├── EntranceView.swift           # Agent Home 页面（SwiftUI）
+│   │   └── EntranceViewModel.swift      # Agent Home 视图模型
+│   ├── Chat/                            # 聊天相关 UI
+│   │   ├── ChatView.swift               # Agent Living 页面（SwiftUI）
+│   │   └── ChatViewModel.swift          # Agent Living 视图模型
+│   ├── ConversationalAIAPI/             # Conversational AI API（Swift）
 │   │   ├── ConversationalAIAPI.swift
 │   │   ├── ConversationalAIAPIImpl.swift
 │   │   └── Transcript/
-│   ├── Tools/                         # 工具类
-│   │   ├── AgentManager.swift         # Agent 管理器
-│   │   └── NetworkManager.swift       # 网络管理器
-│   ├── Assets.xcassets/               # 资源文件
-│   └── Info.plist                     # 应用配置
-├── Podfile                            # CocoaPods 依赖配置
-├── Podfile.lock                       # CocoaPods 锁定文件
-├── VoiceAgent.xcworkspace/            # Xcode 工作空间
-└── README.md                          # 本文档
+│   ├── Tools/                           # 工具类
+│   │   ├── AgentManager.swift           # Agent 管理器
+│   │   └── NetworkManager.swift         # 网络管理器
+│   ├── Assets.xcassets/                 # 资源文件
+│   ├── Preview Content/                 # SwiftUI 预览资源
+│   └── Info.plist                       # 应用配置
+├── Podfile                              # CocoaPods 依赖配置
+├── Podfile.lock                         # CocoaPods 锁定文件
+├── VoiceAgent.xcworkspace/              # Xcode 工作空间
+└── README.md                            # 本文档
 ```
 
 ## 相关资源
