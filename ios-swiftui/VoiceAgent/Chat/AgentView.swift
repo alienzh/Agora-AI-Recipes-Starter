@@ -1,27 +1,106 @@
 //
-//  ChatView.swift
+//  AgentView.swift
 //  VoiceAgent
 //
-//  Created by qinhui on 2025/11/3.
+//  Created by qinhui on 2025/11/17.
 //
 
 import SwiftUI
 import AlertToast
 
-struct ChatView: View {
-    let uid: Int
-    let channel: String
+struct AgentView: View {
+    @StateObject private var viewModel = AgentViewModel()
     
-    @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel: ChatViewModel
-    
-    init(uid: Int, channel: String) {
-        self.uid = uid
-        self.channel = channel
-        _viewModel = StateObject(wrappedValue: ChatViewModel(uid: uid, channel: channel))
-        UINavigationBar.setAnimationsEnabled(false)
+    init() {
+        print("[AgentView] AgentView initialized")
     }
-        
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                // 明确的背景色
+                Color.white
+                    .ignoresSafeArea()
+                
+                // Config View
+                if viewModel.showConfigView {
+                    ConfigView(viewModel: viewModel)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .onAppear {
+                            print("[AgentView] ConfigView appeared")
+                        }
+                }
+                
+                // Chat View
+                if viewModel.showChatView {
+                    ChatView(viewModel: viewModel)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .onAppear {
+                            print("[AgentView] ChatView appeared")
+                        }
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("VoiceAgent")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color.black)
+                }
+            }
+            .toast(isPresenting: $viewModel.isLoading) {
+                AlertToast(type: .loading)
+            }
+            .toast(isPresenting: $viewModel.isError) {
+                AlertToast(displayMode: .alert, type: .error(.red), title: viewModel.initializationError?.localizedDescription ?? "发生错误")
+            }
+            .onChange(of: viewModel.isError) {
+                if viewModel.isError {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        viewModel.endCall()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Config View
+struct ConfigView: View {
+    @ObservedObject var viewModel: AgentViewModel
+    
+    var body: some View {
+        VStack(spacing: 30) {
+            Image("logo")
+            
+            TextField("输入频道名称", text: $viewModel.channelName)
+                .textFieldStyle(.roundedBorder)
+                .padding(.horizontal)
+                .frame(width: 250, height: 50)
+//                .foregroundColor(.white)
+            
+            Button(action: {
+                viewModel.startConnection()
+            }) {
+                Text("Start")
+                    .foregroundColor(.white)
+                    .frame(width: 250, height: 50)
+                    .background(viewModel.channelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.blue.opacity(0.4) : Color.blue)
+                    .cornerRadius(25)
+            }
+            .disabled(viewModel.channelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isLoading)
+            .padding(.top, 30)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+    }
+}
+
+// MARK: - Chat View
+struct ChatView: View {
+    @ObservedObject var viewModel: AgentViewModel
+    
     var body: some View {
         VStack(spacing: 0) {
             // 字幕滚动视图
@@ -32,42 +111,20 @@ struct ChatView: View {
             // 通话控制栏
             ControlBarView(
                 viewModel: viewModel,
-                onEndCall: leave
+                onEndCall: {
+                    viewModel.endCall()
+                }
             )
             .padding(.horizontal, 20)
             .padding(.bottom, 40)
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("VoiceAgent")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-            }
-        }
-        .toast(isPresenting: $viewModel.isLoading) {
-            AlertToast(type: .loading)
-        }
-        .toast(isPresenting: $viewModel.isError) {
-            AlertToast(displayMode: .alert, type: .error(.red), title: viewModel.initializationError?.localizedDescription ?? "发生错误")
-        }
-        .onChange(of: viewModel.isError) {
-            if viewModel.isError {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: leave)
-            }
-        }
-    }
-    
-    private func leave() {
-        viewModel.endCall()
-        dismiss()
+        .background(Color.white)
     }
 }
 
-// 通话控制栏组件
+// MARK: - Control Bar View
 struct ControlBarView: View {
-    @ObservedObject var viewModel: ChatViewModel
+    @ObservedObject var viewModel: AgentViewModel
     let onEndCall: () -> Void
     
     var body: some View {
@@ -93,9 +150,9 @@ struct ControlBarView: View {
     }
 }
 
-// 麦克风控制组
+// MARK: - Microphone Control Group
 struct MicrophoneControlGroup: View {
-    @ObservedObject var viewModel: ChatViewModel
+    @ObservedObject var viewModel: AgentViewModel
     
     var body: some View {
         HStack(spacing: 8) {
@@ -111,7 +168,7 @@ struct MicrophoneControlGroup: View {
     }
 }
 
-// 结束通话按钮
+// MARK: - End Call Button
 struct EndCallButton: View {
     let onEndCall: () -> Void
     
@@ -129,7 +186,7 @@ struct EndCallButton: View {
     }
 }
 
-// 字幕滚动视图
+// MARK: - Transcript Scroll View
 struct TranscriptScrollView: View {
     let transcripts: [Transcript]
     
@@ -152,6 +209,7 @@ struct TranscriptScrollView: View {
                 .padding(.vertical, 16)
             }
             .frame(maxHeight: .infinity)
+            .background(Color.white)
             .onChange(of: transcripts.count) {
                 // 当有新字幕添加时，滚动到底部
                 if let lastTranscript = transcripts.last {
@@ -165,7 +223,7 @@ struct TranscriptScrollView: View {
     }
 }
 
-// 字幕行视图
+// MARK: - Transcript Row
 struct TranscriptRow: View {
     let transcript: Transcript
     
@@ -184,7 +242,7 @@ struct TranscriptRow: View {
             // 字幕内容
             Text(transcript.text)
                 .font(.system(size: 15))
-                .foregroundColor(.primary)
+                .foregroundColor(.black)
                 .fixedSize(horizontal: false, vertical: true)
             
             Spacer()
@@ -197,5 +255,6 @@ struct TranscriptRow: View {
 }
 
 #Preview {
-    ChatView(uid: 0, channel: "test_channel")
+    AgentView()
 }
+

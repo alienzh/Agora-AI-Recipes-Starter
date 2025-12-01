@@ -1,0 +1,202 @@
+# ============================================
+# General
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+*.tmp
+*.temp
+*.log
+*.backup
+*.bak
+*.orig
+
+# ============================================
+# IDE & Editor
+# ============================================
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# ============================================
+# iOS / Xcode
+# ============================================
+# Xcode user data
+**/xcuserdata/
+**/*.xcuserstate
+**/*.xcuserdatad/
+**/*.xcscheme
+**/xcschememanagement.plist
+
+# Xcode build files
+**/build/
+**/DerivedData/
+**/*.xccheckout
+**/*.xcscmblueprint
+**/*.moved-aside
+**/*.pbxuser
+**/*.mode1v3
+**/*.mode2v3
+**/*.perspectivev3
+**/*.hmap
+
+# Xcode playgrounds
+**/timeline.xctimeline
+**/playground.xcworkspace
+
+# CocoaPods
+**/Pods/
+**/Podfile.lock
+**/.symlinks/
+**/profile
+**/xcuserdata/
+**/*.xcworkspace
+!**/*.xcworkspace/contents.xcworkspacedata
+
+# Carthage
+**/Carthage/Build/
+
+# Swift Package Manager
+**/.build/
+**/Packages/
+**/*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+**/.swiftpm/
+
+# App packaging
+**/*.ipa
+**/*.dSYM.zip
+**/*.dSYM
+**/*.app
+**/*.framework
+**/*.dylib
+
+# ============================================
+# Android
+# ============================================
+# Gradle
+**/.gradle/
+**/build/
+**/local.properties
+**/gradle-app.setting
+**/!gradle-wrapper.jar
+**/.gradletasknamecache
+
+# Android Studio
+**/.idea/
+**/*.iml
+**/.idea_modules/
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/dictionaries
+**/.idea/shelf
+**/.idea/caches
+**/.idea/modules.xml
+**/.idea/.name
+**/.idea/compiler.xml
+**/.idea/copyright/profiles_settings.xml
+**/.idea/encodings.xml
+**/.idea/misc.xml
+**/.idea/modules.xml
+**/.idea/scopes/scope_settings.xml
+**/.idea/vcs.xml
+**/.idea/libraries
+
+# Environment files (may contain sensitive data)
+**/env.properties
+**/env.example.properties
+
+# ============================================
+# HarmonyOS
+# ============================================
+**/oh_modules/
+**/build/
+**/.hvigor/
+**/.hvigor-wrapper/
+**/oh-package-lock.json5
+**/oh-package.json5
+!**/oh-package.json5.example
+
+# ============================================
+# Python
+# ============================================
+# Virtual environments
+**/venv/
+**/env/
+**/ENV/
+**/.venv
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/*.so
+**/.Python
+**/pip-log.txt
+**/pip-delete-this-directory.txt
+
+# ============================================
+# Windows / Visual Studio
+# ============================================
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+**/[Ll]ogs/
+**/[Dd]ebug/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/x64/
+**/x86/
+**/bld/
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+**/[Ll]ogs/
+**/*.suo
+**/*.user
+**/*.userosscache
+**/*.sln.docstates
+**/*.userprefs
+**/*.pidb
+**/*.booproj
+**/*.svd
+**/*.pdb
+**/*.opendb
+**/*.opensdf
+**/*.sdf
+**/*.cachefile
+**/*.VC.db
+**/*.VC.VC.opendb
+
+# ============================================
+# Project Specific
+# ============================================
+# Environment configuration files
+**/env.json
+**/env.properties
+**/env.example.json
+**/env.example.properties
+
+# SpecStory (if applicable)
+.specstory/
+
+# Archives
+**/*.zip
+**/*.tar.gz
+**/*.rar
+**/*.7z
+
+# ============================================
+# Temporary & Cache
+# ============================================
+**/.cache/
+**/.temp/
+**/tmp/
+**/*.cache
+

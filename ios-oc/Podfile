@@ -9,5 +9,5 @@ target 'VoiceAgent' do
   pod 'AgoraRtcEngine_iOS', '4.5.1'
   pod 'AgoraRtm', :path => 'AgoraRtm.podspec'
   pod 'SVProgressHUD'
-  pod 'Masonry'
+  pod 'LocalMasonry', :path => 'LocalMasonry.podspec'
 end

@@ -41,7 +41,7 @@ PODS:
   - AgoraRtcEngine_iOS/VirtualBackground (4.5.1)
   - AgoraRtcEngine_iOS/VQA (4.5.1)
   - AgoraRtm (2.2.6)
-  - Masonry (1.1.0)
+  - LocalMasonry (1.1.0)
   - SVProgressHUD (2.3.1):
     - SVProgressHUD/Core (= 2.3.1)
   - SVProgressHUD/Core (2.3.1)
@@ -49,27 +49,28 @@ PODS:
 DEPENDENCIES:
   - AgoraRtcEngine_iOS (= 4.5.1)
   - AgoraRtm (from `AgoraRtm.podspec`)
-  - Masonry
+  - LocalMasonry (from `LocalMasonry.podspec`)
   - SVProgressHUD
 
 SPEC REPOS:
   trunk:
     - AgoraInfra_iOS
     - AgoraRtcEngine_iOS
-    - Masonry
     - SVProgressHUD
 
 EXTERNAL SOURCES:
   AgoraRtm:
     :path: AgoraRtm.podspec
+  LocalMasonry:
+    :path: LocalMasonry.podspec
 
 SPEC CHECKSUMS:
   AgoraInfra_iOS: 65e11a2183ab7836258768868d06058c22701b13
   AgoraRtcEngine_iOS: 5092a058c7b2842db39d8ca614d451af6f84969a
   AgoraRtm: afc0b41aaceb65a61ed9df731c2536fbeadb5318
-  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  LocalMasonry: 7e45000b9bf275db172c1abb76d20bf2da2a31e3
   SVProgressHUD: 4837c74bdfe2e51e8821c397825996a8d7de6e22
 
-PODFILE CHECKSUM: 85eb8acd1815b216761e4413716594463599f458
+PODFILE CHECKSUM: a9f883489248f858bffac08f618dd9c4706d6718
 
 COCOAPODS: 1.16.2
