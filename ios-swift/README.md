@@ -143,13 +143,6 @@ ios-swift/
 └── README.md                          # 本文档
 ```
 
-### 架构说明
-
-- **AgentViewController**：主视图控制器，统一管理配置页面和聊天页面的切换，以及所有业务逻辑（RTC、RTM、ConvoAI 初始化、Agent 启动等）
-- **ConfigBackgroundView**：配置页面视图，负责显示频道名称输入框和启动按钮
-- **ChatBackgroundView**：聊天页面视图，负责显示转录列表、Agent 状态和控制按钮（静音、挂断）
-- **SnapKit**：使用 CocoaPods 集成的自动布局库，用于 Swift 代码的约束布局
-
 ## 相关资源
 
 ### API 文档链接
