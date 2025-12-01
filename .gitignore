@@ -33,7 +33,7 @@ Thumbs.db
 # Xcode user data
 **/xcuserdata/
 **/*.xcuserstate
-**/*.xcuserdatad/
+**/*.xcuserdatad
 **/*.xcscheme
 **/xcschememanagement.plist
 
@@ -58,7 +58,6 @@ Thumbs.db
 **/Podfile.lock
 **/.symlinks/
 **/profile
-**/xcuserdata/
 **/*.xcworkspace
 !**/*.xcworkspace/contents.xcworkspacedata
 

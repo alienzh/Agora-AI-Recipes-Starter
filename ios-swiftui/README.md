@@ -49,7 +49,7 @@ pod install
    - 使用 Xcode 打开 `VoiceAgent.xcworkspace`（注意：不是 `.xcodeproj`）
    - 配置 Agora Key：
 
-   创建 `VoiceAgent/KeyCenter.swift` 文件，填入你的实际配置值：
+   编辑 `VoiceAgent/KeyCenter.swift` 文件，填入你的实际配置值：
 
    ```swift
    class KeyCenter {
@@ -85,24 +85,24 @@ pod install
 
 ### 快速体验流程
 
-1. **Agent Home 页面**（`EntranceView`）：
-   - 运行应用，进入 Agent Home 页面
+1. **配置页面**（`AgentView` 中的 `ConfigView`）：
+   - 运行应用，进入配置页面
    - 输入频道名称（channelName）
    - 点击"Start"按钮
-   - 跳转到 Agent Living 页面
+   - 自动切换到聊天页面
 
-2. **Agent Living 页面**（`ChatView`）：
-   - 生成用户token
-   - 启动RTM
-   - 启动RTC
-   - 启动ConvoAI组件
-   - 生成agentToken
-   - 启动Agent
+2. **聊天页面**（`AgentView` 中的 `ChatView`）：
+   - 自动生成用户token
+   - 自动启动RTM
+   - 自动启动RTC
+   - 自动启动ConvoAI组件
+   - 自动生成agentToken
+   - 自动启动Agent
    - 显示 Agent 状态
    - 实时显示 USER 和 AGENT 的转录内容
    - 可以开始与 AI Agent 对话
    - 支持静音/取消静音功能
-   - 点击挂断按钮返回 Agent Home 页面
+   - 点击挂断按钮返回配置页面
 
 ### 功能验证清单
 
@@ -112,7 +112,7 @@ pod install
 - ✅ 音频传输正常（能够听到 AI 回复）
 - ✅ 转录功能正常（显示 USER 和 AGENT 的转录内容及状态）
 - ✅ 静音/取消静音功能正常
-- ✅ 挂断功能正常（返回 Agent Home 页面）
+- ✅ 挂断功能正常（返回配置页面）
 
 ## 项目结构
 
@@ -121,12 +121,9 @@ ios-swiftui/
 ├── VoiceAgent/
 │   ├── VoiceAgentApp.swift              # SwiftUI 应用入口
 │   ├── KeyCenter.swift                  # 配置中心（需要创建并填写）
-│   ├── Entrance/                        # 入口页面
-│   │   ├── EntranceView.swift           # Agent Home 页面（SwiftUI）
-│   │   └── EntranceViewModel.swift      # Agent Home 视图模型
 │   ├── Chat/                            # 聊天相关 UI
-│   │   ├── ChatView.swift               # Agent Living 页面（SwiftUI）
-│   │   └── ChatViewModel.swift          # Agent Living 视图模型
+│   │   ├── AgentView.swift              # 主视图（包含配置和聊天页面）
+│   │   └── AgentViewModel.swift         # 视图模型（统一管理状态和业务逻辑）
 │   ├── ConversationalAIAPI/             # Conversational AI API（Swift）
 │   │   ├── ConversationalAIAPI.swift
 │   │   ├── ConversationalAIAPIImpl.swift

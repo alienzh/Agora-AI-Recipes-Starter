@@ -1,4 +1,4 @@
-# iOS Agent Starter
+# iOS Swift Agent Starter
 
 ## 功能概述
 
@@ -85,24 +85,24 @@ pod install
 
 ### 快速体验流程
 
-1. **Agent Home 页面**（`ViewController`）：
-   - 运行应用，进入 Agent Home 页面
+1. **配置页面**（`AgentViewController` 中的 `ConfigBackgroundView`）：
+   - 运行应用，进入配置页面
    - 输入频道名称（channelName）
    - 点击"Start"按钮
-   - 跳转到 Agent Living 页面
+   - 自动切换到聊天页面
 
-2. **Agent Living 页面**（`ChatViewController`）：
-   - 生成用户token
-   - 启动RTM
-   - 启动RTC
-   - 启动ConvoAI组件
-   - 生成agentToken
-   - 启动Agent
+2. **聊天页面**（`AgentViewController` 中的 `ChatBackgroundView`）：
+   - 自动生成用户token
+   - 自动启动RTM
+   - 自动启动RTC
+   - 自动启动ConvoAI组件
+   - 自动生成agentToken
+   - 自动启动Agent
    - 显示 Agent 状态
    - 实时显示 USER 和 AGENT 的转录内容
    - 可以开始与 AI Agent 对话
    - 支持静音/取消静音功能
-   - 点击挂断按钮返回 Agent Home 页面
+   - 点击挂断按钮返回配置页面
 
 ### 功能验证清单
 
@@ -112,7 +112,7 @@ pod install
 - ✅ 音频传输正常（能够听到 AI 回复）
 - ✅ 转录功能正常（显示 USER 和 AGENT 的转录内容及状态）
 - ✅ 静音/取消静音功能正常
-- ✅ 挂断功能正常（返回 Agent Home 页面）
+- ✅ 挂断功能正常（返回配置页面）
 
 ## 项目结构
 
@@ -122,9 +122,10 @@ ios-swift/
 │   ├── AppDelegate.swift              # 应用入口
 │   ├── SceneDelegate.swift            # Scene 代理
 │   ├── KeyCenter.swift                # 配置中心（需要填写）
-│   ├── ViewController.swift           # Agent Home 页面
+│   ├── AgentViewController.swift      # 主视图控制器（包含配置和聊天功能）
 │   ├── Chat/                          # 聊天相关 UI
-│   │   ├── ChatViewController.swift   # Agent Living 页面
+│   │   ├── ConfigBackgroundView.swift # 配置页面视图（频道名称输入、启动按钮）
+│   │   ├── ChatBackgroundView.swift   # 聊天页面视图（转录列表、状态、控制按钮）
 │   │   └── AgentStateView.swift       # Agent 状态视图
 │   ├── ConversationalAIAPI/           # Conversational AI API（Swift）
 │   │   ├── ConversationalAIAPI.swift
@@ -134,12 +135,20 @@ ios-swift/
 │   │   ├── AgentManager.swift         # Agent 管理器
 │   │   └── NetworkManager.swift       # 网络管理器
 │   ├── Assets.xcassets/               # 资源文件
+│   ├── Base.lproj/                    # Storyboard 文件
 │   └── Info.plist                     # 应用配置
 ├── Podfile                            # CocoaPods 依赖配置
 ├── Podfile.lock                       # CocoaPods 锁定文件
 ├── VoiceAgent.xcworkspace/            # Xcode 工作空间
 └── README.md                          # 本文档
 ```
+
+### 架构说明
+
+- **AgentViewController**：主视图控制器，统一管理配置页面和聊天页面的切换，以及所有业务逻辑（RTC、RTM、ConvoAI 初始化、Agent 启动等）
+- **ConfigBackgroundView**：配置页面视图，负责显示频道名称输入框和启动按钮
+- **ChatBackgroundView**：聊天页面视图，负责显示转录列表、Agent 状态和控制按钮（静音、挂断）
+- **SnapKit**：使用 CocoaPods 集成的自动布局库，用于 Swift 代码的约束布局
 
 ## 相关资源
 
