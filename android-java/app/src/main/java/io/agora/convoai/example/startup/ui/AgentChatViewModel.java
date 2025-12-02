@@ -413,7 +413,7 @@ public class AgentChatViewModel extends ViewModel {
                 isLoggingIn = false;
                 Log.d(TAG, "RTM login successful");
                 callback.onResult(null);
-                addStatusLog("Rtm login success");
+                addStatusLog("Rtm login successful");
             }
 
             @Override
