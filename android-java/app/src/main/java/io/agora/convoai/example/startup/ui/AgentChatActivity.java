@@ -106,11 +106,6 @@ public class AgentChatActivity extends BaseActivity<ActivityAgentChatBinding> {
         binding.btnStop.setOnClickListener(v -> viewModel.hangup());
     }
 
-    @Override
-    public boolean supportOnBackPressed() {
-        return false;
-    }
-
     private void checkMicrophonePermission(PermissionCallback callback) {
         if (mPermissionHelp.hasMicPerm()) {
             callback.onResult(true);

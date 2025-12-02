@@ -10,7 +10,8 @@
 - **消息传递**：通过 Agora RTM SDK 实现与 AI 代理的消息交互和状态同步
 - **实时转录**：支持实时显示用户和 AI 代理的对话转录内容，包括转录状态（进行中、完成、中断等）
 - **状态管理**：统一管理连接状态、Agent 启动状态、静音状态、转录状态等 UI 状态
-- **自动流程**：自动完成频道加入、RTM 登录、Agent 启动、页面跳转等流程
+- **自动流程**：自动完成频道加入、RTM 登录、Agent 启动等流程
+- **统一界面**：所有功能（日志、状态、转录、控制按钮）集成在同一个页面，移除了页面跳转
 
 ### 适用场景
 
@@ -92,100 +93,53 @@
    - 生产环境**必须**使用方式二，通过自己的业务后台中转请求
    - 直接在前端调用 Agora RESTful API 会暴露 REST Key 和 REST Secret，存在安全风险
    
-   **方式二：通过业务后台服务器中转**（生产环境必需）
-   
-   真实业务场景中，**不应该**直接在前端请求 Agora RESTful API，而应该通过自己的业务后台服务器中转。
-   
-   **核心要求**：
-   
-   - **REST Key 和 REST Secret 必须放在服务端**，绝对不能暴露在客户端代码中
-   - 客户端只请求自己的业务后台接口，业务后台再调用 Agora RESTful API
-   - 业务后台负责保管和管理 REST Key、REST Secret 等敏感信息
-   
-   **实现方式**：
-   
-   1. **参考实现**：`../server-python/agora_http_server.py` 展示了如何在服务端调用 Agora RESTful API
-      - Python 服务器从环境变量或配置文件读取 REST Key 和 REST Secret
-      - 服务端使用这些密钥调用 Agora API，客户端无需知道这些密钥
-   
-   2. **在自己的业务后台实现**：
-      - 参考 Python 服务器的实现逻辑，在你的业务后台（Java、Node.js、Python 等）实现 Agent 启动接口
-      - 将 REST Key 和 REST Secret 存储在服务端环境变量或配置文件中
-      - 客户端请求你的业务后台接口，业务后台使用 REST Key 和 REST Secret 调用 Agora API
-   
-   3. **在 `AgentStarter.kt` 中配置本地 Python 服务器的 IP 地址**（用于本地体验测试）：
-   ```kotlin
-   object AgentStarter {
-       // Switch between local server and Agora API by commenting/uncommenting the lines below
-   //    private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
-       private const val AGORA_API_BASE_URL = "http://<your-computer-ip>:8080"  // Local Python server IP (for local testing)
-   }
-   ```
-   
-   **说明**：
-   - `<your-computer-ip>` 替换为你运行 Python 服务器的电脑 IP 地址
-   - 查找电脑 IP：
-     - macOS/Linux: `ifconfig en0 | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'`
-     - Windows: `ipconfig`（查找 IPv4 地址）
-   - 确保 Android 设备和电脑在同一局域网内
-   
-   **为什么必须使用业务后台中转**：
-   - **安全性**：REST Key 和 REST Secret 绝对不能暴露在客户端代码中，必须由服务端保管
-   - **业务逻辑**：可以在后台实现权限验证、计费、日志记录等业务逻辑
-   - **稳定性**：统一管理 API 调用，便于监控和错误处理
-   - **灵活性**：可以添加缓存、限流、重试等机制
-   - **合规性**：符合安全最佳实践，避免敏感信息泄露
-   
-   **开发测试参考**：
-   
-   如果想在本地测试业务后台的实现方式，可以启动 Python HTTP 服务器作为参考：
-   ```bash
-   cd ../server-python
-   python agora_http_server.py
-   ```
-   
-   然后在 `AgentStarter.kt` 中配置本地服务器地址（仅用于开发测试）：
-   ```kotlin
-   private const val AGORA_API_BASE_URL = "http://<your-computer-ip>:8080"  // Local server for development
-   ```
-   
-   ⚠️ **重要**：Python 服务器示例仅用于演示和开发测试，真实业务中需要：
-   - 将 REST Key 和 REST Secret 放在你的生产环境服务端
-   - 实现完整的权限验证和业务逻辑
-   - 使用 HTTPS 保护数据传输
-   
-   **注意**：
-   - 生产环境必须使用自己的服务端生成 Token，不要使用 `TokenGenerator`（详见代码中的警告）
+   ⚠️ **生产环境要求**：
+   - **必须将敏感信息放在后端**：`appCertificate`、`restKey`、`restSecret` 等敏感信息必须存储在服务端，绝对不能暴露在客户端代码中
+   - **客户端通过后端获取 Token**：客户端请求自己的业务后台接口，由服务端使用 `appCertificate` 生成 Token 并返回给客户端
+   - **客户端通过后端启动 Agent**：客户端请求自己的业务后台接口，由服务端使用 `restKey` 和 `restSecret` 调用 Agora RESTful API 启动 Agent
+   - **参考实现**：可参考 `../server-python/agora_http_server.py` 了解如何在服务端实现 Token 生成和 Agent 启动接口
 
 ## 测试验证
 
 ### 快速体验流程
 
-1. **Agent Home 页面**（`AgentHomeScreen`）：
-   - 运行应用，进入 Agent Home 页面
-   - 点击"Start Agent"按钮
-   - 按钮文本变为"Starting..."，应用自动：
+1. **运行应用**：
+   - 运行应用，进入 `AgentChatScreen` 页面
+   - 页面从上到下依次显示：
+     - **日志区域**：显示 Agent 启动相关的状态日志
+     - **转录列表区域**：实时显示 USER 和 AGENT 的对话转录内容
+       - AGENT 的消息靠左对齐
+       - USER 的消息靠右对齐
+     - **Agent 状态**：显示在转录列表区域的底部，显示当前 Agent 的状态（idle、listening、thinking、speaking 等）
+     - **控制按钮**：
+       - 未连接时：显示 "Start" 按钮
+       - 连接后：显示 "Mute" 和 "Stop Agent" 按钮
+
+2. **启动 Agent**：
+   - 点击 "Start" 按钮
+   - 按钮文本变为 "Starting..."，应用自动：
      - 生成随机 channelName（格式：`channel_compose_XXXX`）
      - 加入 RTC 频道并登录 RTM
      - 连接成功后自动启动 AI Agent
-   - Agent 启动成功后，自动跳转到 Agent Living 页面
+   - Agent 启动成功后，"Start" 按钮隐藏，显示 "Mute" 和 "Stop Agent" 按钮
 
-2. **Agent Living 页面**（`AgentLivingScreen`）：
-   - 显示 Channel、UserId、AgentUid 信息
-   - 显示 Agent 状态
+3. **与 Agent 对话**：
+   - 对着手机说话，能听到 Agent 的回应
    - 实时显示 USER 和 AGENT 的转录内容
-   - 可以开始与 AI Agent 对话
    - 支持静音/取消静音功能
-   - 点击挂断按钮返回 Agent Home 页面
+   - 点击 "Stop Agent" 按钮停止 Agent 并释放资源
+   - 侧滑返回会直接 finish Activity，退出应用
 
 ### 功能验证清单
 
 - [ ] **连接**：App 能成功加入 RTC 频道并登录 RTM。
-- [ ] **启动**：点击 Start 后能自动启动 Agent 并跳转页面。
+- [ ] **启动**：点击 Start 后能自动启动 Agent，按钮切换为 Mute 和 Stop。
 - [ ] **对话**：对着手机说话，能听到 Agent 的回应。
-- [ ] **字幕**：说话时能看到实时的文字转录（User 和 Agent 的内容）。
+- [ ] **字幕**：说话时能看到实时的文字转录（AGENT 靠左，USER 靠右）。
+- [ ] **状态显示**：Agent 状态正确显示在转录列表区域底部。
 - [ ] **打断**：在 Agent 说话时插话，Agent 能被成功打断并回应新的内容。
-- [ ] **挂断**：点击挂断能正确停止 Agent 并释放资源。
+- [ ] **挂断**：点击 Stop Agent 能正确停止 Agent 并释放资源。
+- [ ] **返回**：侧滑返回能直接 finish Activity，退出应用。
 
 ## 项目结构
 
@@ -194,9 +148,10 @@ android-compose/
 ├── app/
 │   ├── src/main/
 │   │   ├── java/io/agora/convoai/example/startup/
-│   │   │   ├── ui/                    # Compose UI (Screens, ViewModel, Theme)
-│   │   │   ├── rtc/                   # RTC 管理器
-│   │   │   ├── rtm/                   # RTM 管理器
+│   │   │   ├── ui/                    # Compose UI
+│   │   │   │   ├── AgentChatScreen.kt # 主界面（合并了 Home 和 Living 功能）
+│   │   │   │   ├── AgentChatViewModel.kt # ViewModel（包含 RTC/RTM 逻辑）
+│   │   │   │   └── theme/            # 主题配置
 │   │   │   ├── api/                   # API (AgentStarter, TokenGenerator)
 │   │   │   └── tools/                 # 工具类
 │   │   ├── res/                       # 资源文件

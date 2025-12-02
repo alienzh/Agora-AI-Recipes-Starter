@@ -96,10 +96,6 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
         }
     }
 
-    override fun supportOnBackPressed(): Boolean {
-        return false
-    }
-
     private fun checkMicrophonePermission(granted: (Boolean) -> Unit) {
         if (mPermissionHelp.hasMicPerm()) {
             granted.invoke(true)
