@@ -117,64 +117,61 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CMainFrame::SetupUI()
 {
-    CRect clientRect;
-    GetClientRect(&clientRect);
-    
+    // Create all controls first, layout will be done in OnSize
     SetupLogPanel();
     SetupTopPanel();
     SetupBottomPanel();
-    LayoutPanels();
 }
 
 void CMainFrame::SetupTopPanel()
 {
-    CRect clientRect;
-    GetClientRect(&clientRect);
-    
-    m_topPanel.Create(_T(""), WS_CHILD | WS_VISIBLE, CRect(0, 0, 100, 100), this);
+    // Top panel background
+    m_topPanel.Create(_T(""), WS_CHILD | WS_VISIBLE, CRect(0, 0, 10, 10), this);
     
     // Message list
     m_listMessages.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_NOCOLUMNHEADER,
-        CRect(0, 0, 100, 100), this, IDC_LIST_MESSAGES);
+        CRect(0, 0, 10, 10), this, IDC_LIST_MESSAGES);
     m_listMessages.SetFont(&m_normalFont);
     m_listMessages.SetExtendedStyle(LVS_EX_FULLROWSELECT);
     m_listMessages.InsertColumn(0, _T("Messages"), LVCFMT_LEFT, 500);
     
-    // Agent status label (bottom-right)
+    // Agent status label
     m_labelAgentStatus.Create(_T("Agent: Not Started"), WS_CHILD | WS_VISIBLE | SS_RIGHT,
-        CRect(0, 0, 100, 16), this);
+        CRect(0, 0, 10, 10), this);
     m_labelAgentStatus.SetFont(&m_normalFont);
 }
 
 void CMainFrame::SetupLogPanel()
 {
-    m_logPanel.Create(_T(""), WS_CHILD | WS_VISIBLE | WS_BORDER, CRect(0, 0, 100, 100), this);
+    // Log panel border (visual only)
+    m_logPanel.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_ETCHEDFRAME, CRect(0, 0, 10, 10), this);
     
     // Log list
-    m_listLog.Create(WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_NOCOLUMNHEADER,
-        CRect(0, 0, 100, 100), this, IDC_LIST_LOG);
+    m_listLog.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_NOCOLUMNHEADER,
+        CRect(0, 0, 10, 10), this, IDC_LIST_LOG);
     m_listLog.SetFont(&m_smallFont);
     m_listLog.SetExtendedStyle(LVS_EX_FULLROWSELECT);
-    m_listLog.InsertColumn(0, _T("Log"), LVCFMT_LEFT, LOG_PANEL_WIDTH - 10);
+    m_listLog.InsertColumn(0, _T("Log"), LVCFMT_LEFT, LOG_PANEL_WIDTH - 20);
 }
 
 void CMainFrame::SetupBottomPanel()
 {
-    m_bottomPanel.Create(_T(""), WS_CHILD | WS_VISIBLE, CRect(0, 0, 100, 100), this);
+    // Bottom panel background with border
+    m_bottomPanel.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ, CRect(0, 0, 10, 10), this);
     
-    // Start button (full width, shown when idle)
+    // Start button (shown when idle)
     m_btnStart.Create(_T("Start Agent"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-        CRect(0, 0, 100, BUTTON_HEIGHT), this, IDC_BTN_START);
+        CRect(0, 0, 10, 10), this, IDC_BTN_START);
     m_btnStart.SetFont(&m_normalFont);
     
-    // Mute button (left, shown when active)
+    // Mute button (shown when active)
     m_btnMute.Create(_T("Mute"), WS_CHILD | BS_PUSHBUTTON,
-        CRect(0, 0, 100, BUTTON_HEIGHT), this, IDC_BTN_MUTE);
+        CRect(0, 0, 10, 10), this, IDC_BTN_MUTE);
     m_btnMute.SetFont(&m_normalFont);
     
-    // Stop button (right, shown when active)
+    // Stop button (shown when active)
     m_btnStop.Create(_T("Stop Agent"), WS_CHILD | BS_PUSHBUTTON,
-        CRect(0, 0, 100, BUTTON_HEIGHT), this, IDC_BTN_STOP);
+        CRect(0, 0, 10, 10), this, IDC_BTN_STOP);
     m_btnStop.SetFont(&m_normalFont);
 }
 
@@ -183,26 +180,36 @@ void CMainFrame::LayoutPanels()
     CRect clientRect;
     GetClientRect(&clientRect);
     
+    if (clientRect.Width() <= 0 || clientRect.Height() <= 0)
+        return;
+    
     int logLeft = clientRect.right - LOG_PANEL_WIDTH;
     int bottomTop = clientRect.bottom - BOTTOM_PANEL_HEIGHT;
-    int topRight = logLeft - PADDING;
+    int contentWidth = logLeft - PADDING;
     
     // Log panel (right side, full height)
     m_logPanel.MoveWindow(logLeft, 0, LOG_PANEL_WIDTH, clientRect.Height());
-    m_listLog.MoveWindow(0, 0, LOG_PANEL_WIDTH, clientRect.Height());
-    m_listLog.SetColumnWidth(0, LOG_PANEL_WIDTH - 10);
+    m_listLog.MoveWindow(logLeft, 0, LOG_PANEL_WIDTH, clientRect.Height());
+    m_listLog.SetColumnWidth(0, LOG_PANEL_WIDTH - 20);
     
-    // Top panel (transcript area)
-    m_topPanel.MoveWindow(0, 0, topRight, bottomTop);
-    m_listMessages.MoveWindow(PADDING, PADDING, topRight - PADDING * 2, bottomTop - PADDING - 30);
-    m_listMessages.SetColumnWidth(0, topRight - PADDING * 2 - 20);
-    m_labelAgentStatus.MoveWindow(PADDING, bottomTop - 28, topRight - PADDING * 2, 20);
+    // Top panel background
+    m_topPanel.MoveWindow(0, 0, contentWidth, bottomTop);
     
-    // Bottom panel (control area)
-    m_bottomPanel.MoveWindow(0, bottomTop, topRight, BOTTOM_PANEL_HEIGHT);
+    // Message list (absolute coordinates)
+    int msgWidth = contentWidth - PADDING * 2;
+    int msgHeight = bottomTop - PADDING - 30;
+    m_listMessages.MoveWindow(PADDING, PADDING, msgWidth, msgHeight);
+    m_listMessages.SetColumnWidth(0, msgWidth - 20);
     
-    int btnY = (BOTTOM_PANEL_HEIGHT - BUTTON_HEIGHT) / 2;
-    int btnWidth = topRight - PADDING * 2;
+    // Agent status label (absolute coordinates, bottom of top area)
+    m_labelAgentStatus.MoveWindow(PADDING, bottomTop - 25, msgWidth, 20);
+    
+    // Bottom panel background
+    m_bottomPanel.MoveWindow(0, bottomTop, contentWidth, BOTTOM_PANEL_HEIGHT);
+    
+    // Button layout (absolute coordinates)
+    int btnY = bottomTop + (BOTTOM_PANEL_HEIGHT - BUTTON_HEIGHT) / 2;
+    int btnWidth = contentWidth - PADDING * 2;
     int halfWidth = (btnWidth - 8) / 2;
     
     // Start button (full width)
@@ -217,7 +224,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
     CFrameWnd::OnSize(nType, cx, cy);
     
-    if (::IsWindow(m_topPanel.GetSafeHwnd())) {
+    if (cx > 0 && cy > 0 && ::IsWindow(m_listMessages.GetSafeHwnd())) {
         LayoutPanels();
     }
 }
