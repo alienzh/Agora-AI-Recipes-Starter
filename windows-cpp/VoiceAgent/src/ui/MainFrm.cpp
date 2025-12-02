@@ -334,11 +334,14 @@ void CMainFrame::InitializeRTM()
 {
     m_rtmHandler = std::make_unique<RtmEventHandler>(this);
     
+    // Keep userId string alive during createAgoraRtmClient call
+    std::string userIdStr = std::to_string(m_userUid);
+    
     agora::rtm::RtmConfig config;
     config.appId = KeyCenter::AGORA_APP_ID;
-    config.userId = std::to_string(m_userUid).c_str();
+    config.userId = userIdStr.c_str();
     config.eventHandler = m_rtmHandler.get();
-    config.presenceTimeout = 300;
+    config.presenceTimeout = 30;
     config.useStringUserId = true;
     config.areaCode = agora::rtm::RTM_AREA_CODE_GLOB;
     
@@ -348,7 +351,9 @@ void CMainFrame::InitializeRTM()
     if (m_rtmClient && errorCode == 0) {
         LogToView(_T("RTM init OK"));
     } else {
-        LogToView(_T("RTM init FAIL"));
+        CString msg;
+        msg.Format(_T("RTM init FAIL, code=%d"), errorCode);
+        LogToView(msg);
     }
 }
 
