@@ -99,6 +99,9 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
     cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
     cs.lpszClass = AfxRegisterWndClass(0);
+    
+    // Fixed window size (no resize, no maximize)
+    cs.style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
     cs.cx = 1200;
     cs.cy = 800;
     cs.x = (GetSystemMetrics(SM_CXSCREEN) - cs.cx) / 2;
@@ -167,10 +170,7 @@ void CMainFrame::SetupBottomPanel()
 {
     m_bottomPanel.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ, CRect(0, 0, 10, 10), this);
     
-    m_btnStart.Create(_T("Start Agent"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-        CRect(0, 0, 10, 10), this, IDC_BTN_START);
-    m_btnStart.SetFont(&m_normalFont);
-    
+    // Create Mute and Stop first (hidden), then Start on top
     m_btnMute.Create(_T("Mute"), WS_CHILD | BS_PUSHBUTTON,
         CRect(0, 0, 10, 10), this, IDC_BTN_MUTE);
     m_btnMute.SetFont(&m_normalFont);
@@ -178,6 +178,10 @@ void CMainFrame::SetupBottomPanel()
     m_btnStop.Create(_T("Stop Agent"), WS_CHILD | BS_PUSHBUTTON,
         CRect(0, 0, 10, 10), this, IDC_BTN_STOP);
     m_btnStop.SetFont(&m_normalFont);
+    
+    m_btnStart.Create(_T("Start Agent"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+        CRect(0, 0, 10, 10), this, IDC_BTN_START);
+    m_btnStart.SetFont(&m_normalFont);
 }
 
 void CMainFrame::LayoutPanels()
@@ -238,10 +242,11 @@ void CMainFrame::UpdateAgentStatus(const CString& message)
 
 void CMainFrame::ShowIdleButtons()
 {
-    m_btnStart.ShowWindow(SW_SHOW);
-    m_btnStart.EnableWindow(TRUE);
     m_btnMute.ShowWindow(SW_HIDE);
     m_btnStop.ShowWindow(SW_HIDE);
+    m_btnStart.ShowWindow(SW_SHOW);
+    m_btnStart.EnableWindow(TRUE);
+    m_btnStart.BringWindowToTop();
 }
 
 void CMainFrame::ShowActiveButtons()
@@ -251,6 +256,8 @@ void CMainFrame::ShowActiveButtons()
     m_btnMute.EnableWindow(TRUE);
     m_btnStop.ShowWindow(SW_SHOW);
     m_btnStop.EnableWindow(TRUE);
+    m_btnMute.BringWindowToTop();
+    m_btnStop.BringWindowToTop();
 }
 
 void CMainFrame::UpdateTranscripts()
