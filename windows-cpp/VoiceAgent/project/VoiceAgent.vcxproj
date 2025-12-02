@@ -69,12 +69,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
-              <AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
           ..\src;
-          ..\src\General;
+          ..\src\general;
           ..\src\ui;
-          ..\src\rtc;
-          ..\src\rtm;
           ..\src\api;
           ..\src\ConversationalAIAPI;
           ..\src\tools;
@@ -127,7 +125,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\src;..\src\General;..\src\ui;..\src\rtc;..\src\rtm;..\src\api;..\src\ConversationalAIAPI;..\src\tools;..\src\tools\dependencies;..\resources;..\rtcLib\high_level_api\include;..\rtmLib\high_level_api\include;..\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\src\general;..\src\ui;..\src\api;..\src\ConversationalAIAPI;..\src\tools;..\src\tools\dependencies;..\resources;..\rtcLib\high_level_api\include;..\rtmLib\high_level_api\include;..\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -154,14 +152,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\General\framework.h" />
-    <ClInclude Include="..\src\General\pch.h" />
-    <ClInclude Include="..\src\General\targetver.h" />
-    <ClInclude Include="..\src\General\VoiceAgent.h" />
+    <ClInclude Include="..\src\general\framework.h" />
+    <ClInclude Include="..\src\general\pch.h" />
+    <ClInclude Include="..\src\general\targetver.h" />
+    <ClInclude Include="..\src\general\VoiceAgent.h" />
     <ClInclude Include="..\src\KeyCenter.h" />
     <ClInclude Include="..\src\ui\MainFrm.h" />
-    <ClInclude Include="..\src\rtc\RtcManager.h" />
-    <ClInclude Include="..\src\rtm\RtmManager.h" />
     <ClInclude Include="..\src\api\TokenGenerator.h" />
     <ClInclude Include="..\src\api\HttpClient.h" />
     <ClInclude Include="..\src\api\AgentManager.h" />
@@ -171,11 +167,9 @@
     <ClInclude Include="..\resources\Resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\General\pch.cpp" />
-    <ClCompile Include="..\src\General\VoiceAgent.cpp" />
+    <ClCompile Include="..\src\general\pch.cpp" />
+    <ClCompile Include="..\src\general\VoiceAgent.cpp" />
     <ClCompile Include="..\src\ui\MainFrm.cpp" />
-    <ClCompile Include="..\src\rtc\RtcManager.cpp" />
-    <ClCompile Include="..\src\rtm\RtmManager.cpp" />
     <ClCompile Include="..\src\api\TokenGenerator.cpp" />
     <ClCompile Include="..\src\api\HttpClient.cpp" />
     <ClCompile Include="..\src\api\AgentManager.cpp" />

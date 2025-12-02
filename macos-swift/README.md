@@ -175,9 +175,9 @@ struct KeyCenter {
 
 ### 步骤1：基础设置
 
-1. **初始化 RTC Engine**：在 `RtcManager.swift` 中创建 RTC Engine 实例，配置音频场景和角色。
+1. **初始化 RTC Engine**：在 `ViewController.swift` 的 `initializeRTC()` 方法中创建 RTC Engine 实例，配置音频场景和角色。
 
-2. **初始化 RTM Client**：在 `RtmManager.swift` 中创建 RTM Client 实例，使用 KeyCenter 中的 APP_ID 和 User ID。
+2. **初始化 RTM Client**：在 `ViewController.swift` 的 `initializeRTM()` 方法中创建 RTM Client 实例，使用 KeyCenter 中的 APP_ID 和 User ID。
 
 3. **配置 ConversationalAI API**：在 `ViewController.swift` 中初始化 ConversationalAI API，订阅频道消息以接收 AI Agent 的状态和转录。
 
@@ -240,16 +240,13 @@ macos-swift/
 │   │   ├── ConversationalAIAPIImpl.swift
 │   │   └── Transcript/
 │   │       └── TranscriptController.swift
-│   ├── Managers/                   # 管理器类
-│   │   ├── RtcManager.swift        # RTC SDK 管理器
-│   │   └── RtmManager.swift        # RTM SDK 管理器
-│   ├── Network/                    # 网络请求相关
-│   │   ├── HTTPClient.swift        # 统一 HTTP 请求封装 (NEW)
+│   ├── API/                        # API 相关封装
+│   │   ├── HTTPClient.swift        # 统一 HTTP 请求封装
 │   │   ├── TokenGenerator.swift    # Token 生成器（使用 HTTPClient）
 │   │   └── AgentManager.swift      # Agent 启动/停止管理（使用 HTTPClient）
-│   ├── Scene/                      # UI 界面
+│   ├── UI/                         # UI 界面
 │   │   ├── AppDelegate.swift       # 应用入口
-│   │   ├── ViewController.swift    # 主视图控制器（包含 User/Agent UID）
+│   │   ├── ViewController.swift    # 主视图控制器（直接管理 RTC/RTM Engine）
 │   │   └── MessageListView.swift   # 消息列表视图（实时字幕）
 │   ├── Resouces/                   # 资源文件
 │   │   ├── Assets.xcassets/
