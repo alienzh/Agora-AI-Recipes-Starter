@@ -92,9 +92,7 @@ cd Agora-AI-Recipes-Starter/harmonyos
    
 - 等待依赖同步完成
 
-3**配置 Agent 启动方式**：
-   
-   **方式一：直接调用 Agora RESTful API**（仅用于快速体验，不推荐用于生产）
+3. **配置 Agent 启动方式**：
    
    默认配置，无需额外设置。HarmonyOS 应用直接调用 Agora RESTful API 启动 Agent，方便开发者快速体验功能。
    
@@ -107,90 +105,52 @@ cd Agora-AI-Recipes-Starter/harmonyos
    
    ⚠️ **重要说明**：
    - 此方式**仅用于快速体验和开发测试**，**不推荐用于生产环境**
-   - 生产环境**必须**使用方式二，通过自己的业务后台中转请求
    - 直接在前端调用 Agora RESTful API 会暴露 REST Key 和 REST Secret，存在安全风险
    
-   **方式二：通过业务后台服务器中转**（生产环境必需）
-   
-   真实业务场景中，**不应该**直接在前端请求 Agora RESTful API，而应该通过自己的业务后台服务器中转。
-   
-   **核心要求**：
-   
-   - **REST Key 和 REST Secret 必须放在服务端**，绝对不能暴露在客户端代码中
-   - 客户端只请求自己的业务后台接口，业务后台再调用 Agora RESTful API
-   - 业务后台负责保管和管理 REST Key、REST Secret 等敏感信息
-   
-   **实现方式**：
-   
-   1. **参考实现**：`../server-python/agora_http_server.py` 展示了如何在服务端调用 Agora RESTful API
-      ```bash
-      cd ../server-python
-      python agora_http_server.py
-      ```
-      - Python 服务器从环境变量或配置文件读取 REST Key 和 REST Secret
-      - 服务端使用这些密钥调用 Agora API，客户端无需知道这些密钥
-   
-   2. **在自己的业务后台实现**：
-      - 参考 Python 服务器的实现逻辑，在你的业务后台（Java、Node.js、Python 等）实现 Agent 启动接口
-      - 将 REST Key 和 REST Secret 存储在服务端环境变量或配置文件中
-      - 客户端请求你的业务后台接口，业务后台使用 REST Key 和 REST Secret 调用 Agora API
-   
-   3. **在 `api/AgentStarter.ets` 中配置本地 Python 服务器的 IP 地址**（用于本地体验测试）：
-   ```typescript
-   export class AgentStarter {
-     // Switch between local server and Agora API by commenting/uncommenting the lines below
-   //    private static readonly AGORA_API_BASE_URL = 'https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects';
-     private static readonly AGORA_API_BASE_URL = 'http://<your-computer-ip>:8080';  // Local Python server IP (for local testing)
-   }
-   ```
-   
-   **说明**：
-   - `<your-computer-ip>` 替换为你运行 Python 服务器的电脑 IP 地址
-   - 查找电脑 IP：
-     - macOS/Linux: `ifconfig en0 | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'`
-     - Windows: `ipconfig`（查找 IPv4 地址）
-   - 确保 HarmonyOS 设备和电脑在同一局域网内
-   
-   **为什么必须使用业务后台中转**：
-   - **安全性**：REST Key 和 REST Secret 绝对不能暴露在客户端代码中，必须由服务端保管
-   - **业务逻辑**：可以在后台实现权限验证、计费、日志记录等业务逻辑
-   - **稳定性**：统一管理 API 调用，便于监控和错误处理
-   - **灵活性**：可以添加缓存、限流、重试等机制
-   - **合规性**：符合安全最佳实践，避免敏感信息泄露
-   
-   **注意**：
-   - 生产环境必须使用自己的服务端生成 Token，不要使用 `TokenGenerator`（详见代码中的警告）
+   ⚠️ **生产环境要求**：
+   - **必须将敏感信息放在后端**：`appCertificate`、`restKey`、`restSecret` 等敏感信息必须存储在服务端，绝对不能暴露在客户端代码中
+   - **客户端通过后端获取 Token**：客户端请求自己的业务后台接口，由服务端使用 `appCertificate` 生成 Token 并返回给客户端
+   - **客户端通过后端启动 Agent**：客户端请求自己的业务后台接口，由服务端使用 `restKey` 和 `restSecret` 调用 Agora RESTful API 启动 Agent
+   - **参考实现**：可参考 `../server-python/agora_http_server.py` 了解如何在服务端实现 Token 生成和 Agent 启动接口
 
 ## 测试验证
 
 ### 快速体验流程
 
-1. **Agent Home 页面**（`AgentHome`）：
-   - 运行应用，进入 Agent Home 页面
-   - 点击"Start Agent"按钮
-   - 按钮文本变为"Starting..."，应用自动：
+1. **启动应用**：
+   - 运行应用，直接进入 Agent Chat 页面
+   - 页面从上到下显示：
+     - **日志区域**：显示 Agent 启动相关的状态日志
+     - **转录区域**：显示对话转录内容，底部显示 Agent 状态
+     - **控制按钮**：初始显示 "Start Agent" 按钮
+
+2. **启动 Agent**：
+   - 点击 "Start Agent" 按钮
+   - 按钮文本变为 "Starting..."，应用自动：
      - 生成随机 channelName（格式：`channel_harmonyos_XXXX`）
      - 加入 RTC 频道并订阅消息（通过 RTC DataStream）
      - 连接成功后自动启动 AI Agent
-   - Agent 启动成功后，自动跳转到 Agent Living 页面
+   - Agent 启动成功后：
+     - "Start Agent" 按钮隐藏
+     - 显示 "Mute" 和 "Stop Agent" 按钮
 
-2. **Agent Living 页面**（`AgentLiving`）：
-   - 显示 Channel、UserId、AgentUid 信息
-   - 显示 Agent 状态
+3. **与 Agent 对话**：
    - 实时显示 USER 和 AGENT 的转录内容
-   - 可以开始与 AI Agent 对话
-   - 支持静音/取消静音功能
-   - 点击挂断按钮返回 Agent Home 页面
+   - AGENT 消息左对齐，USER 消息右对齐
+   - 转录区域底部显示当前 Agent 状态（idle、listening、thinking、speaking 等）
+   - 支持静音/取消静音功能（点击 Mute 按钮）
+   - 点击 "Stop Agent" 按钮结束对话并清理资源
 
 ### 功能验证清单
 
-- ✅ RTC 频道加入成功（查看状态消息）
-- ✅ 消息订阅成功（通过 RTC DataStream，查看状态消息）
-- ✅ Agent 启动成功（页面自动跳转）
+- ✅ RTC 频道加入成功（查看日志区域的状态消息）
+- ✅ 消息订阅成功（通过 RTC DataStream，查看日志区域的状态消息）
+- ✅ Agent 启动成功（按钮从 "Start Agent" 变为 "Mute" 和 "Stop Agent"）
 - ✅ 音频传输正常（能够听到 AI 回复）
 - ✅ 转录功能正常（显示 USER 和 AGENT 的转录内容及状态）
-- ✅ 静音/取消静音功能正常
-- ✅ 挂断功能正常（返回 Agent Home 页面）
+- ✅ Agent 状态显示正常（转录区域底部显示当前状态）
+- ✅ 静音/取消静音功能正常（点击 Mute 按钮）
+- ✅ 停止功能正常（点击 "Stop Agent" 按钮，清理资源并重置状态）
 
 ## 项目结构
 
@@ -199,25 +159,56 @@ harmonyos/
 ├── entry/
 │   └── src/main/ets/
 │       ├── api/                   # API 相关代码
+│       │   ├── AgentStarter.ets   # Agent 启动 API
+│       │   └── TokenGenerator.ets # Token 生成（仅用于开发测试）
 │       ├── common/                # 通用工具类
+│       │   ├── KeyCenter.ets     # Key 配置中心
+│       │   ├── PermissionHelper.ets # 权限管理
+│       │   └── TranscriptDataSource.ets # 转录数据源
 │       ├── convoaiApi/            # Conversational AI API
-│       ├── rtc/                   # RTC 管理
 │       ├── pages/                 # 页面
+│       │   ├── Index.ets          # 应用入口（简单包装 AgentChat）
+│       │   ├── AgentChat.ets      # 主页面（单页面架构）
+│       │   └── AgentChatController.ets # 业务逻辑控制器
 │       └── entryability/          # Ability
 ├── env.json                       # 环境配置（需要创建）
 ├── env.example.json               # 环境配置示例
 └── README.md                      # 本文档
 ```
 
+### 核心文件说明
+
+- **`pages/AgentChat.ets`**：主页面，采用单页面架构，包含：
+  - 日志显示区域（顶部）
+  - 转录列表和 Agent 状态（中间，合并在一个卡片中）
+  - 控制按钮（底部：Start/Mute/Stop）
+  
+- **`pages/AgentChatController.ets`**：业务逻辑控制器，负责：
+  - RTC 引擎初始化和频道管理
+  - Conversational AI API 集成
+  - Agent 启动和停止
+  - 状态管理（连接状态、静音状态、日志等）
+  - 转录数据管理
+
+- **`api/AgentStarter.ets`**：Agent 启动 API 封装，支持：
+  - 直接调用 Agora RESTful API（开发测试）
+  - 通过业务后台服务器中转（生产环境）
+
 ## 重要说明
 
 ### HarmonyOS 版本特性
 
+- **单页面架构**：采用单页面设计，所有功能（日志、状态、转录、控制）集中在一个页面，简化用户体验
+- **状态管理**：使用轮询机制（每 100ms）更新 UI 状态，适合单页面架构，无需复杂的回调机制
 - **消息传递方式**：HarmonyOS 版本使用 RTC DataStream 进行消息传递，**不需要**单独开通 RTM 功能
 - **配置方式**：使用 JSON 格式配置文件（`env.json`），构建时自动生成配置
 - **构建时配置**：构建脚本（`entry/hvigorfile.ts`）会在构建时读取 `harmonyos/env.json` 并自动生成 `entry/src/main/ets/common/KeyCenterConfig.ets`
 - **字幕渲染模式**：由于 HarmonyOS RTC SDK 能力限制，**仅支持 Text 模式渲染字幕**，不支持 Word 模式（逐词渲染）
 - **Token 续期**：自动处理 RTC token 续期，当 token 即将过期时自动更新
+- **UI 布局**：
+  - 日志区域：显示 Agent 启动相关的状态日志（仅显示 ViewModel 中的状态消息，不显示 IConversationalAIAPIEventHandler 回调的日志）
+  - 转录区域：AGENT 消息左对齐，USER 消息右对齐，底部显示 Agent 状态
+  - 控制按钮：初始显示 "Start Agent"，启动成功后显示 "Mute" 和 "Stop Agent"
 
 ## 相关资源
 

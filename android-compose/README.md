@@ -40,17 +40,15 @@
    ```
 
 2. **配置 Android 项目**：
-   - 使用 Android Studio 打开项目
-   - 等待 Gradle 同步完成
+    - 使用 Android Studio 打开项目
+    - 配置 Agora Key：
 
-3. **配置 Agora Key**：
-   
-   1. 复制 `env.example.properties` 文件为 `env.properties`：
-   ```bash
-   cp env.example.properties env.properties
-   ```
-   
-   2. 编辑 `env.properties` 文件，填入你的实际配置值：
+      复制 `env.example.properties` 文件为 `env.properties`：
+         ```bash
+         cp env.example.properties env.properties
+         ```
+
+   编辑 `env.properties` 文件，填入你的实际配置值：
    ```properties
    agora.appId=your_app_id
    agora.appCertificate=your_app_certificate
@@ -75,9 +73,7 @@
    - 每次启动时会自动生成随机的 channelName，格式为 `channel_compose_XXXX`（XXXX 为 4 位随机数字），无需手动配置。
    - ⚠️ **重要**：`TokenGenerator.kt` 中的 Token 生成功能仅用于演示和开发测试，**生产环境必须使用自己的服务端生成 Token**。代码中已添加详细警告说明。
 
-4. **配置 Agent 启动方式**：
-   
-   **方式一：直接调用 Agora RESTful API**（仅用于快速体验，不推荐用于生产）
+3. **配置 Agent 启动方式**：
    
    默认配置，无需额外设置。Android 应用直接调用 Agora RESTful API 启动 Agent，方便开发者快速体验功能。
    

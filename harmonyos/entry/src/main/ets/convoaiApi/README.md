@@ -66,12 +66,11 @@ Parses stream messages that may be split into multiple parts:
 import { createConversationalAIAPI, IConversationalAIAPIEventHandler } from './convoaiApi/ConversationalAIAPIImpl';
 import { ConversationalAIAPIConfig, TextMessage, Priority } from './convoaiApi/IConversationalAIAPI';
 import { TranscriptRenderMode } from './convoaiApi/subRender/TranscriptConfig';
-import { RtcManager } from '../rtc/RtcManager';
-
 // Create API instance
 // Note: HarmonyOS version only supports Text mode, Word mode is not supported
+// Note: RTC engine should be obtained from AgentChatController
 const config: ConversationalAIAPIConfig = {
-  rtcEngine: RtcManager.getRtcEngine()!,
+  rtcEngine: viewModel.getRtcEngine()!,
   renderMode: TranscriptRenderMode.Text, // Only Text mode is supported
   enableLog: true
 };

@@ -76,8 +76,6 @@
 
    3. **配置 Agent 启动方式**：
 
-      **方式一：直接调用 Agora RESTful API**（仅用于快速体验，不推荐用于生产）
-
       默认配置，无需额外设置。Android 应用直接调用 Agora RESTful API 启动 Agent，方便开发者快速体验功能。
 
       **使用前提**：
