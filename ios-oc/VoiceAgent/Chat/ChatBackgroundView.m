@@ -52,10 +52,6 @@
     self.controlBarView = [[UIView alloc] init];
     self.controlBarView.backgroundColor = [UIColor whiteColor];
     self.controlBarView.layer.cornerRadius = 16;
-    self.controlBarView.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.controlBarView.layer.shadowOpacity = 0.1;
-    self.controlBarView.layer.shadowOffset = CGSizeMake(0, 2);
-    self.controlBarView.layer.shadowRadius = 8;
     [self addSubview:self.controlBarView];
     
     // Mic Button

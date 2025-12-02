@@ -43,10 +43,6 @@ class ChatBackgroundView: UIView {
         // Control Bar
         controlBarView.backgroundColor = .white
         controlBarView.layer.cornerRadius = 16
-        controlBarView.layer.shadowColor = UIColor.black.cgColor
-        controlBarView.layer.shadowOpacity = 0.1
-        controlBarView.layer.shadowOffset = CGSize(width: 0, height: 2)
-        controlBarView.layer.shadowRadius = 8
         addSubview(controlBarView)
         
         // Mic Button

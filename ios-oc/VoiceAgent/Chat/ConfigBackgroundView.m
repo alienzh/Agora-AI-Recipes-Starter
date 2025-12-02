@@ -10,7 +10,6 @@
 
 @interface ConfigBackgroundView ()
 
-@property (nonatomic, strong, readwrite) UIImageView *logoImageView;
 @property (nonatomic, strong, readwrite) UITextField *channelNameTextField;
 @property (nonatomic, strong, readwrite) UIButton *startButton;
 
@@ -34,12 +33,6 @@
 - (void)setupUI {
     self.backgroundColor = [UIColor whiteColor];
     
-    // Logo ImageView
-    self.logoImageView = [[UIImageView alloc] init];
-    self.logoImageView.image = [UIImage imageNamed:@"logo"];
-    self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
-    [self addSubview:self.logoImageView];
-    
     // Channel Name TextField
     self.channelNameTextField = [[UITextField alloc] init];
     self.channelNameTextField.placeholder = @"输入频道名称";
@@ -48,7 +41,7 @@
     
     // Start Button
     self.startButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
+    [self.startButton setTitle:@"连接对话式AI引擎" forState:UIControlStateNormal];
     [self.startButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.startButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] 
                             forState:UIControlStateDisabled];
@@ -61,14 +54,9 @@
 - (void)setupConstraints {
     [self.channelNameTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self);
-        make.centerY.equalTo(self);
+        make.centerY.equalTo(self).offset(-40);
         make.width.mas_equalTo(250);
         make.height.mas_equalTo(50);
-    }];
-    
-    [self.logoImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self);
-        make.bottom.equalTo(self.channelNameTextField.mas_top).offset(-30);
     }];
     
     [self.startButton mas_makeConstraints:^(MASConstraintMaker *make) {

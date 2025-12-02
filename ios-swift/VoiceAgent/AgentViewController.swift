@@ -14,6 +14,7 @@ class AgentViewController: UIViewController {
     // MARK: - UI Components
     private let configBackgroundView = ConfigBackgroundView()
     private let chatBackgroundView = ChatBackgroundView()
+    private let debugInfoTextView = UITextView()
     
     // MARK: - State
     private let uid = Int.random(in: 1000...9999999)
@@ -37,6 +38,28 @@ class AgentViewController: UIViewController {
     // MARK: - Toast
     private var loadingToast: UIView?
     
+    // MARK: - Debug Info Helper
+    private func addDebugMessage(_ message: String) {
+        let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
+        let debugMessage = "[\(timestamp)] \(message)\n"
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.debugInfoTextView.text += debugMessage
+            
+            // Auto-scroll to bottom
+            let bottom = NSRange(location: self.debugInfoTextView.text.count - 1, length: 1)
+            self.debugInfoTextView.scrollRangeToVisible(bottom)
+        }
+    }
+    
+    private func clearDebugMessages() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.debugInfoTextView.text = "等待连接...\n"
+        }
+    }
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,6 +74,19 @@ class AgentViewController: UIViewController {
         
         title = "VoiceAgent"
         navigationController?.navigationBar.prefersLargeTitles = false
+        
+        // Debug Info TextView (always visible)
+        debugInfoTextView.isEditable = false
+        debugInfoTextView.isSelectable = true
+        debugInfoTextView.font = .systemFont(ofSize: 11)
+        debugInfoTextView.textColor = .label
+        debugInfoTextView.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
+        debugInfoTextView.layer.cornerRadius = 8
+        debugInfoTextView.layer.borderWidth = 0.5
+        debugInfoTextView.layer.borderColor = UIColor.separator.cgColor
+        debugInfoTextView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        debugInfoTextView.text = "等待连接...\n"
+        view.addSubview(debugInfoTextView)
         
         // Config Background View
         view.addSubview(configBackgroundView)
@@ -67,12 +103,23 @@ class AgentViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        configBackgroundView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        // Debug Info TextView (always visible at top)
+        debugInfoTextView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.left.right.equalToSuperview().inset(20)
+            make.height.equalTo(120)
         }
         
+        // Config Background View (below debug view)
+        configBackgroundView.snp.makeConstraints { make in
+            make.top.equalTo(debugInfoTextView.snp.bottom).offset(20)
+            make.left.right.bottom.equalToSuperview()
+        }
+        
+        // Chat Background View (below debug view)
         chatBackgroundView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(debugInfoTextView.snp.bottom).offset(20)
+            make.left.right.bottom.equalToSuperview()
         }
     }
     
@@ -94,8 +141,10 @@ class AgentViewController: UIViewController {
             let rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: self)
             self.rtmEngine = rtmClient
             print("[Engine Init] RTM initialized successfully")
+            addDebugMessage("RTM Client 初始化成功")
         } catch {
             print("[Engine Init] RTM initialization failed: \(error)")
+            addDebugMessage("RTM Client 初始化失败")
         }
     }
     
@@ -117,6 +166,7 @@ class AgentViewController: UIViewController {
         
         self.rtcEngine = rtcEngine
         print("[Engine Init] RTC initialized successfully")
+        addDebugMessage("RTC Engine 初始化成功")
     }
     
     private func initializeConvoAIAPI() {
@@ -182,13 +232,17 @@ class AgentViewController: UIViewController {
     
     // MARK: - Token Generation
     private func generateUserToken() async throws {
+        addDebugMessage("获取 Token 调用中...")
+        
         return try await withCheckedThrowingContinuation { continuation in
             NetworkManager.shared.generateToken(channelName: channel, uid: "\(uid)", types: [.rtc, .rtm]) { token in
                 guard let token = token else {
+                    self.addDebugMessage("获取 Token 调用失败")
                     continuation.resume(throwing: NSError(domain: "generateUserToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
                     return
                 }
                 self.token = token
+                self.addDebugMessage("获取 Token 调用成功")
                 continuation.resume()
             }
         }
@@ -214,13 +268,18 @@ class AgentViewController: UIViewController {
             throw NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTM engine 未初始化"])
         }
         
+        addDebugMessage("RTM Login 调用中...")
+        
         return try await withCheckedThrowingContinuation { continuation in
             rtmEngine.login(token) { res, error in
                 if let error = error {
+                    self.addDebugMessage("RTM Login 调用失败: \(error.localizedDescription)")
                     continuation.resume(throwing: NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "rtm 登录失败: \(error.localizedDescription)"]))
                 } else if let _ = res {
+                    self.addDebugMessage("RTM Login 调用成功")
                     continuation.resume()
                 } else {
+                    self.addDebugMessage("RTM Login 调用失败")
                     continuation.resume(throwing: NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "rtm 登录失败"]))
                 }
             }
@@ -233,6 +292,8 @@ class AgentViewController: UIViewController {
             throw NSError(domain: "joinRTCChannel", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTC engine 未初始化"])
         }
         
+        addDebugMessage("joinChannel 调用中...")
+        
         let options = AgoraRtcChannelMediaOptions()
         options.clientRoleType = .broadcaster
         options.publishMicrophoneTrack = true
@@ -241,7 +302,10 @@ class AgentViewController: UIViewController {
         options.autoSubscribeVideo = true
         let result = rtcEngine.joinChannel(byToken: token, channelId: channel, uid: UInt(uid), mediaOptions: options)
         if result != 0 {
+            addDebugMessage("joinChannel 调用失败: ret=\(result)")
             throw NSError(domain: "joinRTCChannel", code: Int(result), userInfo: [NSLocalizedDescriptionKey: "加入 RTC 频道失败，错误码: \(result)"])
+        } else {
+            addDebugMessage("joinChannel 调用成功: ret=\(result)")
         }
     }
     
@@ -264,6 +328,8 @@ class AgentViewController: UIViewController {
     
     // MARK: - Agent Management
     private func startAgent() async throws {
+        addDebugMessage("Agent Start 调用中...")
+        
         return try await withCheckedThrowingContinuation { continuation in
             let parameter: [String: Any] = [
                 "name": channel,
@@ -277,14 +343,17 @@ class AgentViewController: UIViewController {
             ]
             AgentManager.startAgent(parameter: parameter) { agentId, error in
                 if let error = error {
+                    self.addDebugMessage("Agent Start 调用失败: \(error.localizedDescription)")
                     continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
                     return
                 }
                 
                 if let agentId = agentId {
                     self.agentId = agentId
+                    self.addDebugMessage("Agent Start 调用成功 (agentId: \(agentId))")
                     continuation.resume()
                 } else {
+                    self.addDebugMessage("Agent Start 调用失败: 未返回 agentId")
                     continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: "请求失败"]))
                 }
             }
@@ -313,6 +382,7 @@ class AgentViewController: UIViewController {
         
         transcripts.removeAll()
         chatBackgroundView.tableView.reloadData()
+        clearDebugMessages()
         isMicMuted = false
         currentAgentState = .unknown
         chatBackgroundView.updateStatusView(state: .unknown)
@@ -433,12 +503,23 @@ extension AgentViewController: UITableViewDataSource, UITableViewDelegate {
 
 // MARK: - AgoraRtcEngineDelegate
 extension AgentViewController: AgoraRtcEngineDelegate {
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
+        print("[RTC Call Back] didJoinChannel: \(channel), uid: \(uid)")
+        addDebugMessage("onJoinChannelSuccess")
+    }
+    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         print("[RTC Call Back] didJoinedOfUid uid: \(uid)")
+        addDebugMessage("onUserJoined: \(uid)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
         print("[RTC Call Back] didOfflineOfUid uid: \(uid)")
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
+        print("[RTC Call Back] didOccurError: \(errorCode.rawValue)")
+        addDebugMessage("onError: \(errorCode.rawValue)")
     }
 }
 

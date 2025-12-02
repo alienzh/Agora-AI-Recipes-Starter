@@ -10,7 +10,6 @@ import SnapKit
 
 class ConfigBackgroundView: UIView {
     // MARK: - UI Components
-    let logoImageView = UIImageView()
     let channelNameTextField = UITextField()
     let startButton = UIButton(type: .system)
     
@@ -29,15 +28,11 @@ class ConfigBackgroundView: UIView {
     private func setupUI() {
         backgroundColor = .systemBackground
         
-        logoImageView.image = UIImage(named: "logo")
-        logoImageView.contentMode = .scaleAspectFit
-        addSubview(logoImageView)
-        
         channelNameTextField.placeholder = "输入频道名称"
         channelNameTextField.borderStyle = .roundedRect
         addSubview(channelNameTextField)
         
-        startButton.setTitle("Start", for: .normal)
+        startButton.setTitle("连接对话式AI引擎", for: .normal)
         startButton.setTitleColor(.white, for: .normal)
         startButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
         startButton.backgroundColor = .systemBlue.withAlphaComponent(0.4)
@@ -49,14 +44,9 @@ class ConfigBackgroundView: UIView {
     private func setupConstraints() {
         channelNameTextField.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-40)
             make.width.equalTo(250)
             make.height.equalTo(50)
-        }
-        
-        logoImageView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalTo(channelNameTextField.snp.top).offset(-30)
         }
         
         startButton.snp.makeConstraints { make in

@@ -17,27 +17,36 @@ struct AgentView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                // 明确的背景色
-                Color.white
-                    .ignoresSafeArea()
+            VStack(spacing: 0) {
+                // Debug Info View (always visible at top)
+                DebugInfoView(debugMessages: viewModel.debugMessages)
+                    .frame(height: 120)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                 
-                // Config View
-                if viewModel.showConfigView {
-                    ConfigView(viewModel: viewModel)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .onAppear {
-                            print("[AgentView] ConfigView appeared")
-                        }
-                }
-                
-                // Chat View
-                if viewModel.showChatView {
-                    ChatView(viewModel: viewModel)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .onAppear {
-                            print("[AgentView] ChatView appeared")
-                        }
+                // Config View or Chat View
+                ZStack {
+                    // 明确的背景色
+                    Color.white
+                        .ignoresSafeArea()
+                    
+                    // Config View
+                    if viewModel.showConfigView {
+                        ConfigView(viewModel: viewModel)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .onAppear {
+                                print("[AgentView] ConfigView appeared")
+                            }
+                    }
+                    
+                    // Chat View
+                    if viewModel.showChatView {
+                        ChatView(viewModel: viewModel)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .onAppear {
+                                print("[AgentView] ChatView appeared")
+                            }
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -66,24 +75,63 @@ struct AgentView: View {
     }
 }
 
+// MARK: - Debug Info View
+struct DebugInfoView: View {
+    let debugMessages: String
+    
+    var body: some View {
+        UITextViewWrapper(text: debugMessages)
+            .frame(maxHeight: .infinity)
+            .background(Color(white: 0.95))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color(uiColor: .separator), lineWidth: 0.5)
+            )
+    }
+}
+
+// MARK: - UITextView Wrapper for Selectable Text
+struct UITextViewWrapper: UIViewRepresentable {
+    let text: String
+    
+    func makeUIView(context: Context) -> UITextView {
+        let textView = UITextView()
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.font = .systemFont(ofSize: 11)
+        textView.textColor = .label
+        textView.backgroundColor = .clear
+        textView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        textView.textContainer.lineFragmentPadding = 0
+        return textView
+    }
+    
+    func updateUIView(_ uiView: UITextView, context: Context) {
+        if uiView.text != text {
+            uiView.text = text
+            // Auto-scroll to bottom
+            let bottom = NSRange(location: text.count - 1, length: 1)
+            uiView.scrollRangeToVisible(bottom)
+        }
+    }
+}
+
 // MARK: - Config View
 struct ConfigView: View {
     @ObservedObject var viewModel: AgentViewModel
     
     var body: some View {
         VStack(spacing: 30) {
-            Image("logo")
-            
             TextField("输入频道名称", text: $viewModel.channelName)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
                 .frame(width: 250, height: 50)
-//                .foregroundColor(.white)
             
             Button(action: {
                 viewModel.startConnection()
             }) {
-                Text("Start")
+                Text("连接对话式AI引擎")
                     .foregroundColor(.white)
                     .frame(width: 250, height: 50)
                     .background(viewModel.channelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.blue.opacity(0.4) : Color.blue)
@@ -146,7 +194,6 @@ struct ControlBarView: View {
         .padding(.vertical, 16)
         .background(Color.white)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 2)
     }
 }
 

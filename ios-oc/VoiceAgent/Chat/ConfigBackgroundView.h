@@ -11,7 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ConfigBackgroundView : UIView
 
-@property(nonatomic, strong, readonly) UIImageView *logoImageView;
 @property(nonatomic, strong, readonly) UITextField *channelNameTextField;
 @property(nonatomic, strong, readonly) UIButton *startButton;
 

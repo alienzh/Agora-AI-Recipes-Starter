@@ -61,6 +61,7 @@
 // MARK: - UI Components
 @property (nonatomic, strong) ConfigBackgroundView *configBackgroundView;
 @property (nonatomic, strong) ChatBackgroundView *chatBackgroundView;
+@property (nonatomic, strong) UITextView *debugInfoTextView;
 
 // MARK: - State
 @property (nonatomic, assign) NSInteger uid;
@@ -105,12 +106,48 @@
     [self initializeEngines];
 }
 
+// MARK: - Debug Info Helper
+- (void)addDebugMessage:(NSString *)message {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setTimeStyle:NSDateFormatterMediumStyle];
+    NSString *timestamp = [formatter stringFromDate:[NSDate date]];
+    NSString *debugMessage = [NSString stringWithFormat:@"[%@] %@\n", timestamp, message];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.debugInfoTextView.text = [self.debugInfoTextView.text stringByAppendingString:debugMessage];
+        
+        // Auto-scroll to bottom
+        NSRange bottom = NSMakeRange(self.debugInfoTextView.text.length - 1, 1);
+        [self.debugInfoTextView scrollRangeToVisible:bottom];
+    });
+}
+
+- (void)clearDebugMessages {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.debugInfoTextView.text = @"等待连接...\n";
+    });
+}
+
 // MARK: - UI Setup
 - (void)setupUI {
     self.view.backgroundColor = [UIColor whiteColor];
     
     self.title = @"VoiceAgent";
     self.navigationController.navigationBar.prefersLargeTitles = NO;
+    
+    // Debug Info TextView (always visible)
+    self.debugInfoTextView = [[UITextView alloc] init];
+    self.debugInfoTextView.editable = NO;
+    self.debugInfoTextView.selectable = YES;
+    self.debugInfoTextView.font = [UIFont systemFontOfSize:11];
+    self.debugInfoTextView.textColor = [UIColor labelColor];
+    self.debugInfoTextView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+    self.debugInfoTextView.layer.cornerRadius = 8;
+    self.debugInfoTextView.layer.borderWidth = 0.5;
+    self.debugInfoTextView.layer.borderColor = [UIColor separatorColor].CGColor;
+    self.debugInfoTextView.textContainerInset = UIEdgeInsetsMake(8, 8, 8, 8);
+    self.debugInfoTextView.text = @"等待连接...\n";
+    [self.view addSubview:self.debugInfoTextView];
     
     // Config Background View
     self.configBackgroundView = [[ConfigBackgroundView alloc] init];
@@ -138,12 +175,23 @@
 }
 
 - (void)setupConstraints {
-    [self.configBackgroundView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self.view);
+    // Debug Info TextView (always visible at top)
+    [self.debugInfoTextView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop).offset(20);
+        make.left.right.equalTo(self.view).inset(20);
+        make.height.mas_equalTo(120);
     }];
     
+    // Config Background View (below debug view)
+    [self.configBackgroundView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.debugInfoTextView.mas_bottom).offset(20);
+        make.left.right.bottom.equalTo(self.view);
+    }];
+    
+    // Chat Background View (below debug view)
     [self.chatBackgroundView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self.view);
+        make.top.equalTo(self.debugInfoTextView.mas_bottom).offset(20);
+        make.left.right.bottom.equalTo(self.view);
     }];
 }
 
@@ -165,8 +213,10 @@
     self.rtmEngine = [[AgoraRtmClientKit alloc] initWithConfig:rtmConfig delegate:self error:&initError];
     if (initError) {
         NSLog(@"[Engine Init] RTM initialization failed: %@", initError);
+        [self addDebugMessage:@"RTM Client 初始化失败"];
     } else {
         NSLog(@"[Engine Init] RTM initialized successfully");
+        [self addDebugMessage:@"RTM Client 初始化成功"];
     }
 }
 
@@ -188,6 +238,7 @@
     [self.rtcEngine setParameters:@"{\"che.audio.enable.predump\":{\"enable\":\"true\",\"duration\":\"60\"}}"];
     
     NSLog(@"[Engine Init] RTC initialized successfully");
+    [self addDebugMessage:@"RTC Engine 初始化成功"];
 }
 
 - (void)initializeConvoAIAPI {
@@ -349,6 +400,8 @@
 
 // MARK: - Token Generation
 - (BOOL)generateUserToken:(NSError **)error {
+    [self addDebugMessage:@"获取 Token 调用中..."];
+    
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block BOOL success = NO;
     __block NSError *blockError = nil;
@@ -361,8 +414,10 @@
                                       success:^(NSString * _Nullable token) {
         if (token && token.length > 0) {
             self.token = token;
+            [self addDebugMessage:@"获取 Token 调用成功"];
             success = YES;
         } else {
+            [self addDebugMessage:@"获取 Token 调用失败"];
             blockError = [NSError errorWithDomain:@"generateUserToken" 
                                              code:-1 
                                          userInfo:@{NSLocalizedDescriptionKey: @"获取 token 失败，请重试"}];
@@ -419,14 +474,18 @@
         return NO;
     }
     
+    [self addDebugMessage:@"RTM Login 调用中..."];
+    
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block BOOL success = NO;
     __block NSError *blockError = nil;
     
     [self.rtmEngine loginByToken:self.token completion:^(AgoraRtmCommonResponse * _Nullable response, AgoraRtmErrorInfo * _Nullable errorInfo) {
         if (errorInfo == nil) {
+            [self addDebugMessage:@"RTM Login 调用成功"];
             success = YES;
         } else {
+            [self addDebugMessage:[NSString stringWithFormat:@"RTM Login 调用失败: %@", errorInfo.reason]];
             blockError = [NSError errorWithDomain:@"loginRTM" code:errorInfo.errorCode userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"rtm 登录失败: %@", errorInfo.reason]}];
         }
         dispatch_semaphore_signal(semaphore);
@@ -456,12 +515,17 @@
     options.autoSubscribeAudio = YES;
     options.autoSubscribeVideo = YES;
     
+    [self addDebugMessage:@"joinChannel 调用中..."];
+    
     NSInteger result = [self.rtcEngine joinChannelByToken:self.token channelId:self.channel uid:self.uid mediaOptions:options joinSuccess:nil];
     if (result != 0) {
+        [self addDebugMessage:[NSString stringWithFormat:@"joinChannel 调用失败: ret=%ld", (long)result]];
         if (error) {
             *error = [NSError errorWithDomain:@"joinRTCChannel" code:result userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"加入 RTC 频道失败，错误码: %ld", (long)result]}];
         }
         return NO;
+    } else {
+        [self addDebugMessage:[NSString stringWithFormat:@"joinChannel 调用成功: ret=%ld", (long)result]];
     }
     
     return YES;
@@ -498,6 +562,8 @@
 
 // MARK: - Agent Management
 - (BOOL)startAgent:(NSError **)error {
+    [self addDebugMessage:@"Agent Start 调用中..."];
+    
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block BOOL success = NO;
     __block NSError *blockError = nil;
@@ -515,11 +581,14 @@
     
     [AgentManager startAgentWithParameter:parameter completion:^(NSString * _Nullable agentId, NSError * _Nullable err) {
         if (err) {
+            [self addDebugMessage:[NSString stringWithFormat:@"Agent Start 调用失败: %@", err.localizedDescription]];
             blockError = [NSError errorWithDomain:@"startAgent" code:-1 userInfo:@{NSLocalizedDescriptionKey: err.localizedDescription}];
         } else if (agentId) {
             self.agentId = agentId;
+            [self addDebugMessage:[NSString stringWithFormat:@"Agent Start 调用成功 (agentId: %@)", agentId]];
             success = YES;
         } else {
+            [self addDebugMessage:@"Agent Start 调用失败: 未返回 agentId"];
             blockError = [NSError errorWithDomain:@"startAgent" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"请求失败"}];
         }
         dispatch_semaphore_signal(semaphore);
@@ -564,6 +633,7 @@
     self.agentId = @"";
     self.token = @"";
     self.agentToken = @"";
+    [self clearDebugMessages];
 }
 
 // MARK: - Actions
@@ -674,12 +744,23 @@
 }
 
 // MARK: - AgoraRtcEngineDelegate
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinChannel:(NSString *)channel withUid:(NSUInteger)uid elapsed:(NSInteger)elapsed {
+    NSLog(@"[RTC Call Back] didJoinChannel: %@, uid: %lu", channel, (unsigned long)uid);
+    [self addDebugMessage:@"onJoinChannelSuccess"];
+}
+
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed {
     NSLog(@"[RTC Call Back] didJoinedOfUid uid: %lu", (unsigned long)uid);
+    [self addDebugMessage:[NSString stringWithFormat:@"onUserJoined: %lu", (unsigned long)uid]];
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didOfflineOfUid:(NSUInteger)uid reason:(AgoraUserOfflineReason)reason {
     NSLog(@"[RTC Call Back] didOfflineOfUid uid: %lu", (unsigned long)uid);
+}
+
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine didOccurError:(AgoraErrorCode)errorCode {
+    NSLog(@"[RTC Call Back] didOccurError: %ld", (long)errorCode);
+    [self addDebugMessage:[NSString stringWithFormat:@"onError: %ld", (long)errorCode]];
 }
 
 // MARK: - AgoraRtmClientDelegate
