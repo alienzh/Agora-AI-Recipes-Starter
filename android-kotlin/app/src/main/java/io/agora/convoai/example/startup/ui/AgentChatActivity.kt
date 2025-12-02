@@ -1,76 +1,150 @@
 package io.agora.convoai.example.startup.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
-import io.agora.convoai.example.startup.ui.common.SnackbarHelper
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.convoai.example.startup.R
+import io.agora.convoai.example.startup.databinding.ActivityAgentChatBinding
 import io.agora.convoai.example.startup.databinding.ItemTranscriptAgentBinding
 import io.agora.convoai.example.startup.databinding.ItemTranscriptUserBinding
-import io.agora.convoai.example.startup.ui.common.BaseFragment
+import io.agora.convoai.example.startup.ui.common.BaseActivity
 import io.agora.convoai.convoaiApi.Transcript
 import io.agora.convoai.convoaiApi.TranscriptStatus
 import io.agora.convoai.convoaiApi.TranscriptType
 import kotlinx.coroutines.launch
 import kotlin.text.ifEmpty
 import androidx.core.graphics.toColorInt
-import androidx.navigation.fragment.findNavController
-import io.agora.convoai.example.startup.databinding.FragmentAgentLivingBinding
+import io.agora.convoai.example.startup.tools.PermissionHelp
 
 /**
- * Fragment for displaying voice assistant UI and transcript list
- * This fragment only handles UI display, agent is started in AgentHomeFragment
+ * Activity for agent chat interface
+ * Layout: log, agent status, transcript, start/control buttons
  */
-class AgentLivingFragment : BaseFragment<FragmentAgentLivingBinding>() {
+class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
 
-    private val viewModel: ConversationViewModel by activityViewModels()
+    private lateinit var viewModel: AgentChatViewModel
+    private lateinit var mPermissionHelp: PermissionHelp
     private val transcriptAdapter: TranscriptAdapter = TranscriptAdapter()
 
     // Track whether to automatically scroll to bottom
     private var autoScrollToBottom = true
     private var isScrollBottom = false
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentAgentLivingBinding? {
-        return FragmentAgentLivingBinding.inflate(inflater, container, false)
+    override fun getViewBinding(): ActivityAgentChatBinding {
+        return ActivityAgentChatBinding.inflate(layoutInflater)
     }
 
     override fun initData() {
         super.initData()
+        viewModel = ViewModelProvider(this)[AgentChatViewModel::class.java]
+        mPermissionHelp = PermissionHelp(this)
 
         // Observe UI state changes
         observeUiState()
 
         // Observe transcript list changes
         observeTranscriptList()
+
+        // Observe debug log changes
+        observeDebugLogs()
     }
 
     override fun initView() {
         mBinding?.apply {
-            setOnApplyWindowInsets(root)
-
-            // Initialize UI with current state from ViewModel
-            val currentState = viewModel.uiState.value
-            tvChannel.text = "Channel: ${currentState.channelName}"
-            tvUid.text = "UserId: ${currentState.userUid}"
-            tvAgentUid.text = "AgentUid: ${currentState.agentUid}"
+            setOnApplyWindowInsetsListener(root)
 
             // Setup RecyclerView for transcript list
             setupRecyclerView()
 
+            // Start button click listener
+            btnStart.setOnClickListener {
+                // Generate random channel name each time joining channel
+                val channelName = AgentChatViewModel.generateRandomChannelName()
+
+                // Check microphone permission before joining channel
+                checkMicrophonePermission { granted ->
+                    if (granted) {
+                        viewModel.joinChannelAndLogin(channelName)
+                    } else {
+                        Toast.makeText(
+                            this@AgentChatActivity,
+                            "Microphone permission is required to join channel",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+
+            // Mute button click listener
             btnMute.setOnClickListener {
                 viewModel.toggleMute()
             }
-            btnHangup.setOnClickListener {
-                handleHangup()
+
+            // Stop button click listener
+            btnStop.setOnClickListener {
+                viewModel.hangup()
             }
         }
+    }
+
+    override fun supportOnBackPressed(): Boolean {
+        return false
+    }
+
+    private fun checkMicrophonePermission(granted: (Boolean) -> Unit) {
+        if (mPermissionHelp.hasMicPerm()) {
+            granted.invoke(true)
+        } else {
+            mPermissionHelp.checkMicPerm(
+                granted = { granted.invoke(true) },
+                unGranted = {
+                    showPermissionDialog(
+                        "Permission Required",
+                        "Microphone permission is required for voice chat. Please grant the permission to continue.",
+                        onResult = {
+                            if (it) {
+                                mPermissionHelp.launchAppSettingForMic(
+                                    granted = { granted.invoke(true) },
+                                    unGranted = { granted.invoke(false) }
+                                )
+                            } else {
+                                granted.invoke(false)
+                            }
+                        }
+                    )
+                }
+            )
+        }
+    }
+
+    private fun showPermissionDialog(title: String, content: String, onResult: (Boolean) -> Unit) {
+        if (isFinishing || isDestroyed || supportFragmentManager.isStateSaved) return
+
+        CommonDialog.Builder()
+            .setTitle(title)
+            .setContent(content)
+            .setPositiveButton("Retry") {
+                onResult.invoke(true)
+            }
+            .setNegativeButton("Exit") {
+                onResult.invoke(false)
+            }
+            .setCancelable(false)
+            .build()
+            .show(supportFragmentManager, "permission_dialog")
+    }
+
+    private fun handleStop() {
+        viewModel.hangup()
     }
 
     /**
@@ -78,7 +152,7 @@ class AgentLivingFragment : BaseFragment<FragmentAgentLivingBinding>() {
      */
     private fun setupRecyclerView() {
         mBinding?.rvTranscript?.apply {
-            layoutManager = LinearLayoutManager(requireContext()).apply {
+            layoutManager = LinearLayoutManager(this@AgentChatActivity).apply {
                 reverseLayout = false
             }
             adapter = transcriptAdapter
@@ -116,63 +190,36 @@ class AgentLivingFragment : BaseFragment<FragmentAgentLivingBinding>() {
         }
     }
 
-    override fun onHandleOnBackPressed() {
-        // Handle back press (including swipe back gesture) same as hangup button
-        handleHangup()
-    }
-
-    private fun handleHangup() {
-        viewModel.hangup()
-        if (isAdded) {
-            findNavController().popBackStack()
-        }
-    }
-
     private fun observeUiState() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 mBinding?.apply {
-                    // Update channel, user, agent info from state
-                    if (state.channelName.isNotEmpty()) {
-                        tvChannel.text = "Channel: ${state.channelName}"
-                    }
-                    if (state.userUid != 0) {
-                        tvUid.text = "UserId: ${state.userUid}"
-                    }
-                    if (state.agentUid != 0) {
-                        tvAgentUid.text = "AgentUid: ${state.agentUid}"
+                    // Update button visibility based on connection state
+                    val isConnected = state.connectionState == AgentChatViewModel.ConnectionState.Connected
+                    val isConnecting = state.connectionState == AgentChatViewModel.ConnectionState.Connecting
+
+                    // Show/hide buttons
+                    llStart.visibility = if (isConnected) View.GONE else View.VISIBLE
+                    llControls.visibility = if (isConnected) View.VISIBLE else View.GONE
+                    // Update button loading state
+                    if (isConnecting) {
+                        btnStart.text = "Starting..."
+                        btnStart.isEnabled = false
+                    } else {
+                        btnStart.text = "Start Agent"
+                        btnStart.isEnabled = true
                     }
 
                     // Update mute button UI
-
                     btnMute.setImageResource(
                         if (state.isMuted) R.drawable.ic_mic_off else R.drawable.ic_mic
                     )
-                    val muteBackground = if (state.isMuted) {
-                        R.drawable.bg_button_mute_muted_selector
-                    } else {
-                        R.drawable.bg_button_mute_selector
-                    }
-                    btnMute.setBackgroundResource(muteBackground)
-                }
-
-                // Show status messages via Snackbar (only if fragment is visible)
-
-                if (isAdded && isResumed) {
-                    when {
-                        state.connectionState == ConversationViewModel.ConnectionState.Error -> {
-                            SnackbarHelper.showError(this@AgentLivingFragment, state.statusMessage)
-                        }
-                        state.statusMessage.isNotEmpty() -> {
-                            SnackbarHelper.showNormal(this@AgentLivingFragment, state.statusMessage)
-                        }
-                    }
                 }
             }
         }
 
         // Observe agent state
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             viewModel.agentState.collect { agentState ->
                 mBinding?.apply {
                     agentState?.let {
@@ -188,12 +235,28 @@ class AgentLivingFragment : BaseFragment<FragmentAgentLivingBinding>() {
     }
 
     private fun observeTranscriptList() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             viewModel.transcriptList.collect { transcriptList ->
                 // Update transcript list
                 transcriptAdapter.submitList(transcriptList)
                 if (autoScrollToBottom) {
                     scrollToBottom()
+                }
+            }
+        }
+    }
+
+    private fun observeDebugLogs() {
+        lifecycleScope.launch {
+            viewModel.debugLogList.collect { logList ->
+                mBinding?.apply {
+                    // Update log text with all logs, separated by newlines
+                    tvLog.text = logList.joinToString("\n").ifEmpty { "log" }
+                    // Auto scroll to bottom
+                    tvLog.post {
+                        val scrollView = tvLog.parent as? android.widget.ScrollView
+                        scrollView?.fullScroll(android.view.View.FOCUS_DOWN)
+                    }
                 }
             }
         }
@@ -225,7 +288,6 @@ class AgentLivingFragment : BaseFragment<FragmentAgentLivingBinding>() {
             }
         }
     }
-
 }
 
 /**

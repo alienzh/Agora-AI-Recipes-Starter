@@ -8,13 +8,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#BBBBBB</color>
+    <color name="red">#FFE6544B</color>
 
     <!-- Primary color for modern UI -->
     <color name="colorPrimary">#6366F1</color>
     <color name="colorPrimaryDark">#4F46E5</color>
     <color name="colorPrimaryLight">#818CF8</color>
     <color name="colorAccent">#10B981</color>
-    
+
     <!-- Snackbar colors -->
     <color name="snackbar_background">#E8000000</color>
     <color name="snackbar_background_error">#E8D32F2F</color>
