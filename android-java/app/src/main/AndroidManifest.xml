@@ -28,7 +28,7 @@
         android:theme="@style/Theme.Agentstarterconvoaiandroid">
 
         <activity
-            android:name="io.agora.convoai.example.startup.ui.MainActivity"
+            android:name="io.agora.convoai.example.startup.ui.AgentChatActivity"
             android:exported="true"
             android:keepScreenOn="true">
             <intent-filter>
