@@ -494,11 +494,12 @@ void CMainFrame::JoinRTCChannel(const std::string& token)
 void CMainFrame::LoginRTM(const std::string& token)
 {
     if (!m_rtmClient) {
-        LogToView(_T("RTM login FAIL"));
+        LogToView(_T("RTM login FAIL: nil"));
         PostMessage(WM_RTM_LOGIN_FAILED, 0, 0);
         return;
     }
     
+    LogToView(_T("RTM login..."));
     uint64_t requestId = 0;
     m_rtmClient->login(token.c_str(), requestId);
 }
