@@ -138,6 +138,7 @@ void CMainFrame::SetupUI()
     SetupLogPanel();
     SetupTopPanel();
     SetupBottomPanel();
+    LayoutPanels();
 }
 
 void CMainFrame::SetupTopPanel()
