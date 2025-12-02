@@ -8,8 +8,7 @@ function EntranceView({ onStart }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (channelName.trim()) {
-      // 生成一个简单的 uid（实际项目中可能需要更复杂的逻辑）
-      const uid = Math.random().toString(36).substring(7)
+      const uid = Math.floor(Math.random() * (9999999 - 1000 + 1)) + 1000
       onStart(uid, channelName.trim())
     }
   }

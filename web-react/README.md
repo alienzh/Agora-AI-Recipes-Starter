@@ -1,4 +1,4 @@
-# Agent Starter React
+# Web React
 
 一个基于 React 和 Vite 的前端项目。
 
@@ -60,7 +60,7 @@ const appId = env.AG_APP_ID;
 ## 项目结构
 
 ```
-agent-starter-react/
+web-react/
 ├── src/
 │   ├── config/
 │   │   └── env.js       # 环境变量配置
