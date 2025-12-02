@@ -7,14 +7,16 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
+#include <functional>
 
-#include "../rtc/RtcManager.h"
-#include "../rtm/RtmManager.h"
+#include <IAgoraRtcEngine.h>
+#include <IAgoraRtmClient.h>
+#include <AgoraRtmBase.h>
 #include "../ConversationalAIAPI/ConversationalAIAPI.h"
 
 class CMainFrame : public CFrameWnd, 
                    public agora::rtc::IRtcEngineEventHandler,
-                   public IRtmManagerEventHandler,
                    public IConversationalAIAPIEventHandler
 {
     DECLARE_DYNAMIC(CMainFrame)
@@ -30,29 +32,27 @@ public:
 #endif
 
 private:
-    // UI Components - Top Panel (Transcript)
+    // UI Components
     CStatic m_topPanel;
-    CListCtrl m_listMessages;
-    CStatic m_labelAgentStatus;
-    
-    // UI Components - Log Panel (right side)
     CStatic m_logPanel;
-    CListCtrl m_listLog;
-    
-    // UI Components - Bottom Panel (Control)
     CStatic m_bottomPanel;
+    CListCtrl m_listMessages;
+    CListCtrl m_listLog;
+    CStatic m_labelAgentStatus;
     CButton m_btnStart;
     CButton m_btnStop;
     CButton m_btnMute;
-    
-    // Fonts
     CFont m_normalFont;
     CFont m_smallFont;
     
-    // Agora SDK
-    RtcManager& m_rtcManager;
-    RtmManager& m_rtmManager;
+    // Agora SDK (direct management like macOS)
+    agora::rtc::IRtcEngine* m_rtcEngine;
+    agora::rtm::IRtmClient* m_rtmClient;
     std::unique_ptr<ConversationalAIAPI> m_convoAIAPI;
+    
+    // RTM Event Handler (internal class)
+    class RtmEventHandler;
+    std::unique_ptr<RtmEventHandler> m_rtmHandler;
     
     // State
     std::string m_channelName;
@@ -61,7 +61,9 @@ private:
     std::string m_agentId;
     bool m_isActive;
     bool m_isMuted;
+    bool m_rtmLoggedIn;
     std::vector<Transcript> m_transcripts;
+    std::map<uint64_t, std::function<void(int, const std::string&)>> m_rtmCallbacks;
     
     // Constants
     unsigned int m_userUid;
@@ -85,7 +87,7 @@ private:
     void UpdateTranscripts();
     void LogToView(const CString& message);
     
-    // SDK Setup
+    // SDK Setup (direct like macOS)
     void SetupSDK();
     void InitializeRTC();
     void InitializeRTM();
@@ -97,11 +99,9 @@ private:
     void JoinRTCChannel(const std::string& token);
     void LoginRTM(const std::string& token);
     void StartAgent();
-    
-    // Helpers
     std::string GenerateRandomChannelName();
     
-    // RTC Callbacks
+    // RTC Callbacks (IRtcEngineEventHandler)
     void onJoinChannelSuccess(const char* channel, agora::rtc::uid_t uid, int elapsed) override;
     void onLeaveChannel(const agora::rtc::RtcStats& stats) override;
     void onUserJoined(agora::rtc::uid_t uid, int elapsed) override;
@@ -109,12 +109,9 @@ private:
     void onTokenPrivilegeWillExpire(const char* token) override;
     void onError(int err, const char* msg) override;
     
-    // RTM Callbacks
-    void onLoginSuccess(const char* userId) override;
-    void onLoginFailed(int errorCode, const char* errorMessage) override;
-    void onLogout() override;
-    void onMessageReceived(const char* message, const char* fromUserId) override;
-    void onConnectionStateChanged(agora::rtm::RTM_LINK_STATE state, agora::rtm::RTM_LINK_STATE_CHANGE_REASON reason) override;
+    // RTM Callbacks (called by internal handler)
+    void OnRtmLoginResult(int errorCode);
+    void OnRtmMessage(const char* message, const char* publisher);
     
     // ConvoAI Callbacks
     void OnAgentStateChanged(const std::string& agentUserId, const StateChangeEvent& event) override;
@@ -127,7 +124,6 @@ protected:
     afx_msg void OnStopClicked();
     afx_msg void OnMuteClicked();
     
-    // Async message handlers
     afx_msg LRESULT OnTokenFailed(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnRTMLoginSuccess(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnRTMLoginFailed(WPARAM wParam, LPARAM lParam);
@@ -139,4 +135,28 @@ protected:
     afx_msg LRESULT OnAgentStateUpdate(WPARAM wParam, LPARAM lParam);
     
     DECLARE_MESSAGE_MAP()
+};
+
+// Internal RTM Event Handler
+class CMainFrame::RtmEventHandler : public agora::rtm::IRtmEventHandler {
+public:
+    explicit RtmEventHandler(CMainFrame* frame) : m_frame(frame) {}
+    
+    void onLoginResult(const uint64_t requestId, agora::rtm::RTM_ERROR_CODE errorCode) override;
+    void onMessageEvent(const MessageEvent& event) override;
+    void onPresenceEvent(const PresenceEvent& event) override;
+    void onLinkStateEvent(const LinkStateEvent& event) override;
+    void onSubscribeResult(const uint64_t requestId, const char* channelName, agora::rtm::RTM_ERROR_CODE errorCode) override;
+    
+    // Empty implementations for unused callbacks
+    void onTopicEvent(const TopicEvent& event) override {}
+    void onLockEvent(const LockEvent& event) override {}
+    void onStorageEvent(const StorageEvent& event) override {}
+    void onJoinResult(const uint64_t, const char*, const char*, agora::rtm::RTM_ERROR_CODE) override {}
+    void onLeaveResult(const uint64_t, const char*, const char*, agora::rtm::RTM_ERROR_CODE) override {}
+    void onPublishResult(const uint64_t, agora::rtm::RTM_ERROR_CODE) override {}
+    void onUnsubscribeResult(const uint64_t, const char*, agora::rtm::RTM_ERROR_CODE) override {}
+    
+private:
+    CMainFrame* m_frame;
 };

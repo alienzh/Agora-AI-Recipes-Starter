@@ -1,7 +1,7 @@
 // HttpClient.cpp: Modern HTTP client implementation using libcurl
 //
 
-#include "../General/pch.h"
+#include "../general/pch.h"
 #include <memory>
 #include <thread>
 #include <sstream>
