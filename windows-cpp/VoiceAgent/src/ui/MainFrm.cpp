@@ -246,7 +246,7 @@ void CMainFrame::ShowIdleButtons()
     m_btnStop.ShowWindow(SW_HIDE);
     m_btnStart.ShowWindow(SW_SHOW);
     m_btnStart.EnableWindow(TRUE);
-    m_btnStart.BringWindowToTop();
+    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
 }
 
 void CMainFrame::ShowActiveButtons()
@@ -256,8 +256,7 @@ void CMainFrame::ShowActiveButtons()
     m_btnMute.EnableWindow(TRUE);
     m_btnStop.ShowWindow(SW_SHOW);
     m_btnStop.EnableWindow(TRUE);
-    m_btnMute.BringWindowToTop();
-    m_btnStop.BringWindowToTop();
+    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
 }
 
 void CMainFrame::UpdateTranscripts()
