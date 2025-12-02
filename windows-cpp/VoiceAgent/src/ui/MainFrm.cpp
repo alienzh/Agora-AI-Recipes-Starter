@@ -300,7 +300,7 @@ void CMainFrame::SetupSDK()
 
 void CMainFrame::InitializeRTC()
 {
-    m_rtcEngine = agora::rtc::createAgoraRtcEngine();
+    m_rtcEngine = createAgoraRtcEngine();
     if (!m_rtcEngine) {
         LogToView(_T("RTC init FAIL"));
         return;
@@ -343,7 +343,7 @@ void CMainFrame::InitializeRTM()
     config.areaCode = agora::rtm::RTM_AREA_CODE_GLOB;
     
     int errorCode = 0;
-    m_rtmClient = agora::rtm::createAgoraRtmClient(config, errorCode);
+    m_rtmClient = createAgoraRtmClient(config, errorCode);
     
     if (m_rtmClient && errorCode == 0) {
         LogToView(_T("RTM init OK"));
