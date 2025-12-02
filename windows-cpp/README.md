@@ -1,10 +1,10 @@
-# macOS Agent Starter
+# Windows Agent Starter
 
 ## 功能概述
 
 ### 解决的问题
 
-本示例项目展示了如何在 macOS 应用中集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
+本示例项目展示了如何在 Windows 应用中集成 Agora Conversational AI（对话式 AI）功能，实现与 AI 语音助手的实时对话交互。主要解决以下问题：
 
 - **实时语音交互**：通过 Agora RTC SDK 实现与 AI 代理的实时音频通信
 - **消息传递**：通过 Agora RTM SDK 实现与 AI 代理的消息交互和状态同步
@@ -16,16 +16,16 @@
 ### 适用场景
 
 - 智能客服系统：构建基于 AI 的实时语音客服应用
-- 语音助手应用：开发类似 Siri 的桌面语音助手功能
+- 语音助手应用：开发桌面语音助手功能
 - 实时语音转录：实时显示用户和 AI 代理的对话转录内容
 - 语音交互游戏：开发需要语音交互的游戏应用
 - 教育培训：构建语音交互式教学应用
 
 ### 前置条件
 
-- macOS 10.13 或更高版本
-- Xcode 14.0 或更高版本
-- CocoaPods 1.11.0 或更高版本
+- Windows 10 或更高版本
+- Visual Studio 2019 或更高版本（需安装 C++ 桌面开发工作负载）
+- vcpkg 包管理器
 - Agora 开发者账号 [Console](https://console.shengwang.cn/)
 - 已在 Agora 控制台开通 **实时消息 RTM** 功能（必需）
 - 已创建 Agora 项目并获取 App ID 和 App Certificate
@@ -38,34 +38,34 @@
 1. **克隆项目**：
 ```bash
 git clone https://github.com/AgoraIO-Community/Agora-AI-Recipes-Starter.git
-cd Agora-AI-Recipes-Starter/macos-swift
+cd Agora-AI-Recipes-Starter/windows-cpp
 ```
 
-2. **安装 CocoaPods 依赖**：
-```bash
-# Install CocoaPods if not already installed
-sudo gem install cocoapods
+2. **安装 vcpkg 依赖**：
+```powershell
+# 进入项目目录
+cd VoiceAgent
 
-# Install project dependencies
-pod install
+# 运行依赖安装脚本
+.\install_dependencies.ps1
 ```
 
 3. **配置 Agora Key**：
 
-   复制 `KeyCenter.swift.example` 文件为 `KeyCenter.swift`：
-   ```bash
-   cp KeyCenter.swift.example VoiceAgent/KeyCenter.swift
+   复制 `KeyCenter.h.example` 文件为 `KeyCenter.h`：
+   ```powershell
+   copy KeyCenter.h.example VoiceAgent\src\KeyCenter.h
    ```
 
-   编辑 `VoiceAgent/KeyCenter.swift` 文件，填入你的实际配置值：
-   ```swift
+   编辑 `VoiceAgent\src\KeyCenter.h` 文件，填入你的实际配置值：
+   ```cpp
    struct KeyCenter {
-       static let AGORA_APP_ID = "your_app_id"
-       static let AGORA_APP_CERTIFICATE = "your_app_certificate"
-       static let REST_KEY = "your_rest_key"
-       static let REST_SECRET = "your_rest_secret"
-       static let PIPELINE_ID = "your_pipeline_id"
-   }
+       static constexpr const char* AGORA_APP_ID = "your_app_id";
+       static constexpr const char* AGORA_APP_CERTIFICATE = "your_app_certificate";
+       static constexpr const char* REST_KEY = "your_rest_key";
+       static constexpr const char* REST_SECRET = "your_rest_secret";
+       static constexpr const char* PIPELINE_ID = "your_pipeline_id";
+   };
    ```
 
    **配置项说明**：
@@ -80,24 +80,24 @@ pod install
    - Pipeline ID：在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 中创建 Pipeline 后获取
 
    **注意**：
-   - `KeyCenter.swift` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
-   - 每次启动时会自动生成随机的 channelName，格式为 `channel_macos_XXXX`（XXXX 为 4 位随机数字），无需手动配置。
-   - ⚠️ **重要**：`TokenGenerator.swift` 中的 Token 生成功能仅用于演示和开发测试，**生产环境必须使用自己的服务端生成 Token**。
+   - `KeyCenter.h` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
+   - 每次启动时会自动生成随机的 channelName，格式为 `channel_windows_XXXX`（XXXX 为 4 位随机数字），无需手动配置。
+   - ⚠️ **重要**：`TokenGenerator.cpp` 中的 Token 生成功能仅用于演示和开发测试，**生产环境必须使用自己的服务端生成 Token**。
 
-4. **打开 Xcode 工作空间**：
-```bash
-# IMPORTANT: Open .xcworkspace, not .xcodeproj
-open VoiceAgent.xcworkspace
+4. **打开 Visual Studio 解决方案**：
+```powershell
+# 使用 Visual Studio 打开解决方案
+start VoiceAgent.sln
 ```
 
 5. **配置 Agent 启动方式**：
    
    **方式一：直接调用 Agora RESTful API**（仅用于快速体验，不推荐用于生产）
    
-   默认配置，无需额外设置。macOS 应用直接调用 Agora RESTful API 启动 Agent，方便开发者快速体验功能。
+   默认配置，无需额外设置。Windows 应用直接调用 Agora RESTful API 启动 Agent，方便开发者快速体验功能。
    
    **使用前提**：
-   - 确保已正确配置 `KeyCenter.swift` 文件中的相关 key。
+   - 确保已正确配置 `KeyCenter.h` 文件中的相关 key。
    
    **适用场景**：
    - 快速体验和功能验证
@@ -118,7 +118,7 @@ open VoiceAgent.xcworkspace
 ### 快速体验流程
 
 1. **Agent Chat 页面**：
-   - 在 Xcode 中按 `Cmd + R` 运行应用
+   - 在 Visual Studio 中按 `F5` 运行应用
    - 页面布局从左到右依次为：
      - **消息区域**：显示 USER 和 AGENT 的对话转录内容
      - **Agent 状态**：显示在消息列表右下角，显示当前 Agent 的状态
@@ -128,7 +128,7 @@ open VoiceAgent.xcworkspace
 2. **启动 Agent**：
    - 点击"Start Agent"按钮
    - 按钮禁用，应用自动：
-     - 生成随机 channelName（格式：`channel_macos_XXXX`）
+     - 生成随机 channelName（格式：`channel_windows_XXXX`）
      - 加入 RTC 频道并登录 RTM
      - 连接成功后自动启动 AI Agent
    - Agent 启动成功后：
@@ -154,38 +154,46 @@ open VoiceAgent.xcworkspace
 ## 项目结构
 
 ```
-macos-swift/
+windows-cpp/
 ├── VoiceAgent/
-│   ├── UI/                               # UI 相关代码
-│   │   ├── AppDelegate.swift                    # 应用入口
-│   │   ├── ViewController.swift                 # 主界面（包含 RTC 和 RTM 逻辑）
-│   │   ├── MessageListView.swift                # 消息列表视图
-│   │   └── LogView.swift                        # 日志视图
-│   ├── API/                              # API 相关代码
-│   │   ├── AgentManager.swift                   # Agent 启动/停止 API
-│   │   ├── TokenGenerator.swift                 # Token 生成（仅用于测试）
-│   │   └── HTTPClient.swift                     # HTTP 请求封装
-│   ├── ConversationalAIAPI/              # 实时字幕组件
-│   ├── KeyCenter.swift                   # 配置中心（需要创建，不提交到版本控制）
-│   └── Resources/                        # 资源文件
-├── Podfile                               # CocoaPods 依赖配置
-├── KeyCenter.swift.example               # 配置文件示例
+│   ├── src/
+│   │   ├── ui/                           # UI 相关代码
+│   │   │   ├── MainFrm.h                        # 主界面头文件
+│   │   │   └── MainFrm.cpp                      # 主界面（包含 RTC 和 RTM 逻辑）
+│   │   ├── api/                          # API 相关代码
+│   │   │   ├── AgentManager.h/cpp               # Agent 启动/停止 API
+│   │   │   ├── TokenGenerator.h/cpp             # Token 生成（仅用于测试）
+│   │   │   └── HttpClient.h/cpp                 # HTTP 请求封装
+│   │   ├── ConversationalAIAPI/          # 实时字幕组件
+│   │   ├── general/                      # 通用代码
+│   │   │   ├── pch.h/cpp                        # 预编译头
+│   │   │   └── VoiceAgent.h/cpp                 # 应用入口
+│   │   ├── tools/                        # 工具类
+│   │   │   ├── Logger.h/cpp                     # 日志工具
+│   │   │   └── StringUtils.h                    # 字符串工具
+│   │   └── KeyCenter.h                   # 配置中心（需要创建，不提交到版本控制）
+│   ├── project/
+│   │   └── VoiceAgent.vcxproj            # Visual Studio 项目文件
+│   ├── resources/                        # 资源文件
+│   ├── rtcLib/                           # Agora RTC SDK
+│   └── rtmLib/                           # Agora RTM SDK
+├── VoiceAgent.sln                        # Visual Studio 解决方案
+├── KeyCenter.h.example                   # 配置文件示例
 └── README.md                             # 本文档
 ```
 
 **主要文件说明**：
-- `ViewController.swift`：主界面，包含日志显示、Agent 状态、转录列表和控制按钮，直接管理 RTC/RTM SDK
-- `AgentManager.swift`：Agent 启动 API 封装，支持直接调用 Agora API 或通过业务后台中转
-- `TokenGenerator.swift`：Token 生成工具（仅用于开发测试，生产环境需使用服务端生成）
+- `MainFrm.cpp`：主界面，包含日志显示、Agent 状态、转录列表和控制按钮，直接管理 RTC/RTM SDK
+- `AgentManager.cpp`：Agent 启动 API 封装，支持直接调用 Agora API 或通过业务后台中转
+- `TokenGenerator.cpp`：Token 生成工具（仅用于开发测试，生产环境需使用服务端生成）
 
 ## 相关资源
 
 ### API 文档链接
 
-- [Agora RTC macOS SDK 文档](https://doc.shengwang.cn/doc/rtc/macos/landing-page)
-- [Agora RTM iOS SDK 文档](https://doc.shengwang.cn/doc/rtm2/ios/landing-page)（macOS 使用相同 API）
+- [Agora RTC Windows SDK 文档](https://doc.shengwang.cn/doc/rtc/windows/landing-page)
+- [Agora RTM Windows SDK 文档](https://doc.shengwang.cn/doc/rtm2/windows/landing-page)
 - [Conversational AI RESTful API 文档](https://doc.shengwang.cn/doc/convoai/restful/landing-page)
-- [Conversational AI iOS 客户端组件 文档](https://doc.shengwang.cn/api-ref/convoai/ios/ios-component/overview)
 
 ### 相关 Recipes
 
@@ -198,3 +206,4 @@ macos-swift/
 - [Stack Overflow](https://stackoverflow.com/questions/tagged/agora)
 
 ---
+
