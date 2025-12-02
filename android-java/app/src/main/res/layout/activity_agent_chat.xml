@@ -37,7 +37,7 @@
         </ScrollView>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Transcript List and Agent Status  -->
+    <!-- Transcript List and Agent Status -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardTranscript"
         android:layout_width="0dp"

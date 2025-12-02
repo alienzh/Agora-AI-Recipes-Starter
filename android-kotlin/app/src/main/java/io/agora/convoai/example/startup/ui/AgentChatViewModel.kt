@@ -662,7 +662,6 @@ class AgentChatViewModel : ViewModel() {
 
                 leaveRtcChannel()
                 rtcJoined = false
-                rtmLoggedIn = false
                 _uiState.value = _uiState.value.copy(
                     connectionState = ConnectionState.Idle
                 )

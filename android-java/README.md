@@ -10,7 +10,8 @@
 - **消息传递**：通过 Agora RTM SDK 实现与 AI 代理的消息交互和状态同步
 - **实时转录**：支持实时显示用户和 AI 代理的对话转录内容，包括转录状态（进行中、完成、中断等）
 - **状态管理**：统一管理连接状态、Agent 启动状态、静音状态、转录状态等 UI 状态
-- **自动流程**：自动完成频道加入、RTM 登录、Agent 启动、页面跳转等流程
+- **自动流程**：自动完成频道加入、RTM 登录、Agent 启动等流程
+- **统一界面**：所有功能（日志、状态、转录、控制按钮）集成在同一个页面
 
 ### 适用场景
 
@@ -70,7 +71,7 @@
          **注意**：
          - `env.properties` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
          - 每次启动时会自动生成随机的 channelName，格式为 `channel_java_XXXX`（XXXX 为 4 位随机数字），无需手动配置。
-         - ⚠️ **重要**：`TokenGenerator.kt` 中的 Token 生成功能仅用于演示和开发测试，**生产环境必须使用自己的服务端生成 Token**。代码中已添加详细警告说明。
+         - ⚠️ **重要**：`TokenGenerator.java` 中的 Token 生成功能仅用于演示和开发测试，**生产环境必须使用自己的服务端生成 Token**。代码中已添加详细警告说明。
     - 等待 Gradle 同步完成
 
    3. **配置 Agent 启动方式**：
@@ -88,84 +89,52 @@
 
       ⚠️ **重要说明**：
        - 此方式**仅用于快速体验和开发测试**，**不推荐用于生产环境**
-       - 生产环境**必须**使用方式二，通过自己的业务后台中转请求
        - 直接在前端调用 Agora RESTful API 会暴露 REST Key 和 REST Secret，存在安全风险
-
-      **方式二：通过业务后台服务器中转**（生产环境必需）
-
-      真实业务场景中，**不应该**直接在前端请求 Agora RESTful API，而应该通过自己的业务后台服务器中转。
-
-      **核心要求**：
-
-       - **REST Key 和 REST Secret 必须放在服务端**，绝对不能暴露在客户端代码中
-       - 客户端只请求自己的业务后台接口，业务后台再调用 Agora RESTful API
-       - 业务后台负责保管和管理 REST Key、REST Secret 等敏感信息
-
-      **实现方式**：
-
-       1. **参考实现**：`../server-python/agora_http_server.py` 展示了如何在服务端调用 Agora RESTful API
-          ```bash
-          cd ../server-python
-          python agora_http_server.py
-          ```
-         - Python 服务器从环境变量或配置文件读取 REST Key 和 REST Secret
-         - 服务端使用这些密钥调用 Agora API，客户端无需知道这些密钥
-
-       2. **在自己的业务后台实现**：
-         - 参考 Python 服务器的实现逻辑，在你的业务后台（Java、Node.js、Python 等）实现 Agent 启动接口
-         - 将 REST Key 和 REST Secret 存储在服务端环境变量或配置文件中
-         - 客户端请求你的业务后台接口，业务后台使用 REST Key 和 REST Secret 调用 Agora API
-    
-       3. **在 `AgentStarter.java` 中配置本地 Python 服务器的 IP 地址**（用于本地体验测试）：
-      ```java
-      // Option 1: Agora RESTful API (Default)
-      // private static final String AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects";
    
-      // Option 2: Local Python Server
-      private static final String AGORA_API_BASE_URL = "http://<your-computer-ip>:8080"; 
-      ```
-
-      **说明**：
-      - `<your-computer-ip>` 替换为你运行 Python 服务器的电脑 IP 地址
-      - 查找电脑 IP：
-          - macOS/Linux: `ifconfig en0 | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'`
-          - Windows: `ipconfig`（查找 IPv4 地址）
-      - 确保 Android 设备和电脑在同一局域网内
-
-      **为什么必须使用业务后台中转**：
-       - **安全性**：REST Key 和 REST Secret 绝对不能暴露在客户端代码中，必须由服务端保管
-       - **业务逻辑**：可以在后台实现权限验证、计费、日志记录等业务逻辑
-       - **稳定性**：统一管理 API 调用，便于监控和错误处理
-       - **灵活性**：可以添加缓存、限流、重试等机制
-       - **合规性**：符合安全最佳实践，避免敏感信息泄露
-
-    **注意**：
-    - 生产环境必须使用自己的服务端生成 Token，不要使用 `TokenGenerator`（详见代码中的警告）
+      ⚠️ **生产环境要求**：
+       - **必须将敏感信息放在后端**：`appCertificate`、`restKey`、`restSecret` 等敏感信息必须存储在服务端，绝对不能暴露在客户端代码中
+       - **客户端通过后端获取 Token**：客户端请求自己的业务后台接口，由服务端使用 `appCertificate` 生成 Token 并返回给客户端
+       - **客户端通过后端启动 Agent**：客户端请求自己的业务后台接口，由服务端使用 `restKey` 和 `restSecret` 调用 Agora RESTful API 启动 Agent
+       - **参考实现**：可参考 `../server-python/agora_http_server.py` 了解如何在服务端实现 Token 生成和 Agent 启动接口
 
 ## 测试验证
 
 ### 快速体验流程
 
-1. **运行应用**：在 Android Studio 中运行 `android-java` 项目。
-2. **AgentHomeFragment**：
-   - 应用启动后进入首页。
-   - 点击 "Start Agent" 按钮。按钮逻辑：先加入频道并登录 RTM，成功后自动调用 API 启动 Agent。
-   - 观察按钮状态变为 "Starting..."。
-3. **自动跳转**：
-   - 当 Agent 成功启动（收到 `agentStarted` 状态）且 RTC/RTM 连接就绪后，App 会自动跳转到通话页面。
-4. **AgentLivingFragment**：
-   - 这是一个纯展示页面，负责显示字幕（Transcript）和 Agent 状态。
-   - 你可以开始说话，观察字幕实时上屏。
-   - 点击 "Hang Up" 结束通话并返回首页。
+1. **Agent Chat 页面**（`AgentChatActivity`）：
+   - 运行应用，进入 Agent Chat 页面
+   - 页面布局从上到下依次为：
+     - **日志区域**：显示 Agent 启动相关的状态消息（RTC 连接、RTM 登录、Agent 启动等）
+     - **转录列表区域**：
+       - **转录列表**：实时显示 USER 和 AGENT 的对话转录内容及状态
+       - **Agent 状态**：显示在转录列表底部，显示当前 Agent 的连接状态
+     - **控制按钮**：初始显示"Start Agent"按钮
+   
+2. **启动 Agent**：
+   - 点击"Start Agent"按钮
+   - 按钮文本变为"Starting..."并禁用，应用自动：
+     - 生成随机 channelName（格式：`channel_java_XXXX`）
+     - 加入 RTC 频道并登录 RTM
+     - 连接成功后自动启动 AI Agent
+   - Agent 启动成功后：
+     - "Start Agent"按钮隐藏
+     - 显示"静音"和"停止"按钮
+     - 可以开始与 AI Agent 对话
+
+3. **对话交互**：
+   - 实时显示 USER 和 AGENT 的转录内容
+   - 支持静音/取消静音功能
+   - 点击"停止"按钮结束对话并断开连接
 
 ### 功能验证清单
 
-- [ ] **连接**：App 能成功加入 RTC 频道并登录 RTM。
-- [ ] **启动**：点击 Start 后能自动启动 Agent 并跳转页面。
-- [ ] **对话**：对着手机说话，能听到 Agent 的回应。
-- [ ] **字幕**：说话时能看到实时的文字转录（User 和 Agent 的内容）。
-- [ ] **打断**：在 Agent 说话时插话，Agent 能被成功打断并回应新的内容。
-- [ ] **挂断**：点击挂断能正确停止 Agent 并释放资源。
+- ✅ RTC 频道加入成功（查看日志区域的状态消息）
+- ✅ RTM 登录成功（查看日志区域的状态消息）
+- ✅ Agent 启动成功（按钮状态变化，显示静音和停止按钮）
+- ✅ 音频传输正常（能够听到 AI 回复）
+- ✅ 转录功能正常（显示 USER 和 AGENT 的转录内容及状态）
+- ✅ 静音/取消静音功能正常
+- ✅ 停止功能正常（断开连接，按钮恢复为 Start Agent）
 
 ## 项目结构
 
@@ -175,17 +144,34 @@ android-java/
 │   ├── src/main/
 │   │   ├── java/io/agora/convoai/example/startup/
 │   │   │   ├── ui/                    # UI 相关代码
+│   │   │   │   ├── AgentChatActivity.java      # 主界面 Activity（合并了原 Home 和 Living 页面）
+│   │   │   │   ├── AgentChatViewModel.java     # ViewModel（包含 RTC 和 RTM 逻辑）
+│   │   │   │   ├── CommonDialog.java           # 通用对话框
 │   │   │   │   └── common/            # 通用 UI 组件
-│   │   │   ├── rtc/                   # RTC 管理器
-│   │   │   ├── tools/                 # 工具类 (Token, AgentStarter)
-│   │   │   └── net/                   # 网络相关
+│   │   │   ├── api/                   # API 相关代码
+│   │   │   │   ├── AgentStarter.java           # Agent 启动 API
+│   │   │   │   ├── TokenGenerator.java         # Token 生成（仅用于测试）
+│   │   │   │   └── net/               # 网络相关
+│   │   │   ├── tools/                 # 工具类
+│   │   │   │   ├── PermissionHelp.java         # 权限处理
+│   │   │   │   └── Base64Encoding.java         # Base64 编码工具
+│   │   │   ├── KeyCenter.java         # 配置中心（读取 env.properties）
+│   │   │   └── AgentApp.java          # Application 类
 │   │   ├── res/                       # 资源文件
-│   │   └── convoaiApi/                # Conversational AI API (Kotlin)
+│   │   │   └── layout/
+│   │   │       └── activity_agent_chat.xml   # Agent Chat 页面布局
+│   │   └── convoaiApi/                # Conversational AI API（Kotlin）
 │   └── build.gradle
 ├── env.properties                     # 环境配置（需要创建，不提交到版本控制）
 ├── env.example.properties             # 环境配置示例
 └── README.md                          # 本文档
 ```
+
+**主要文件说明**：
+- `AgentChatActivity.java`：主界面，包含日志显示、Agent 状态、转录列表和控制按钮
+- `AgentChatViewModel.java`：业务逻辑层，包含 RTC 引擎、RTM 客户端的管理和 Agent 启动逻辑
+- `AgentStarter.java`：Agent 启动 API 封装，支持直接调用 Agora API 或通过业务后台中转
+- `TokenGenerator.java`：Token 生成工具（仅用于开发测试，生产环境需使用服务端生成）
 
 ## 相关资源
 
