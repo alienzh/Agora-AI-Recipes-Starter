@@ -168,19 +168,19 @@ void CMainFrame::SetupLogPanel()
 
 void CMainFrame::SetupBottomPanel()
 {
-    m_bottomPanel.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ, CRect(0, 0, 10, 10), this);
+    m_bottomPanel.Create(_T(""), WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, CRect(0, 0, 10, 10), this);
     
-    // Create Mute and Stop first (hidden), then Start on top
+    // Create buttons as children of bottomPanel
     m_btnMute.Create(_T("Mute"), WS_CHILD | BS_PUSHBUTTON,
-        CRect(0, 0, 10, 10), this, IDC_BTN_MUTE);
+        CRect(0, 0, 10, 10), &m_bottomPanel, IDC_BTN_MUTE);
     m_btnMute.SetFont(&m_normalFont);
     
     m_btnStop.Create(_T("Stop Agent"), WS_CHILD | BS_PUSHBUTTON,
-        CRect(0, 0, 10, 10), this, IDC_BTN_STOP);
+        CRect(0, 0, 10, 10), &m_bottomPanel, IDC_BTN_STOP);
     m_btnStop.SetFont(&m_normalFont);
     
     m_btnStart.Create(_T("Start Agent"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-        CRect(0, 0, 10, 10), this, IDC_BTN_START);
+        CRect(0, 0, 10, 10), &m_bottomPanel, IDC_BTN_START);
     m_btnStart.SetFont(&m_normalFont);
 }
 
@@ -211,7 +211,9 @@ void CMainFrame::LayoutPanels()
     
     // Bottom panel
     m_bottomPanel.MoveWindow(0, bottomTop, contentWidth, BOTTOM_PANEL_HEIGHT);
-    int btnY = bottomTop + (BOTTOM_PANEL_HEIGHT - BUTTON_HEIGHT) / 2;
+    
+    // Button positions relative to bottomPanel (not main window)
+    int btnY = (BOTTOM_PANEL_HEIGHT - BUTTON_HEIGHT) / 2;
     int btnWidth = contentWidth - PADDING * 2;
     int halfWidth = (btnWidth - 8) / 2;
     
@@ -246,7 +248,6 @@ void CMainFrame::ShowIdleButtons()
     m_btnStop.ShowWindow(SW_HIDE);
     m_btnStart.ShowWindow(SW_SHOW);
     m_btnStart.EnableWindow(TRUE);
-    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
 }
 
 void CMainFrame::ShowActiveButtons()
@@ -256,7 +257,6 @@ void CMainFrame::ShowActiveButtons()
     m_btnMute.EnableWindow(TRUE);
     m_btnStop.ShowWindow(SW_SHOW);
     m_btnStop.EnableWindow(TRUE);
-    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
 }
 
 void CMainFrame::UpdateTranscripts()
