@@ -34,44 +34,34 @@ npm run preview
 
 ### 使用说明
 
-启动后，填入频道号，点击开始，等待 Agent 加入。
+1. 启动项目后，在入口页面填写以下信息：
+   - **App ID**: Agora App ID（必填）
+   - **App Certificate**: Agora App Certificate（选填）
+   - **频道名称**: 频道名称（必填）
 
-## 环境变量配置
+2. 点击"连接对话式AI引擎"按钮开始连接
 
-`web-react-lite` 版本只负责 RTM、RTC 和 ConvoAI 的连接，不包含 Agent 启动功能，因此只需要以下配置：
+3. 配置会自动保存到浏览器的 localStorage，下次打开页面时会自动填充
 
-1. 复制 `.env.example` 文件为 `.env`：
+**注意**: `web-react-lite` 版本只启动前端开发服务器，不包含后端 API 代理服务器。Agent 的启动和停止应由后端服务处理。
 
-```bash
-cp .env.example .env
-```
+## 配置说明
 
-2. 在 `.env` 文件中填写相应的配置值：
+`web-react-lite` 版本使用页面输入的方式配置 Agora 参数，无需配置 `.env` 文件。
 
-```
-VITE_AG_APP_ID=your_app_id
-VITE_AG_APP_CERTIFICATE=your_certificate
-```
+### 配置项说明
 
-**配置说明**：
+- **App ID**: Agora App ID，用于初始化 RTM 和 RTC 引擎（必填）
+- **App Certificate**: Agora App Certificate，用于生成用户 Token（选填）
+- **频道名称**: 用于加入的频道名称（必填）
 
-- `VITE_AG_APP_ID`: Agora App ID，用于初始化 RTM 和 RTC 引擎
-- `VITE_AG_APP_CERTIFICATE`: Agora App Certificate，用于生成用户 Token
+### 配置存储
 
-3. 在代码中使用环境变量：
+- 配置会自动保存到浏览器的 localStorage
+- 下次打开页面时会自动填充已保存的配置
+- 可以随时修改配置，新配置会覆盖旧配置
 
-```javascript
-import { env } from "./config/env";
-
-// 使用配置
-const appId = env.AG_APP_ID;
-const certificate = env.AG_APP_CERTIFICATE;
-```
-
-**注意**:
-
-- Vite 要求环境变量必须以 `VITE_` 开头才能暴露给客户端代码
-- Agent 的启动和停止应由后端服务处理，前端不参与
+**注意**: Agent 的启动和停止应由后端服务处理，前端不参与
 
 ## 功能说明
 
@@ -115,17 +105,18 @@ const certificate = env.AG_APP_CERTIFICATE;
 web-react-lite/
 ├── src/
 │   ├── config/
-│   │   └── env.js       # 环境变量配置（仅 RTM/RTC）
+│   │   └── env.js       # 环境变量配置（已弃用，保留用于向后兼容）
 │   ├── components/
 │   │   ├── ChatView.jsx # 聊天视图组件（RTM/RTC/ConvoAI）
-│   │   └── EntranceView.jsx # 入口视图组件
+│   │   └── EntranceView.jsx # 入口视图组件（包含配置输入）
 │   ├── conversational-ai-api/ # ConvoAI API 封装
 │   ├── utils/
-│   │   └── api.js       # Token 生成 API
+│   │   ├── api.js       # Token 生成 API
+│   │   └── configStorage.js # 配置存储工具（localStorage）
 │   ├── App.jsx          # 主应用组件
 │   ├── main.jsx         # 入口文件
 │   └── index.css        # 全局样式
-├── .env.example         # 环境变量示例文件（仅包含 RTM/RTC 配置）
+├── .env.example         # 环境变量示例文件（已弃用，配置改为页面输入）
 ├── index.html           # HTML 模板
 ├── vite.config.js       # Vite 配置
 └── package.json         # 项目配置

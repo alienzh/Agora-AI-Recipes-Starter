@@ -26,17 +26,6 @@
   overflow: hidden;
 }
 
-.log-view-area {
-  width: 300px;
-  border-left: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  background-color: #f9fafb;
-  min-height: 0;
-  max-height: 100%;
-  overflow: hidden;
-}
-
 /* 字幕滚动视图 */
 .transcript-scroll-view {
   flex: 1;

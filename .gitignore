@@ -184,6 +184,7 @@ Thumbs.db
 
 # SpecStory (if applicable)
 .specstory/
+.specstory
 
 # Archives
 **/*.zip

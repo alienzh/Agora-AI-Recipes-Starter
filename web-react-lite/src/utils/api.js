@@ -1,22 +1,26 @@
-import { env } from '../config/env'
-
 /**
  * 生成 Token
  * @param {string} channelName - 频道名称
  * @param {string} uid - 用户ID
  * @param {number} expire - 过期时间（秒），默认 86400（24小时）
  * @param {number[]} types - Token 类型数组
+ * @param {string} appId - Agora App ID
+ * @param {string} appCertificate - Agora App Certificate
  * @returns {Promise<string|null>} 返回 token 或 null
  */
-export async function generateToken(channelName, uid, expire = 86400, types = [1]) {
+export async function generateToken(channelName, uid, expire = 86400, types = [1], appId, appCertificate) {
   // 检查配置是否已填写
-  if (!env.AG_APP_ID || !env.AG_APP_CERTIFICATE) {
-    throw new Error('请先在 .env.local 文件中配置 VITE_AG_APP_ID 和 VITE_AG_APP_CERTIFICATE')
+  if (!appId) {
+    throw new Error('App ID 未配置')
+  }
+  
+  if (!appCertificate) {
+    throw new Error('App Certificate 未配置')
   }
   
   const params = {
-    appCertificate: env.AG_APP_CERTIFICATE,
-    appId: env.AG_APP_ID,
+    appCertificate: appCertificate,
+    appId: appId,
     channelName: channelName,
     expire: expire,
     src: 'Web',

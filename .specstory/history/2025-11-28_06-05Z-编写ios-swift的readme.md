@@ -24,7 +24,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir">
 <details>
-            <summary>Tool use: **list_directory** • Listed directory undefined • **0** results</summary>
+            <summary>Tool use: **list_dir** • Listed directory undefined • **0** results</summary>
         
 No results found
 </details>
@@ -302,7 +302,7 @@ Directory: **/Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starte
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/README.md</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/README.md</summary>
 
 **Chunk 1**
 Lines added: 229, lines removed: 1
@@ -364,11 +364,11 @@ Lines added: 229, lines removed: 1
 +    编辑 &#96;VoiceAgent/KeyCenter.swift&#96; 文件，填入你的实际配置值：
 +    &#96;&#96;&#96;swift
 +    class KeyCenter {
-+        static let AG_APP_ID: String = &quot;your_app_id&quot;
-+        static let AG_APP_CERTIFICATE: String = &quot;your_app_certificate&quot;
-+        static let AG_BASIC_AUTH_KEY: String = &quot;your_rest_key&quot;
-+        static let AG_BASIC_AUTH_SECRET: String = &quot;your_rest_secret&quot;
-+        static let AG_PIPELINE_ID: String = &quot;your_pipeline_id&quot;
++        static let AG_APP_ID: String = "your_app_id"
++        static let AG_APP_CERTIFICATE: String = "your_app_certificate"
++        static let AG_BASIC_AUTH_KEY: String = "your_rest_key"
++        static let AG_BASIC_AUTH_SECRET: String = "your_rest_secret"
++        static let AG_PIPELINE_ID: String = "your_pipeline_id"
 +    }
 +    &#96;&#96;&#96;
 + 
@@ -436,15 +436,15 @@ Lines added: 229, lines removed: 1
 +    &#96;&#96;&#96;swift
 +    class AgentManager {
 +        // Switch between local server and Agora API by commenting/uncommenting the lines below
-+    //    static private var API_BASE_URL = &quot;https://api.agora.io/cn/api/conversational-ai-agent/v2/projects&quot;
-+        static private var API_BASE_URL = &quot;http://&lt;your-computer-ip&gt;:8080&quot;  // Local Python server IP (for local testing)
++    //    static private var API_BASE_URL = "https://api.agora.io/cn/api/conversational-ai-agent/v2/projects"
++        static private var API_BASE_URL = "http://&lt;your-computer-ip&gt;:8080"  // Local Python server IP (for local testing)
 +    }
 +    &#96;&#96;&#96;
 +    
 +    **说明**：
 +    - &#96;&lt;your-computer-ip&gt;&#96; 替换为你运行 Python 服务器的电脑 IP 地址
 +    - 查找电脑 IP：
-+      - macOS/Linux: &#96;ifconfig en0 | grep &quot;inet &quot; | grep -v 127.0.0.1 | awk &#39;{print $2}&#39;&#96;
++      - macOS/Linux: &#96;ifconfig en0 | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'&#96;
 +      - Windows: &#96;ipconfig&#96;（查找 IPv4 地址）
 +    - 确保 iOS 设备和电脑在同一局域网内
 +    
@@ -465,7 +465,7 @@ Lines added: 229, lines removed: 1
 + 1. **Agent Home 页面**（&#96;ViewController&#96;）：
 +    - 运行应用，进入 Agent Home 页面
 +    - 输入频道名称（channelName）
-+    - 点击&quot;Start&quot;按钮
++    - 点击"Start"按钮
 +    - 应用自动：
 +      - 生成用户 Token
 +      - 加入 RTC 频道并登录 RTM
@@ -588,7 +588,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir">
 <details>
-            <summary>Tool use: **list_directory** • Listed directory undefined • **0** results</summary>
+            <summary>Tool use: **list_dir** • Listed directory undefined • **0** results</summary>
         
 No results found
 </details>
@@ -791,7 +791,7 @@ Directory: **/Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starte
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/README.md</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/README.md</summary>
 
 **Chunk 1**
 Lines added: 215, lines removed: 1
@@ -854,11 +854,11 @@ Lines added: 215, lines removed: 1
 + 
 +    &#96;&#96;&#96;swift
 +    class KeyCenter {
-+        static let AG_APP_ID: String = &quot;your_app_id&quot;
-+        static let AG_APP_CERTIFICATE: String = &quot;your_app_certificate&quot;
-+        static let AG_BASIC_AUTH_KEY: String = &quot;your_rest_key&quot;
-+        static let AG_BASIC_AUTH_SECRET: String = &quot;your_rest_secret&quot;
-+        static let AG_PIPELINE_ID: String = &quot;your_pipeline_id&quot;
++        static let AG_APP_ID: String = "your_app_id"
++        static let AG_APP_CERTIFICATE: String = "your_app_certificate"
++        static let AG_BASIC_AUTH_KEY: String = "your_rest_key"
++        static let AG_BASIC_AUTH_SECRET: String = "your_rest_secret"
++        static let AG_PIPELINE_ID: String = "your_pipeline_id"
 +    }
 +    &#96;&#96;&#96;
 + 
@@ -939,7 +939,7 @@ Lines added: 215, lines removed: 1
 + 1. **Agent Home 页面**（&#96;EntranceView&#96;）：
 +    - 运行应用，进入 Agent Home 页面
 +    - 输入频道名称（channelName）
-+    - 点击&quot;Start&quot;按钮
++    - 点击"Start"按钮
 +    - 跳转到 Agent Living 页面
 + 
 + 2. **Agent Living 页面**（&#96;ChatView&#96;）：
@@ -1064,7 +1064,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir">
 <details>
-            <summary>Tool use: **list_directory** • Listed directory undefined • **0** results</summary>
+            <summary>Tool use: **list_dir** • Listed directory undefined • **0** results</summary>
         
 No results found
 </details>
@@ -1280,7 +1280,7 @@ _No matches found_
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/README.md</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/README.md</summary>
 
 **Chunk 1**
 Lines added: 240, lines removed: 1
@@ -1342,28 +1342,28 @@ Lines added: 240, lines removed: 1
 +    编辑 &#96;VoiceAgent/KeyCenter.m&#96; 文件，填入你的实际配置值：
 + 
 +    &#96;&#96;&#96;objc
-+    #import &quot;KeyCenter.h&quot;
++    #import "KeyCenter.h"
 + 
 +    @implementation KeyCenter
 + 
 +    + (NSString *)AG_APP_ID {
-+        return @&quot;your_app_id&quot;;
++        return @"your_app_id";
 +    }
 + 
 +    + (NSString *)AG_APP_CERTIFICATE {
-+        return @&quot;your_app_certificate&quot;;
++        return @"your_app_certificate";
 +    }
 + 
 +    + (NSString *)AG_BASIC_AUTH_KEY {
-+        return @&quot;your_rest_key&quot;;
++        return @"your_rest_key";
 +    }
 + 
 +    + (NSString *)AG_BASIC_AUTH_SECRET {
-+        return @&quot;your_rest_secret&quot;;
++        return @"your_rest_secret";
 +    }
 + 
 +    + (NSString *)AG_PIPELINE_ID {
-+        return @&quot;your_pipeline_id&quot;;
++        return @"your_pipeline_id";
 +    }
 + 
 +    @end
@@ -1453,7 +1453,7 @@ Lines added: 240, lines removed: 1
 + 1. **Agent Home 页面**（&#96;ViewController&#96;）：
 +    - 运行应用，进入 Agent Home 页面
 +    - 输入频道名称（channelName）
-+    - 点击&quot;Start&quot;按钮
++    - 点击"Start"按钮
 +    - 跳转到 Agent Living 页面
 + 
 + 2. **Agent Living 页面**（&#96;ChatViewController&#96;）：
@@ -1596,7 +1596,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatBackgroundView.swift</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatBackgroundView.swift</summary>
 
 **Chunk 1**
 Lines added: 105, lines removed: 1
@@ -1630,7 +1630,7 @@ Lines added: 105, lines removed: 1
 +     }
 +     
 +     required init?(coder: NSCoder) {
-+         fatalError(&quot;init(coder:) has not been implemented&quot;)
++         fatalError("init(coder:) has not been implemented")
 +     }
 +     
 +     // MARK: - UI Setup
@@ -1640,7 +1640,7 @@ Lines added: 105, lines removed: 1
 +         // TableView for transcripts
 +         tableView.separatorStyle = .none
 +         tableView.backgroundColor = .clear
-+         tableView.register(TranscriptCell.self, forCellReuseIdentifier: &quot;TranscriptCell&quot;)
++         tableView.register(TranscriptCell.self, forCellReuseIdentifier: "TranscriptCell")
 +         addSubview(tableView)
 +         
 +         // Status View
@@ -1656,12 +1656,12 @@ Lines added: 105, lines removed: 1
 +         addSubview(controlBarView)
 +         
 +         // Mic Button
-+         micButton.setImage(UIImage(systemName: &quot;mic.fill&quot;), for: .normal)
++         micButton.setImage(UIImage(systemName: "mic.fill"), for: .normal)
 +         micButton.tintColor = .black
 +         controlBarView.addSubview(micButton)
 +         
 +         // End Call Button
-+         endCallButton.setImage(UIImage(systemName: &quot;phone.down.fill&quot;), for: .normal)
++         endCallButton.setImage(UIImage(systemName: "phone.down.fill"), for: .normal)
 +         endCallButton.tintColor = .white
 +         endCallButton.backgroundColor = .red
 +         endCallButton.layer.cornerRadius = 25
@@ -1700,7 +1700,7 @@ Lines added: 105, lines removed: 1
 +     
 +     // MARK: - Public Methods
 +     func updateMicButtonState(isMuted: Bool) {
-+         let imageName = isMuted ? &quot;mic.slash.fill&quot; : &quot;mic.fill&quot;
++         let imageName = isMuted ? "mic.slash.fill" : "mic.fill"
 +         micButton.setImage(UIImage(systemName: imageName), for: .normal)
 +     }
 +     
@@ -1729,7 +1729,7 @@ Lines added: 105, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 5
@@ -1756,7 +1756,7 @@ Lines added: 1, lines removed: 5
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 8, lines removed: 59
@@ -1770,7 +1770,7 @@ Lines added: 8, lines removed: 59
 -         tableView.dataSource = self
 -         tableView.separatorStyle = .none
 -         tableView.backgroundColor = .clear
--         tableView.register(TranscriptCell.self, forCellReuseIdentifier: &quot;TranscriptCell&quot;)
+-         tableView.register(TranscriptCell.self, forCellReuseIdentifier: "TranscriptCell")
 -         view.addSubview(tableView)
 -         
 -         // Status View
@@ -1786,13 +1786,13 @@ Lines added: 8, lines removed: 59
 -         view.addSubview(controlBarView)
 -         
 -         // Mic Button
--         micButton.setImage(UIImage(systemName: &quot;mic.fill&quot;), for: .normal)
+-         micButton.setImage(UIImage(systemName: "mic.fill"), for: .normal)
 -         micButton.tintColor = .black
 -         micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
 -         controlBarView.addSubview(micButton)
 -         
 -         // End Call Button
--         endCallButton.setImage(UIImage(systemName: &quot;phone.down.fill&quot;), for: .normal)
+-         endCallButton.setImage(UIImage(systemName: "phone.down.fill"), for: .normal)
 -         endCallButton.tintColor = .white
 -         endCallButton.backgroundColor = .red
 -         endCallButton.layer.cornerRadius = 25
@@ -1847,7 +1847,7 @@ Lines added: 8, lines removed: 59
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 2
@@ -1856,7 +1856,7 @@ Lines added: 1, lines removed: 2
 @@ -252,6 +252,5 @@
       @objc private func toggleMicrophone() {
           isMicMuted.toggle()
--         let imageName = isMicMuted ? &quot;mic.slash.fill&quot; : &quot;mic.fill&quot;
+-         let imageName = isMicMuted ? "mic.slash.fill" : "mic.fill"
 -         micButton.setImage(UIImage(systemName: imageName), for: .normal)
 +         chatBackgroundView.updateMicButtonState(isMuted: isMicMuted)
           rtcEngine?.adjustRecordingSignalVolume(isMicMuted ? 0 : 100)
@@ -1871,7 +1871,7 @@ Lines added: 1, lines removed: 2
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -1894,7 +1894,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 2
@@ -2040,7 +2040,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: undefined
@@ -2062,7 +2062,7 @@ Lines added: 1, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/Chat/ChatViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 4, lines removed: undefined
@@ -2085,7 +2085,7 @@ Lines added: 2, lines removed: 2
 ```diff
 @@ -72,8 +76,8 @@
           tableView.backgroundColor = .clear
-          tableView.register(TranscriptCell.self, forCellReuseIdentifier: &quot;TranscriptCell&quot;)
+          tableView.register(TranscriptCell.self, forCellReuseIdentifier: "TranscriptCell")
 -         view.addSubview(tableView)
 +         chatBackgroundView.addSubview(tableView)
           
@@ -2225,7 +2225,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: undefined
@@ -2247,32 +2247,32 @@ Lines added: 1, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 6, lines removed: 2
 
 ```diff
 @@ -27,13 +27,17 @@
-          title = &quot;VoiceAgent&quot;
+          title = "VoiceAgent"
           navigationController?.navigationBar.prefersLargeTitles = false
 +         
 +         // Agent Background View - 统一管理所有入口相关视图
 +         agentBackgroundView.backgroundColor = .systemBackground
 +         view.addSubview(agentBackgroundView)
           
-          logoImageView.image = UIImage(named: &quot;logo&quot;)
+          logoImageView.image = UIImage(named: "logo")
           logoImageView.contentMode = .scaleAspectFit
 -         view.addSubview(logoImageView)
 +         agentBackgroundView.addSubview(logoImageView)
           
-          channelNameTextField.placeholder = &quot;输入频道名称&quot;
+          channelNameTextField.placeholder = "输入频道名称"
           channelNameTextField.borderStyle = .roundedRect
           channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
 -         view.addSubview(channelNameTextField)
 +         agentBackgroundView.addSubview(channelNameTextField)
           
-          startButton.setTitle(&quot;Start&quot;, for: .normal)
+          startButton.setTitle("Start", for: .normal)
 ```
 
 **Chunk 2**
@@ -2363,7 +2363,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -2386,7 +2386,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 5, lines removed: 5
@@ -2402,18 +2402,18 @@ Lines added: 5, lines removed: 5
 +         configBackgroundView.backgroundColor = .systemBackground
 +         view.addSubview(configBackgroundView)
           
-          logoImageView.image = UIImage(named: &quot;logo&quot;)
+          logoImageView.image = UIImage(named: "logo")
           logoImageView.contentMode = .scaleAspectFit
 -         agentBackgroundView.addSubview(logoImageView)
 +         configBackgroundView.addSubview(logoImageView)
           
-          channelNameTextField.placeholder = &quot;输入频道名称&quot;
+          channelNameTextField.placeholder = "输入频道名称"
           channelNameTextField.borderStyle = .roundedRect
           channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
 -         agentBackgroundView.addSubview(channelNameTextField)
 +         configBackgroundView.addSubview(channelNameTextField)
           
-          startButton.setTitle(&quot;Start&quot;, for: .normal)
+          startButton.setTitle("Start", for: .normal)
 ```
 
 **Chunk 2**
@@ -2437,7 +2437,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -2558,7 +2558,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 697, lines removed: 89
@@ -2584,23 +2584,23 @@ Lines added: 697, lines removed: 89
 -     private func setupUI() {
 -         view.backgroundColor = .systemBackground
 -         
--         title = &quot;VoiceAgent&quot;
+-         title = "VoiceAgent"
 -         navigationController?.navigationBar.prefersLargeTitles = false
 -         
 -         // Config Background View - 统一管理所有入口相关视图
 -         configBackgroundView.backgroundColor = .systemBackground
 -         view.addSubview(configBackgroundView)
 -         
--         logoImageView.image = UIImage(named: &quot;logo&quot;)
+-         logoImageView.image = UIImage(named: "logo")
 -         logoImageView.contentMode = .scaleAspectFit
 -         configBackgroundView.addSubview(logoImageView)
 -         
--         channelNameTextField.placeholder = &quot;输入频道名称&quot;
+-         channelNameTextField.placeholder = "输入频道名称"
 -         channelNameTextField.borderStyle = .roundedRect
 -         channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
 -         configBackgroundView.addSubview(channelNameTextField)
 -         
--         startButton.setTitle(&quot;Start&quot;, for: .normal)
+-         startButton.setTitle("Start", for: .normal)
 -         startButton.setTitleColor(.white, for: .normal)
 -         startButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
 -         startButton.backgroundColor = .systemBlue.withAlphaComponent(0.4)
@@ -2640,7 +2640,7 @@ Lines added: 697, lines removed: 89
 -     }
 -     
 -     @objc private func startButtonTapped() {
--         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
+-         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 -         guard !channelName.isEmpty else { return }
 -         
 -         let chatViewController = ChatViewController(uid: uid, channel: channelName)
@@ -2648,7 +2648,7 @@ Lines added: 697, lines removed: 89
 -     }
 -     
 -     private func updateButtonState() {
--         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
+-         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 -         let isValid = !channelName.isEmpty
 -         startButton.isEnabled = isValid
 -         startButton.backgroundColor = isValid ? .systemBlue : .systemBlue.withAlphaComponent(0.4)
@@ -2676,7 +2676,7 @@ Lines added: 697, lines removed: 89
 +     
 +     // MARK: - State
 +     private let uid = Int.random(in: 1000...9999999)
-+     private var channel: String = &quot;&quot;
++     private var channel: String = ""
 +     private var transcripts: [Transcript] = []
 +     private var isMicMuted: Bool = false
 +     private var isLoading: Bool = false
@@ -2685,9 +2685,9 @@ Lines added: 697, lines removed: 89
 +     private var currentAgentState: AgentState = .unknown
 +     
 +     // MARK: - Agora Components
-+     private var token: String = &quot;&quot;
-+     private var agentToken: String = &quot;&quot;
-+     private var agentId: String = &quot;&quot;
++     private var token: String = ""
++     private var agentToken: String = ""
++     private var agentId: String = ""
 +     private var rtcEngine: AgoraRtcEngineKit?
 +     private var rtmEngine: AgoraRtmClientKit?
 +     private var convoAIAPI: ConversationalAIAPI?
@@ -2704,23 +2704,23 @@ Lines added: 697, lines removed: 89
 +     private func setupUI() {
 +         view.backgroundColor = .systemBackground
 +         
-+         title = &quot;VoiceAgent&quot;
++         title = "VoiceAgent"
 +         navigationController?.navigationBar.prefersLargeTitles = false
 +         
 +         // Config Background View - 统一管理所有入口相关视图
 +         configBackgroundView.backgroundColor = .systemBackground
 +         view.addSubview(configBackgroundView)
 +         
-+         logoImageView.image = UIImage(named: &quot;logo&quot;)
++         logoImageView.image = UIImage(named: "logo")
 +         logoImageView.contentMode = .scaleAspectFit
 +         configBackgroundView.addSubview(logoImageView)
 +         
-+         channelNameTextField.placeholder = &quot;输入频道名称&quot;
++         channelNameTextField.placeholder = "输入频道名称"
 +         channelNameTextField.borderStyle = .roundedRect
 +         channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
 +         configBackgroundView.addSubview(channelNameTextField)
 +         
-+         startButton.setTitle(&quot;Start&quot;, for: .normal)
++         startButton.setTitle("Start", for: .normal)
 +         startButton.setTitleColor(.white, for: .normal)
 +         startButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
 +         startButton.backgroundColor = .systemBlue.withAlphaComponent(0.4)
@@ -2739,7 +2739,7 @@ Lines added: 697, lines removed: 89
 +         tableView.dataSource = self
 +         tableView.separatorStyle = .none
 +         tableView.backgroundColor = .clear
-+         tableView.register(TranscriptCell.self, forCellReuseIdentifier: &quot;TranscriptCell&quot;)
++         tableView.register(TranscriptCell.self, forCellReuseIdentifier: "TranscriptCell")
 +         chatBackgroundView.addSubview(tableView)
 +         
 +         // Status View
@@ -2755,13 +2755,13 @@ Lines added: 697, lines removed: 89
 +         chatBackgroundView.addSubview(controlBarView)
 +         
 +         // Mic Button
-+         micButton.setImage(UIImage(systemName: &quot;mic.fill&quot;), for: .normal)
++         micButton.setImage(UIImage(systemName: "mic.fill"), for: .normal)
 +         micButton.tintColor = .black
 +         micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
 +         controlBarView.addSubview(micButton)
 +         
 +         // End Call Button
-+         endCallButton.setImage(UIImage(systemName: &quot;phone.down.fill&quot;), for: .normal)
++         endCallButton.setImage(UIImage(systemName: "phone.down.fill"), for: .normal)
 +         endCallButton.tintColor = .white
 +         endCallButton.backgroundColor = .red
 +         endCallButton.layer.cornerRadius = 25
@@ -2843,7 +2843,7 @@ Lines added: 697, lines removed: 89
 +     }
 +     
 +     private func initRTM() {
-+         let rtmConfig = AgoraRtmClientConfig(appId: KeyCenter.AG_APP_ID, userId: &quot;\(uid)&quot;)
++         let rtmConfig = AgoraRtmClientConfig(appId: KeyCenter.AG_APP_ID, userId: "\(uid)")
 +         rtmConfig.areaCode = [.CN, .NA]
 +         rtmConfig.presenceTimeout = 30
 +         rtmConfig.heartbeatInterval = 10
@@ -2852,9 +2852,9 @@ Lines added: 697, lines removed: 89
 +         do {
 +             let rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: self)
 +             self.rtmEngine = rtmClient
-+             print(&quot;[Engine Init] RTM initialized successfully&quot;)
++             print("[Engine Init] RTM initialized successfully")
 +         } catch {
-+             print(&quot;[Engine Init] RTM initialization failed: \(error)&quot;)
++             print("[Engine Init] RTM initialization failed: \(error)")
 +         }
 +     }
 +     
@@ -2872,20 +2872,20 @@ Lines added: 697, lines removed: 89
 +         cameraConfig.cameraDirection = .rear
 +         rtcEngine.setCameraCapturerConfiguration(cameraConfig)
 +         
-+         rtcEngine.setParameters(&quot;{\&quot;che.audio.enable.predump\&quot;:{\&quot;enable\&quot;:\&quot;true\&quot;,\&quot;duration\&quot;:\&quot;60\&quot;}}&quot;)
++         rtcEngine.setParameters("{\"che.audio.enable.predump\":{\"enable\":\"true\",\"duration\":\"60\"}}")
 +         
 +         self.rtcEngine = rtcEngine
-+         print(&quot;[Engine Init] RTC initialized successfully&quot;)
++         print("[Engine Init] RTC initialized successfully")
 +     }
 +     
 +     private func initConvoAIAPI() {
 +         guard let rtcEngine = self.rtcEngine else {
-+             print(&quot;[Engine Init] RTC engine is nil, cannot init ConvoAI API&quot;)
++             print("[Engine Init] RTC engine is nil, cannot init ConvoAI API")
 +             return
 +         }
 +         
 +         guard let rtmEngine = self.rtmEngine else {
-+             print(&quot;[Engine Init] RTM engine is nil, cannot init ConvoAI API&quot;)
++             print("[Engine Init] RTM engine is nil, cannot init ConvoAI API")
 +             return
 +         }
 +         
@@ -2894,7 +2894,7 @@ Lines added: 697, lines removed: 89
 +         convoAIAPI.addHandler(handler: self)
 +         
 +         self.convoAIAPI = convoAIAPI
-+         print(&quot;[Engine Init] ConvoAI API initialized successfully&quot;)
++         print("[Engine Init] ConvoAI API initialized successfully")
 +     }
 +     
 +     // MARK: - Actions
@@ -2903,7 +2903,7 @@ Lines added: 697, lines removed: 89
 +     }
 +     
 +     @objc private func startButtonTapped() {
-+         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
++         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 +         guard !channelName.isEmpty else { return }
 +         
 +         self.channel = channelName
@@ -2948,9 +2948,9 @@ Lines added: 697, lines removed: 89
 +     
 +     private func generateUserToken() async throws {
 +         return try await withCheckedThrowingContinuation { continuation in
-+             NetworkManager.shared.generateToken(channelName: channel, uid: &quot;\(uid)&quot;, types: [.rtc, .rtm]) { token in
++             NetworkManager.shared.generateToken(channelName: channel, uid: "\(uid)", types: [.rtc, .rtm]) { token in
 +                 guard let token = token else {
-+                     continuation.resume(throwing: NSError(domain: &quot;generateUserToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;获取 token 失败，请重试&quot;]))
++                     continuation.resume(throwing: NSError(domain: "generateUserToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
 +                     return
 +                 }
 +                 self.token = token
@@ -2973,17 +2973,17 @@ Lines added: 697, lines removed: 89
 +     @MainActor
 +     private func loginRTM() async throws {
 +         guard let rtmEngine = self.rtmEngine else {
-+             throw NSError(domain: &quot;loginRTM&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;RTM engine 未初始化&quot;])
++             throw NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTM engine 未初始化"])
 +         }
 +         
 +         return try await withCheckedThrowingContinuation { continuation in
 +             rtmEngine.login(token) { res, error in
 +                 if let error = error {
-+                     continuation.resume(throwing: NSError(domain: &quot;loginRTM&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;rtm 登录失败: \(error.localizedDescription)&quot;]))
++                     continuation.resume(throwing: NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "rtm 登录失败: \(error.localizedDescription)"]))
 +                 } else if let _ = res {
 +                     continuation.resume()
 +                 } else {
-+                     continuation.resume(throwing: NSError(domain: &quot;loginRTM&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;rtm 登录失败&quot;]))
++                     continuation.resume(throwing: NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "rtm 登录失败"]))
 +                 }
 +             }
 +         }
@@ -2992,7 +2992,7 @@ Lines added: 697, lines removed: 89
 +     @MainActor
 +     private func joinRTC() async throws {
 +         guard let rtcEngine = self.rtcEngine else {
-+             throw NSError(domain: &quot;joinRTC&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;RTC engine 未初始化&quot;])
++             throw NSError(domain: "joinRTC", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTC engine 未初始化"])
 +         }
 +         
 +         let options = AgoraRtcChannelMediaOptions()
@@ -3003,20 +3003,20 @@ Lines added: 697, lines removed: 89
 +         options.autoSubscribeVideo = true
 +         let result = rtcEngine.joinChannel(byToken: token, channelId: channel, uid: UInt(uid), mediaOptions: options)
 +         if result != 0 {
-+             throw NSError(domain: &quot;joinRTC&quot;, code: Int(result), userInfo: [NSLocalizedDescriptionKey: &quot;加入 RTC 频道失败，错误码: \(result)&quot;])
++             throw NSError(domain: "joinRTC", code: Int(result), userInfo: [NSLocalizedDescriptionKey: "加入 RTC 频道失败，错误码: \(result)"])
 +         }
 +     }
 +     
 +     @MainActor
 +     private func subscribeConvoAIMessage() async throws {
 +         guard let convoAIAPI = self.convoAIAPI else {
-+             throw NSError(domain: &quot;subscribeConvoAIMessage&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;ConvoAI API 未初始化&quot;])
++             throw NSError(domain: "subscribeConvoAIMessage", code: -1, userInfo: [NSLocalizedDescriptionKey: "ConvoAI API 未初始化"])
 +         }
 +         
 +         return try await withCheckedThrowingContinuation { continuation in
 +             convoAIAPI.subscribeMessage(channelName: channel) { err in
 +                 if let error = err {
-+                     continuation.resume(throwing: NSError(domain: &quot;subscribeConvoAIMessage&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;订阅消息失败: \(error.message)&quot;]))
++                     continuation.resume(throwing: NSError(domain: "subscribeConvoAIMessage", code: -1, userInfo: [NSLocalizedDescriptionKey: "订阅消息失败: \(error.message)"]))
 +                 } else {
 +                     continuation.resume()
 +                 }
@@ -3026,9 +3026,9 @@ Lines added: 697, lines removed: 89
 +     
 +     private func generateAgentToken() async throws {
 +         return try await withCheckedThrowingContinuation { continuation in
-+             NetworkManager.shared.generateToken(channelName: channel, uid: &quot;\(agentUid)&quot;, types: [.rtc, .rtm]) { token in
++             NetworkManager.shared.generateToken(channelName: channel, uid: "\(agentUid)", types: [.rtc, .rtm]) { token in
 +                 guard let token = token else {
-+                     continuation.resume(throwing: NSError(domain: &quot;generateAgentToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;获取 token 失败，请重试&quot;]))
++                     continuation.resume(throwing: NSError(domain: "generateAgentToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
 +                     return
 +                 }
 +                 self.agentToken = token
@@ -3040,18 +3040,18 @@ Lines added: 697, lines removed: 89
 +     private func startAgent() async throws {
 +         return try await withCheckedThrowingContinuation { continuation in
 +             let parameter: [String: Any] = [
-+                 &quot;name&quot;: channel,
-+                 &quot;pipeline_id&quot;: KeyCenter.AG_PIPELINE_ID,
-+                 &quot;properties&quot;: [
-+                     &quot;channel&quot;: channel,
-+                     &quot;agent_rtc_uid&quot;: &quot;\(agentUid)&quot;,
-+                     &quot;remote_rtc_uids&quot;: [&quot;*&quot;],
-+                     &quot;token&quot;: agentToken
++                 "name": channel,
++                 "pipeline_id": KeyCenter.AG_PIPELINE_ID,
++                 "properties": [
++                     "channel": channel,
++                     "agent_rtc_uid": "\(agentUid)",
++                     "remote_rtc_uids": ["*"],
++                     "token": agentToken
 +                 ]
 +             ]
 +             AgentManager.startAgent(parameter: parameter) { agentId, error in
 +                 if let error = error {
-+                     continuation.resume(throwing: NSError(domain: &quot;startAgent&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
++                     continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
 +                     return
 +                 }
 +                 
@@ -3059,7 +3059,7 @@ Lines added: 697, lines removed: 89
 +                     self.agentId = agentId
 +                     continuation.resume()
 +                 } else {
-+                     continuation.resume(throwing: NSError(domain: &quot;startAgent&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;请求失败&quot;]))
++                     continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: "请求失败"]))
 +                 }
 +             }
 +         }
@@ -3073,7 +3073,7 @@ Lines added: 697, lines removed: 89
 +     
 +     @objc private func toggleMicrophone() {
 +         isMicMuted.toggle()
-+         let imageName = isMicMuted ? &quot;mic.slash.fill&quot; : &quot;mic.fill&quot;
++         let imageName = isMicMuted ? "mic.slash.fill" : "mic.fill"
 +         micButton.setImage(UIImage(systemName: imageName), for: .normal)
 +         rtcEngine?.adjustRecordingSignalVolume(isMicMuted ? 0 : 100)
 +     }
@@ -3110,7 +3110,7 @@ Lines added: 697, lines removed: 89
 +     }
 +     
 +     private func updateButtonState() {
-+         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
++         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 +         let isValid = !channelName.isEmpty
 +         startButton.isEnabled = isValid
 +         startButton.backgroundColor = isValid ? .systemBlue : .systemBlue.withAlphaComponent(0.4)
@@ -3188,7 +3188,7 @@ Lines added: 697, lines removed: 89
 +     }
 +     
 +     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -&gt; UITableViewCell {
-+         let cell = tableView.dequeueReusableCell(withIdentifier: &quot;TranscriptCell&quot;, for: indexPath) as! TranscriptCell
++         let cell = tableView.dequeueReusableCell(withIdentifier: "TranscriptCell", for: indexPath) as! TranscriptCell
 +         cell.configure(with: transcripts[indexPath.row])
 +         return cell
 +     }
@@ -3201,25 +3201,25 @@ Lines added: 697, lines removed: 89
 + // MARK: - AgoraRtcEngineDelegate
 + extension AgentViewController: AgoraRtcEngineDelegate {
 +     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-+         print(&quot;[RTC Call Back] didJoinedOfUid uid: \(uid)&quot;)
++         print("[RTC Call Back] didJoinedOfUid uid: \(uid)")
 +     }
 +     
 +     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-+         print(&quot;[RTC Call Back] didOfflineOfUid uid: \(uid)&quot;)
++         print("[RTC Call Back] didOfflineOfUid uid: \(uid)")
 +     }
 + }
 + 
 + // MARK: - AgoraRtmClientDelegate
 + extension AgentViewController: AgoraRtmClientDelegate {
 +     func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveLinkStateEvent event: AgoraRtmLinkStateEvent) {
-+         print(&quot;&lt;&lt;&lt; [rtmKit:didReceiveLinkStateEvent]&quot;)
++         print("&lt;&lt;&lt; [rtmKit:didReceiveLinkStateEvent]")
 +         switch event.currentState {
 +         case .connected:
-+             print(&quot;RTM connected successfully&quot;)
++             print("RTM connected successfully")
 +         case .disconnected:
-+             print(&quot;RTM disconnected&quot;)
++             print("RTM disconnected")
 +         case .failed:
-+             print(&quot;RTM connection failed, need to re-login&quot;)
++             print("RTM connection failed, need to re-login")
 +         default:
 +             break
 +         }
@@ -3229,19 +3229,19 @@ Lines added: 697, lines removed: 89
 + // MARK: - ConversationalAIAPIEventHandler
 + extension AgentViewController: ConversationalAIAPIEventHandler {
 +     func onAgentVoiceprintStateChanged(agentUserId: String, event: VoiceprintStateChangeEvent) {
-+         print(&quot;onAgentVoiceprintStateChanged: \(event)&quot;)
++         print("onAgentVoiceprintStateChanged: \(event)")
 +     }
 +     
 +     func onMessageError(agentUserId: String, error: MessageError) {
-+         print(&quot;onMessageError: \(error)&quot;)
++         print("onMessageError: \(error)")
 +     }
 +     
 +     func onMessageReceiptUpdated(agentUserId: String, messageReceipt: MessageReceipt) {
-+         print(&quot;onMessageReceiptUpdated: \(messageReceipt)&quot;)
++         print("onMessageReceiptUpdated: \(messageReceipt)")
 +     }
 +     
 +     func onAgentStateChanged(agentUserId: String, event: StateChangeEvent) {
-+         print(&quot;onAgentStateChanged: \(event)&quot;)
++         print("onAgentStateChanged: \(event)")
 +         DispatchQueue.main.async { [weak self] in
 +             guard let self = self else { return }
 +             self.currentAgentState = event.state
@@ -3250,15 +3250,15 @@ Lines added: 697, lines removed: 89
 +     }
 +     
 +     func onAgentInterrupted(agentUserId: String, event: InterruptEvent) {
-+         print(&quot;&lt;&lt;&lt; [onAgentInterrupted]&quot;)
++         print("&lt;&lt;&lt; [onAgentInterrupted]")
 +     }
 +     
 +     func onAgentMetrics(agentUserId: String, metrics: Metric) {
-+         print(&quot;&lt;&lt;&lt; [onAgentMetrics] metrics: \(metrics)&quot;)
++         print("&lt;&lt;&lt; [onAgentMetrics] metrics: \(metrics)")
 +     }
 +     
 +     func onAgentError(agentUserId: String, error: ModuleError) {
-+         print(&quot;&lt;&lt;&lt; [onAgentError] error: \(error)&quot;)
++         print("&lt;&lt;&lt; [onAgentError] error: \(error)")
 +     }
 +     
 +     func onTranscriptUpdated(agentUserId: String, transcript: Transcript) {
@@ -3302,7 +3302,7 @@ Lines added: 697, lines removed: 89
 +     }
 +     
 +     required init?(coder: NSCoder) {
-+         fatalError(&quot;init(coder:) has not been implemented&quot;)
++         fatalError("init(coder:) has not been implemented")
 +     }
 +     
 +     private func setupUI() {
@@ -3348,7 +3348,7 @@ Lines added: 697, lines removed: 89
 +     func configure(with transcript: Transcript) {
 +         let isAgent = transcript.type == .agent
 +         avatarView.backgroundColor = isAgent ? .blue : .green
-+         avatarLabel.text = isAgent ? &quot;AI&quot; : &quot;我&quot;
++         avatarLabel.text = isAgent ? "AI" : "我"
 +         messageLabel.text = transcript.text
 +     }
 + }
@@ -3504,7 +3504,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 12
@@ -3543,9 +3543,9 @@ Lines added: 3, lines removed: undefined
 @@ -459,4 +449,7 @@
           currentAgentState = .unknown
           statusView.updateState(.unknown)
-+         agentId = &quot;&quot;
-+         token = &quot;&quot;
-+         agentToken = &quot;&quot;
++         agentId = ""
++         token = ""
++         agentToken = ""
       }
       
 ```
@@ -3746,7 +3746,7 @@ Output mode: content
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/ConfigBackgroundView.swift</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/ConfigBackgroundView.swift</summary>
 
 **Chunk 1**
 Lines added: 76, lines removed: 1
@@ -3778,22 +3778,22 @@ Lines added: 76, lines removed: 1
 +     }
 +     
 +     required init?(coder: NSCoder) {
-+         fatalError(&quot;init(coder:) has not been implemented&quot;)
++         fatalError("init(coder:) has not been implemented")
 +     }
 +     
 +     // MARK: - UI Setup
 +     private func setupUI() {
 +         backgroundColor = .systemBackground
 +         
-+         logoImageView.image = UIImage(named: &quot;logo&quot;)
++         logoImageView.image = UIImage(named: "logo")
 +         logoImageView.contentMode = .scaleAspectFit
 +         addSubview(logoImageView)
 +         
-+         channelNameTextField.placeholder = &quot;输入频道名称&quot;
++         channelNameTextField.placeholder = "输入频道名称"
 +         channelNameTextField.borderStyle = .roundedRect
 +         addSubview(channelNameTextField)
 +         
-+         startButton.setTitle(&quot;Start&quot;, for: .normal)
++         startButton.setTitle("Start", for: .normal)
 +         startButton.setTitleColor(.white, for: .normal)
 +         startButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
 +         startButton.backgroundColor = .systemBlue.withAlphaComponent(0.4)
@@ -3840,7 +3840,7 @@ Lines added: 76, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/ChatBackgroundView.swift</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/ChatBackgroundView.swift</summary>
 
 **Chunk 1**
 Lines added: 105, lines removed: 1
@@ -3874,7 +3874,7 @@ Lines added: 105, lines removed: 1
 +     }
 +     
 +     required init?(coder: NSCoder) {
-+         fatalError(&quot;init(coder:) has not been implemented&quot;)
++         fatalError("init(coder:) has not been implemented")
 +     }
 +     
 +     // MARK: - UI Setup
@@ -3884,7 +3884,7 @@ Lines added: 105, lines removed: 1
 +         // TableView for transcripts
 +         tableView.separatorStyle = .none
 +         tableView.backgroundColor = .clear
-+         tableView.register(TranscriptCell.self, forCellReuseIdentifier: &quot;TranscriptCell&quot;)
++         tableView.register(TranscriptCell.self, forCellReuseIdentifier: "TranscriptCell")
 +         addSubview(tableView)
 +         
 +         // Status View
@@ -3900,12 +3900,12 @@ Lines added: 105, lines removed: 1
 +         addSubview(controlBarView)
 +         
 +         // Mic Button
-+         micButton.setImage(UIImage(systemName: &quot;mic.fill&quot;), for: .normal)
++         micButton.setImage(UIImage(systemName: "mic.fill"), for: .normal)
 +         micButton.tintColor = .black
 +         controlBarView.addSubview(micButton)
 +         
 +         // End Call Button
-+         endCallButton.setImage(UIImage(systemName: &quot;phone.down.fill&quot;), for: .normal)
++         endCallButton.setImage(UIImage(systemName: "phone.down.fill"), for: .normal)
 +         endCallButton.tintColor = .white
 +         endCallButton.backgroundColor = .red
 +         endCallButton.layer.cornerRadius = 25
@@ -3944,7 +3944,7 @@ Lines added: 105, lines removed: 1
 +     
 +     // MARK: - Public Methods
 +     func updateMicButtonState(isMuted: Bool) {
-+         let imageName = isMuted ? &quot;mic.slash.fill&quot; : &quot;mic.fill&quot;
++         let imageName = isMuted ? "mic.slash.fill" : "mic.fill"
 +         micButton.setImage(UIImage(systemName: imageName), for: .normal)
 +     }
 +     
@@ -3991,7 +3991,7 @@ Lines added: 105, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 3, lines removed: 13
@@ -4028,7 +4028,7 @@ Lines added: 3, lines removed: 13
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 8, lines removed: 105
@@ -4042,16 +4042,16 @@ Lines added: 8, lines removed: 105
 +         // Config Background View
           view.addSubview(configBackgroundView)
 -         
--         logoImageView.image = UIImage(named: &quot;logo&quot;)
+-         logoImageView.image = UIImage(named: "logo")
 -         logoImageView.contentMode = .scaleAspectFit
 -         configBackgroundView.addSubview(logoImageView)
 -         
--         channelNameTextField.placeholder = &quot;输入频道名称&quot;
+-         channelNameTextField.placeholder = "输入频道名称"
 -         channelNameTextField.borderStyle = .roundedRect
 -         channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
 -         configBackgroundView.addSubview(channelNameTextField)
 -         
--         startButton.setTitle(&quot;Start&quot;, for: .normal)
+-         startButton.setTitle("Start", for: .normal)
 -         startButton.setTitleColor(.white, for: .normal)
 -         startButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
 -         startButton.backgroundColor = .systemBlue.withAlphaComponent(0.4)
@@ -4073,7 +4073,7 @@ Lines added: 8, lines removed: 105
 -         tableView.dataSource = self
 -         tableView.separatorStyle = .none
 -         tableView.backgroundColor = .clear
--         tableView.register(TranscriptCell.self, forCellReuseIdentifier: &quot;TranscriptCell&quot;)
+-         tableView.register(TranscriptCell.self, forCellReuseIdentifier: "TranscriptCell")
 -         chatBackgroundView.addSubview(tableView)
 -         
 -         // Status View
@@ -4089,13 +4089,13 @@ Lines added: 8, lines removed: 105
 -         chatBackgroundView.addSubview(controlBarView)
 -         
 -         // Mic Button
--         micButton.setImage(UIImage(systemName: &quot;mic.fill&quot;), for: .normal)
+-         micButton.setImage(UIImage(systemName: "mic.fill"), for: .normal)
 -         micButton.tintColor = .black
 -         micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
 -         controlBarView.addSubview(micButton)
 -         
 -         // End Call Button
--         endCallButton.setImage(UIImage(systemName: &quot;phone.down.fill&quot;), for: .normal)
+-         endCallButton.setImage(UIImage(systemName: "phone.down.fill"), for: .normal)
 -         endCallButton.tintColor = .white
 -         endCallButton.backgroundColor = .red
 -         endCallButton.layer.cornerRadius = 25
@@ -4176,7 +4176,7 @@ Lines added: 8, lines removed: 105
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -4185,8 +4185,8 @@ Lines added: 1, lines removed: 1
 @@ -146,5 +146,5 @@
       
       @objc private func startButtonTapped() {
--         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
-+         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
+-         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
++         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
           guard !channelName.isEmpty else { return }
           
 ```
@@ -4199,7 +4199,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 2
@@ -4208,7 +4208,7 @@ Lines added: 1, lines removed: 2
 @@ -311,6 +311,5 @@
       @objc private func toggleMicrophone() {
           isMicMuted.toggle()
--         let imageName = isMicMuted ? &quot;mic.slash.fill&quot; : &quot;mic.fill&quot;
+-         let imageName = isMicMuted ? "mic.slash.fill" : "mic.fill"
 -         micButton.setImage(UIImage(systemName: imageName), for: .normal)
 +         chatBackgroundView.updateMicButtonState(isMuted: isMicMuted)
           rtcEngine?.adjustRecordingSignalVolume(isMicMuted ? 0 : 100)
@@ -4223,7 +4223,7 @@ Lines added: 1, lines removed: 2
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 2
@@ -4238,8 +4238,8 @@ Lines added: 2, lines removed: 2
           currentAgentState = .unknown
 -         statusView.updateState(.unknown)
 +         chatBackgroundView.updateStatusView(state: .unknown)
-          agentId = &quot;&quot;
-          token = &quot;&quot;
+          agentId = ""
+          token = ""
 ```
 
 </details>
@@ -4250,7 +4250,7 @@ Lines added: 2, lines removed: 2
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 3, lines removed: 4
@@ -4259,8 +4259,8 @@ Lines added: 3, lines removed: 4
 @@ -341,13 +341,12 @@
       
       private func updateButtonState() {
--         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
-+         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
+-         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
++         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
           let isValid = !channelName.isEmpty
 -         startButton.isEnabled = isValid
 -         startButton.backgroundColor = isValid ? .systemBlue : .systemBlue.withAlphaComponent(0.4)
@@ -4283,7 +4283,7 @@ Lines added: 3, lines removed: 4
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 2
@@ -4404,7 +4404,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swift/VoiceAgent/AgentViewController.swift</summary>
 
 **Chunk 1**
 Lines added: 5, lines removed: 1
@@ -4451,7 +4451,7 @@ Lines added: 5, lines removed: 10
       
 -     private func initRTM() {
 +     private func initializeRTM() {
-          let rtmConfig = AgoraRtmClientConfig(appId: KeyCenter.AG_APP_ID, userId: &quot;\(uid)&quot;)
+          let rtmConfig = AgoraRtmClientConfig(appId: KeyCenter.AG_APP_ID, userId: "\(uid)")
           rtmConfig.areaCode = [.CN, .NA]
 ```
 
@@ -4478,7 +4478,7 @@ Lines added: 1, lines removed: 1
 -     private func initConvoAIAPI() {
 +     private func initializeConvoAIAPI() {
           guard let rtcEngine = self.rtcEngine else {
-              print(&quot;[Engine Init] RTC engine is nil, cannot init ConvoAI API&quot;)
+              print("[Engine Init] RTC engine is nil, cannot init ConvoAI API")
 ```
 
 **Chunk 5**
@@ -4494,7 +4494,7 @@ Lines added: 1, lines removed: 13
 -     }
 -     
 -     @objc private func startButtonTapped() {
--         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
+-         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 -         guard !channelName.isEmpty else { return }
 -         
 -         self.channel = channelName
@@ -4552,9 +4552,9 @@ Lines added: 14, lines removed: undefined
       
 +     private func generateAgentToken() async throws {
 +         return try await withCheckedThrowingContinuation { continuation in
-+             NetworkManager.shared.generateToken(channelName: channel, uid: &quot;\(agentUid)&quot;, types: [.rtc, .rtm]) { token in
++             NetworkManager.shared.generateToken(channelName: channel, uid: "\(agentUid)", types: [.rtc, .rtm]) { token in
 +                 guard let token = token else {
-+                     continuation.resume(throwing: NSError(domain: &quot;generateAgentToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;获取 token 失败，请重试&quot;]))
++                     continuation.resume(throwing: NSError(domain: "generateAgentToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
 +                     return
 +                 }
 +                 self.agentToken = token
@@ -4578,8 +4578,8 @@ Lines added: 2, lines removed: 2
 -     private func joinRTC() async throws {
 +     private func joinRTCChannel() async throws {
           guard let rtcEngine = self.rtcEngine else {
--             throw NSError(domain: &quot;joinRTC&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;RTC engine 未初始化&quot;])
-+             throw NSError(domain: &quot;joinRTCChannel&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;RTC engine 未初始化&quot;])
+-             throw NSError(domain: "joinRTC", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTC engine 未初始化"])
++             throw NSError(domain: "joinRTCChannel", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTC engine 未初始化"])
           }
           
 ```
@@ -4591,8 +4591,8 @@ Lines added: 1, lines removed: 1
 @@ -241,5 +242,5 @@
           let result = rtcEngine.joinChannel(byToken: token, channelId: channel, uid: UInt(uid), mediaOptions: options)
           if result != 0 {
--             throw NSError(domain: &quot;joinRTC&quot;, code: Int(result), userInfo: [NSLocalizedDescriptionKey: &quot;加入 RTC 频道失败，错误码: \(result)&quot;])
-+             throw NSError(domain: &quot;joinRTCChannel&quot;, code: Int(result), userInfo: [NSLocalizedDescriptionKey: &quot;加入 RTC 频道失败，错误码: \(result)&quot;])
+-             throw NSError(domain: "joinRTC", code: Int(result), userInfo: [NSLocalizedDescriptionKey: "加入 RTC 频道失败，错误码: \(result)"])
++             throw NSError(domain: "joinRTCChannel", code: Int(result), userInfo: [NSLocalizedDescriptionKey: "加入 RTC 频道失败，错误码: \(result)"])
           }
       }
 ```
@@ -4606,9 +4606,9 @@ Lines added: 1, lines removed: 13
       
 -     private func generateAgentToken() async throws {
 -         return try await withCheckedThrowingContinuation { continuation in
--             NetworkManager.shared.generateToken(channelName: channel, uid: &quot;\(agentUid)&quot;, types: [.rtc, .rtm]) { token in
+-             NetworkManager.shared.generateToken(channelName: channel, uid: "\(agentUid)", types: [.rtc, .rtm]) { token in
 -                 guard let token = token else {
--                     continuation.resume(throwing: NSError(domain: &quot;generateAgentToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;获取 token 失败，请重试&quot;]))
+-                     continuation.resume(throwing: NSError(domain: "generateAgentToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
 -                     return
 -                 }
 -                 self.agentToken = token
@@ -4686,7 +4686,7 @@ Lines added: 27, lines removed: 5
 -     private func updateButtonState() {
 +     // MARK: - UI Updates
 +     private func updateStartButtonState() {
-          let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
+          let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
           let isValid = !channelName.isEmpty
           configBackgroundView.updateButtonState(isEnabled: isValid)
       }
@@ -4703,7 +4703,7 @@ Lines added: 27, lines removed: 5
 +     }
 +     
 +     @objc private func startButtonTapped() {
-+         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? &quot;&quot;
++         let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 +         guard !channelName.isEmpty else { return }
 +         
 +         self.channel = channelName
@@ -4894,7 +4894,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/AgentViewModel.swift</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/AgentViewModel.swift</summary>
 
 **Chunk 1**
 Lines added: 391, lines removed: 1
@@ -4916,7 +4916,7 @@ Lines added: 391, lines removed: 1
 + 
 + class AgentViewModel: NSObject, ObservableObject {
 +     // MARK: - UI State
-+     @Published var channelName: String = &quot;&quot;
++     @Published var channelName: String = ""
 +     @Published var showConfigView: Bool = true
 +     @Published var showChatView: Bool = false
 +     
@@ -4929,10 +4929,10 @@ Lines added: 391, lines removed: 1
 +     
 +     // MARK: - Properties
 +     private let uid = Int.random(in: 1000...9999999)
-+     private var channel: String = &quot;&quot;
-+     private var token: String = &quot;&quot;
-+     private var agentToken: String = &quot;&quot;
-+     private var agentId: String = &quot;&quot;
++     private var channel: String = ""
++     private var token: String = ""
++     private var agentToken: String = ""
++     private var agentId: String = ""
 +     private let agentUid = Int.random(in: 10000000...99999999)
 +     
 +     // MARK: - Agora Components
@@ -4953,7 +4953,7 @@ Lines added: 391, lines removed: 1
 +     }
 +     
 +     private func initializeRTM() {
-+         let rtmConfig = AgoraRtmClientConfig(appId: KeyCenter.AG_APP_ID, userId: &quot;\(uid)&quot;)
++         let rtmConfig = AgoraRtmClientConfig(appId: KeyCenter.AG_APP_ID, userId: "\(uid)")
 +         rtmConfig.areaCode = [.CN, .NA]
 +         rtmConfig.presenceTimeout = 30
 +         rtmConfig.heartbeatInterval = 10
@@ -4962,9 +4962,9 @@ Lines added: 391, lines removed: 1
 +         do {
 +             let rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: self)
 +             self.rtmEngine = rtmClient
-+             print(&quot;[Engine Init] RTM initialized successfully&quot;)
++             print("[Engine Init] RTM initialized successfully")
 +         } catch {
-+             print(&quot;[Engine Init] RTM initialization failed: \(error)&quot;)
++             print("[Engine Init] RTM initialization failed: \(error)")
 +         }
 +     }
 +     
@@ -4982,20 +4982,20 @@ Lines added: 391, lines removed: 1
 +         cameraConfig.cameraDirection = .rear
 +         rtcEngine.setCameraCapturerConfiguration(cameraConfig)
 +         
-+         rtcEngine.setParameters(&quot;{\&quot;che.audio.enable.predump\&quot;:{\&quot;enable\&quot;:\&quot;true\&quot;,\&quot;duration\&quot;:\&quot;60\&quot;}}&quot;)
++         rtcEngine.setParameters("{\"che.audio.enable.predump\":{\"enable\":\"true\",\"duration\":\"60\"}}")
 +         
 +         self.rtcEngine = rtcEngine
-+         print(&quot;[Engine Init] RTC initialized successfully&quot;)
++         print("[Engine Init] RTC initialized successfully")
 +     }
 +     
 +     private func initializeConvoAIAPI() {
 +         guard let rtcEngine = self.rtcEngine else {
-+             print(&quot;[Engine Init] RTC engine is nil, cannot init ConvoAI API&quot;)
++             print("[Engine Init] RTC engine is nil, cannot init ConvoAI API")
 +             return
 +         }
 +         
 +         guard let rtmEngine = self.rtmEngine else {
-+             print(&quot;[Engine Init] RTM engine is nil, cannot init ConvoAI API&quot;)
++             print("[Engine Init] RTM engine is nil, cannot init ConvoAI API")
 +             return
 +         }
 +         
@@ -5004,7 +5004,7 @@ Lines added: 391, lines removed: 1
 +         convoAIAPI.addHandler(handler: self)
 +         
 +         self.convoAIAPI = convoAIAPI
-+         print(&quot;[Engine Init] ConvoAI API initialized successfully&quot;)
++         print("[Engine Init] ConvoAI API initialized successfully")
 +     }
 +     
 +     // MARK: - Connection Flow
@@ -5053,13 +5053,13 @@ Lines added: 391, lines removed: 1
 +     private func generateUserToken() async throws {
 +         return try await withCheckedThrowingContinuation { [weak self] continuation in
 +             guard let self = self else {
-+                 continuation.resume(throwing: NSError(domain: &quot;generateUserToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;self 被释放&quot;]))
++                 continuation.resume(throwing: NSError(domain: "generateUserToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "self 被释放"]))
 +                 return
 +             }
 +             
-+             NetworkManager.shared.generateToken(channelName: self.channel, uid: &quot;\(self.uid)&quot;, types: [.rtc, .rtm]) { token in
++             NetworkManager.shared.generateToken(channelName: self.channel, uid: "\(self.uid)", types: [.rtc, .rtm]) { token in
 +                 guard let token = token else {
-+                     continuation.resume(throwing: NSError(domain: &quot;generateUserToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;获取 token 失败，请重试&quot;]))
++                     continuation.resume(throwing: NSError(domain: "generateUserToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
 +                     return
 +                 }
 +                 self.token = token
@@ -5071,13 +5071,13 @@ Lines added: 391, lines removed: 1
 +     private func generateAgentToken() async throws {
 +         return try await withCheckedThrowingContinuation { [weak self] continuation in
 +             guard let self = self else {
-+                 continuation.resume(throwing: NSError(domain: &quot;generateAgentToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;self 被释放&quot;]))
++                 continuation.resume(throwing: NSError(domain: "generateAgentToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "self 被释放"]))
 +                 return
 +             }
 +             
-+             NetworkManager.shared.generateToken(channelName: self.channel, uid: &quot;\(self.agentUid)&quot;, types: [.rtc, .rtm]) { token in
++             NetworkManager.shared.generateToken(channelName: self.channel, uid: "\(self.agentUid)", types: [.rtc, .rtm]) { token in
 +                 guard let token = token else {
-+                     continuation.resume(throwing: NSError(domain: &quot;generateAgentToken&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;获取 token 失败，请重试&quot;]))
++                     continuation.resume(throwing: NSError(domain: "generateAgentToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
 +                     return
 +                 }
 +                 self.agentToken = token
@@ -5090,17 +5090,17 @@ Lines added: 391, lines removed: 1
 +     @MainActor
 +     private func loginRTM() async throws {
 +         guard let rtmEngine = self.rtmEngine else {
-+             throw NSError(domain: &quot;loginRTM&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;RTM engine 未初始化&quot;])
++             throw NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTM engine 未初始化"])
 +         }
 +         
 +         return try await withCheckedThrowingContinuation { continuation in
 +             rtmEngine.login(token) { res, error in
 +                 if let error = error {
-+                     continuation.resume(throwing: NSError(domain: &quot;loginRTM&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;rtm 登录失败: \(error.localizedDescription)&quot;]))
++                     continuation.resume(throwing: NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "rtm 登录失败: \(error.localizedDescription)"]))
 +                 } else if let _ = res {
 +                     continuation.resume()
 +                 } else {
-+                     continuation.resume(throwing: NSError(domain: &quot;loginRTM&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;rtm 登录失败&quot;]))
++                     continuation.resume(throwing: NSError(domain: "loginRTM", code: -1, userInfo: [NSLocalizedDescriptionKey: "rtm 登录失败"]))
 +                 }
 +             }
 +         }
@@ -5109,7 +5109,7 @@ Lines added: 391, lines removed: 1
 +     @MainActor
 +     private func joinRTCChannel() async throws {
 +         guard let rtcEngine = self.rtcEngine else {
-+             throw NSError(domain: &quot;joinRTCChannel&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;RTC engine 未初始化&quot;])
++             throw NSError(domain: "joinRTCChannel", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTC engine 未初始化"])
 +         }
 +         
 +         let options = AgoraRtcChannelMediaOptions()
@@ -5120,20 +5120,20 @@ Lines added: 391, lines removed: 1
 +         options.autoSubscribeVideo = true
 +         let result = rtcEngine.joinChannel(byToken: token, channelId: channel, uid: UInt(uid), mediaOptions: options)
 +         if result != 0 {
-+             throw NSError(domain: &quot;joinRTCChannel&quot;, code: Int(result), userInfo: [NSLocalizedDescriptionKey: &quot;加入 RTC 频道失败，错误码: \(result)&quot;])
++             throw NSError(domain: "joinRTCChannel", code: Int(result), userInfo: [NSLocalizedDescriptionKey: "加入 RTC 频道失败，错误码: \(result)"])
 +         }
 +     }
 +     
 +     @MainActor
 +     private func subscribeConvoAIMessage() async throws {
 +         guard let convoAIAPI = self.convoAIAPI else {
-+             throw NSError(domain: &quot;subscribeConvoAIMessage&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;ConvoAI API 未初始化&quot;])
++             throw NSError(domain: "subscribeConvoAIMessage", code: -1, userInfo: [NSLocalizedDescriptionKey: "ConvoAI API 未初始化"])
 +         }
 +             
 +         return try await withCheckedThrowingContinuation { continuation in
 +             convoAIAPI.subscribeMessage(channelName: channel) { err in
 +                 if let error = err {
-+                     continuation.resume(throwing: NSError(domain: &quot;subscribeConvoAIMessage&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;订阅消息失败: \(error.message)&quot;]))
++                     continuation.resume(throwing: NSError(domain: "subscribeConvoAIMessage", code: -1, userInfo: [NSLocalizedDescriptionKey: "订阅消息失败: \(error.message)"]))
 +                 } else {
 +                     continuation.resume()
 +                 }
@@ -5145,23 +5145,23 @@ Lines added: 391, lines removed: 1
 +     private func startAgent() async throws {
 +         return try await withCheckedThrowingContinuation { [weak self] continuation in
 +             guard let self = self else {
-+                 continuation.resume(throwing: NSError(domain: &quot;startAgent&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;self 被释放&quot;]))
++                 continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: "self 被释放"]))
 +                 return
 +             }
 +             
 +             let parameter: [String: Any] = [
-+                 &quot;name&quot;: self.channel,
-+                 &quot;pipeline_id&quot;: KeyCenter.AG_PIPELINE_ID,
-+                 &quot;properties&quot;: [
-+                     &quot;channel&quot;: self.channel,
-+                     &quot;agent_rtc_uid&quot;: &quot;\(agentUid)&quot;,
-+                     &quot;remote_rtc_uids&quot;: [&quot;*&quot;],
-+                     &quot;token&quot;: self.agentToken
++                 "name": self.channel,
++                 "pipeline_id": KeyCenter.AG_PIPELINE_ID,
++                 "properties": [
++                     "channel": self.channel,
++                     "agent_rtc_uid": "\(agentUid)",
++                     "remote_rtc_uids": ["*"],
++                     "token": self.agentToken
 +                 ]
 +             ]
 +             AgentManager.startAgent(parameter: parameter) { agentId, error in
 +                 if let error = error {
-+                     continuation.resume(throwing: NSError(domain: &quot;startAgent&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
++                     continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
 +                     return
 +                 }
 +                 
@@ -5169,7 +5169,7 @@ Lines added: 391, lines removed: 1
 +                     self.agentId = agentId
 +                     continuation.resume()
 +                 } else {
-+                     continuation.resume(throwing: NSError(domain: &quot;startAgent&quot;, code: -1, userInfo: [NSLocalizedDescriptionKey: &quot;请求失败&quot;]))
++                     continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: "请求失败"]))
 +                 }
 +             }
 +         }
@@ -5208,34 +5208,34 @@ Lines added: 391, lines removed: 1
 +         
 +         transcripts.removeAll()
 +         isMicMuted = false
-+         agentId = &quot;&quot;
-+         token = &quot;&quot;
-+         agentToken = &quot;&quot;
++         agentId = ""
++         token = ""
++         agentToken = ""
 +     }
 + }
 + 
 + // MARK: - AgoraRtcEngineDelegate
 + extension AgentViewModel: AgoraRtcEngineDelegate {
 +     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-+         print(&quot;[RTC Call Back] didJoinedOfUid uid: \(uid)&quot;)
++         print("[RTC Call Back] didJoinedOfUid uid: \(uid)")
 +     }
 +     
 +     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-+         print(&quot;[RTC Call Back] didOfflineOfUid uid: \(uid)&quot;)
++         print("[RTC Call Back] didOfflineOfUid uid: \(uid)")
 +     }
 + }
 + 
 + // MARK: - AgoraRtmClientDelegate
 + extension AgentViewModel: AgoraRtmClientDelegate {
 +     func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveLinkStateEvent event: AgoraRtmLinkStateEvent) {
-+         print(&quot;&lt;&lt;&lt; [rtmKit:didReceiveLinkStateEvent]&quot;)
++         print("&lt;&lt;&lt; [rtmKit:didReceiveLinkStateEvent]")
 +         switch event.currentState {
 +         case .connected:
-+             print(&quot;RTM connected successfully&quot;)
++             print("RTM connected successfully")
 +         case .disconnected:
-+             print(&quot;RTM disconnected&quot;)
++             print("RTM disconnected")
 +         case .failed:
-+             print(&quot;RTM connection failed, need to re-login&quot;)
++             print("RTM connection failed, need to re-login")
 +         default:
 +             break
 +         }
@@ -5245,31 +5245,31 @@ Lines added: 391, lines removed: 1
 + // MARK: - ConversationalAIAPIEventHandler
 + extension AgentViewModel: ConversationalAIAPIEventHandler {
 +     func onAgentVoiceprintStateChanged(agentUserId: String, event: VoiceprintStateChangeEvent) {
-+         print(&quot;onAgentVoiceprintStateChanged: \(event)&quot;)
++         print("onAgentVoiceprintStateChanged: \(event)")
 +     }
 +     
 +     func onMessageError(agentUserId: String, error: MessageError) {
-+         print(&quot;onMessageError: \(error)&quot;)
++         print("onMessageError: \(error)")
 +     }
 +     
 +     func onMessageReceiptUpdated(agentUserId: String, messageReceipt: MessageReceipt) {
-+         print(&quot;onMessageReceiptUpdated: \(messageReceipt)&quot;)
++         print("onMessageReceiptUpdated: \(messageReceipt)")
 +     }
 +     
 +     func onAgentStateChanged(agentUserId: String, event: StateChangeEvent) {
-+         print(&quot;onAgentStateChanged: \(event)&quot;)
++         print("onAgentStateChanged: \(event)")
 +     }
 +     
 +     func onAgentInterrupted(agentUserId: String, event: InterruptEvent) {
-+         print(&quot;&lt;&lt;&lt; [onAgentInterrupted]&quot;)
++         print("&lt;&lt;&lt; [onAgentInterrupted]")
 +     }
 +     
 +     func onAgentMetrics(agentUserId: String, metrics: Metric) {
-+         print(&quot;&lt;&lt;&lt; [onAgentMetrics] metrics: \(metrics)&quot;)
++         print("&lt;&lt;&lt; [onAgentMetrics] metrics: \(metrics)")
 +     }
 +     
 +     func onAgentError(agentUserId: String, error: ModuleError) {
-+         print(&quot;&lt;&lt;&lt; [onAgentError] error: \(error)&quot;)
++         print("&lt;&lt;&lt; [onAgentError] error: \(error)")
 +     }
 +     
 +     func onTranscriptUpdated(agentUserId: String, transcript: Transcript) {
@@ -5303,7 +5303,7 @@ Lines added: 391, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/AgentView.swift</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 238, lines removed: 1
@@ -5340,7 +5340,7 @@ Lines added: 238, lines removed: 1
 +             .navigationBarTitleDisplayMode(.inline)
 +             .toolbar {
 +                 ToolbarItem(placement: .principal) {
-+                     Text(&quot;VoiceAgent&quot;)
++                     Text("VoiceAgent")
 +                         .font(.headline)
 +                         .fontWeight(.semibold)
 +                 }
@@ -5349,7 +5349,7 @@ Lines added: 238, lines removed: 1
 +                 AlertToast(type: .loading)
 +             }
 +             .toast(isPresenting: $viewModel.isError) {
-+                 AlertToast(displayMode: .alert, type: .error(.red), title: viewModel.initializationError?.localizedDescription ?? &quot;发生错误&quot;)
++                 AlertToast(displayMode: .alert, type: .error(.red), title: viewModel.initializationError?.localizedDescription ?? "发生错误")
 +             }
 +             .onChange(of: viewModel.isError) {
 +                 if viewModel.isError {
@@ -5368,9 +5368,9 @@ Lines added: 238, lines removed: 1
 +     
 +     var body: some View {
 +         VStack(spacing: 30) {
-+             Image(&quot;logo&quot;)
++             Image("logo")
 +             
-+             TextField(&quot;输入频道名称&quot;, text: $viewModel.channelName)
++             TextField("输入频道名称", text: $viewModel.channelName)
 +                 .textFieldStyle(.roundedBorder)
 +                 .padding(.horizontal)
 +                 .frame(width: 250, height: 50)
@@ -5378,7 +5378,7 @@ Lines added: 238, lines removed: 1
 +             Button(action: {
 +                 viewModel.startConnection()
 +             }) {
-+                 Text(&quot;Start&quot;)
++                 Text("Start")
 +                     .foregroundColor(.white)
 +                     .frame(width: 250, height: 50)
 +                     .background(viewModel.channelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.blue.opacity(0.4) : Color.blue)
@@ -5452,7 +5452,7 @@ Lines added: 238, lines removed: 1
 +             Button {
 +                 viewModel.toggleMicrophone()
 +             } label: {
-+                 Image(systemName: viewModel.isMicMuted ? &quot;mic.slash.fill&quot; : &quot;mic.fill&quot;)
++                 Image(systemName: viewModel.isMicMuted ? "mic.slash.fill" : "mic.fill")
 +                     .font(.system(size: 20))
 +                     .foregroundColor(.black)
 +             }
@@ -5468,7 +5468,7 @@ Lines added: 238, lines removed: 1
 +         Button {
 +             onEndCall()
 +         } label: {
-+             Image(systemName: &quot;phone.down.fill&quot;)
++             Image(systemName: "phone.down.fill")
 +                 .font(.system(size: 24))
 +                 .foregroundColor(.white)
 +                 .frame(width: 50, height: 50)
@@ -5484,7 +5484,7 @@ Lines added: 238, lines removed: 1
 +     
 +     // 为每个字幕生成唯一标识符
 +     private func transcriptId(_ transcript: Transcript) -&gt; String {
-+         return &quot;\(transcript.turnId)_\(transcript.type.rawValue)_\(transcript.userId)&quot;
++         return "\(transcript.turnId)_\(transcript.type.rawValue)_\(transcript.userId)"
 +     }
 +     
 +     var body: some View {
@@ -5525,7 +5525,7 @@ Lines added: 238, lines removed: 1
 +                 .fill(transcript.type == .agent ? Color.blue : Color.green)
 +                 .frame(width: 32, height: 32)
 +                 .overlay(
-+                     Text(transcript.type == .agent ? &quot;AI&quot; : &quot;我&quot;)
++                     Text(transcript.type == .agent ? "AI" : "我")
 +                         .font(.system(size: 12, weight: .semibold))
 +                         .foregroundColor(.white)
 +                 )
@@ -5559,7 +5559,7 @@ Lines added: 238, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -5794,7 +5794,7 @@ Directory: **/Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starte
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir">
 <details>
-            <summary>Tool use: **list_directory** • Listed directory undefined • **0** results</summary>
+            <summary>Tool use: **list_dir** • Listed directory undefined • **0** results</summary>
         
 No results found
 </details>
@@ -5866,7 +5866,7 @@ No results found
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentViewModel.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentViewModel.swift</summary>
 
 **Chunk 1**
 Lines added: 3, lines removed: 3
@@ -5958,7 +5958,7 @@ Lint results
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: undefined
@@ -5986,7 +5986,7 @@ Lines added: 2, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: undefined
@@ -6156,7 +6156,7 @@ Output mode: content
 ---
 
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
-<details><summary>Tool use: **command** • Run command: cd /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui && find . -name "*.swift" -type f | grep -E "(App|main|AgentView)" | head -10</summary>
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui && find . -name "*.swift" -type f | grep -E "(App|main|AgentView)" | head -10</summary>
 
 ```bash
 cd /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui && find . -name "*.swift" -type f | grep -E "(App|main|AgentView)" | head -10
@@ -6255,7 +6255,7 @@ Lint results
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
 
 **Chunk 1**
 Lines added: 7, lines removed: undefined
@@ -6265,14 +6265,14 @@ Lines added: 7, lines removed: undefined
   @main
   struct VoiceAgentApp: App {
 +     init() {
-+         print(&quot;[VoiceAgentApp] App initialized&quot;)
++         print("[VoiceAgentApp] App initialized")
 +     }
 +     
       var body: some Scene {
           WindowGroup {
               AgentView()
 +                 .onAppear {
-+                     print(&quot;[VoiceAgentApp] AgentView appeared&quot;)
++                     print("[VoiceAgentApp] AgentView appeared")
 +                 }
           }
       }
@@ -6312,7 +6312,7 @@ Lines added: 7, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 4, lines removed: undefined
@@ -6323,7 +6323,7 @@ Lines added: 4, lines removed: undefined
       @StateObject private var viewModel = AgentViewModel()
 +     
 +     init() {
-+         print(&quot;[AgentView] AgentView initialized&quot;)
++         print("[AgentView] AgentView initialized")
 +     }
       
       var body: some View {
@@ -6337,7 +6337,7 @@ Lines added: 3, lines removed: undefined
                       ConfigView(viewModel: viewModel)
                           .frame(maxWidth: .infinity, maxHeight: .infinity)
 +                         .onAppear {
-+                             print(&quot;[AgentView] ConfigView appeared&quot;)
++                             print("[AgentView] ConfigView appeared")
 +                         }
                   }
                   
@@ -6351,7 +6351,7 @@ Lines added: 3, lines removed: undefined
                       ChatView(viewModel: viewModel)
                           .frame(maxWidth: .infinity, maxHeight: .infinity)
 +                         .onAppear {
-+                             print(&quot;[AgentView] ChatView appeared&quot;)
++                             print("[AgentView] ChatView appeared")
 +                         }
                   }
               }
@@ -6365,7 +6365,7 @@ Lines added: 3, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentViewModel.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentViewModel.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: undefined
@@ -6374,7 +6374,7 @@ Lines added: 1, lines removed: undefined
 @@ -39,4 +39,5 @@
       override init() {
           super.init()
-+         print(&quot;[AgentViewModel] AgentViewModel initialized&quot;)
++         print("[AgentViewModel] AgentViewModel initialized")
           initializeEngines()
       }
 ```
@@ -6414,7 +6414,7 @@ Lint results
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
 
 **Chunk 1**
 Lines added: 19, lines removed: 3
@@ -6432,20 +6432,20 @@ Lines added: 19, lines removed: 3
 + struct ContentView: View {
 +     var body: some View {
 +         VStack {
-+             Text(&quot;VoiceAgent App&quot;)
++             Text("VoiceAgent App")
 +                 .font(.largeTitle)
 +                 .padding()
 +             
-+             Text(&quot;如果看到这个，说明 App 已启动&quot;)
++             Text("如果看到这个，说明 App 已启动")
 +                 .foregroundColor(.gray)
 +             
               AgentView()
 -                 .onAppear {
--                     print(&quot;[VoiceAgentApp] AgentView appeared&quot;)
+-                     print("[VoiceAgentApp] AgentView appeared")
 -                 }
 +         }
 +         .onAppear {
-+             print(&quot;[ContentView] ContentView appeared&quot;)
++             print("[ContentView] ContentView appeared")
           }
       }
 ```
@@ -6485,7 +6485,7 @@ Lint results
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
 
 **Chunk 1**
 Lines added: 3, lines removed: 19
@@ -6503,19 +6503,19 @@ Lines added: 3, lines removed: 19
 - struct ContentView: View {
 -     var body: some View {
 -         VStack {
--             Text(&quot;VoiceAgent App&quot;)
+-             Text("VoiceAgent App")
 -                 .font(.largeTitle)
 -                 .padding()
 -             
--             Text(&quot;如果看到这个，说明 App 已启动&quot;)
+-             Text("如果看到这个，说明 App 已启动")
 -                 .foregroundColor(.gray)
 -             
               AgentView()
 -         }
 -         .onAppear {
--             print(&quot;[ContentView] ContentView appeared&quot;)
+-             print("[ContentView] ContentView appeared")
 +                 .onAppear {
-+                     print(&quot;[VoiceAgentApp] AgentView appeared&quot;)
++                     print("[VoiceAgentApp] AgentView appeared")
 +                 }
           }
       }
@@ -6551,7 +6551,7 @@ Lines added: 3, lines removed: 19
 ---
 
 <tool-use data-tool-type="shell" data-tool-name="run_terminal_cmd">
-<details><summary>Tool use: **command** • Run command: cd /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui && xcodebuild -list -project VoiceAgent.xcodeproj 2>/dev/null | head -20 || echo "无法读取项目配置"</summary>
+<details><summary>Tool use: **run_terminal_cmd** • Run command: cd /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui && xcodebuild -list -project VoiceAgent.xcodeproj 2>/dev/null | head -20 || echo "无法读取项目配置"</summary>
 
 ```bash
 cd /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui && xcodebuild -list -project VoiceAgent.xcodeproj 2>/dev/null | head -20 || echo "无法读取项目配置"
@@ -6564,7 +6564,7 @@ Command line invocation:
 User defaults from command line:
     IDEPackageSupportUseBuiltinSCM = YES
 
-Information about project &quot;VoiceAgent&quot;:
+Information about project "VoiceAgent":
     Targets:
         VoiceAgent
 
@@ -6572,7 +6572,7 @@ Information about project &quot;VoiceAgent&quot;:
         Debug
         Release
 
-    If no build configuration is specified and -scheme is not passed then &quot;Release&quot; is used.
+    If no build configuration is specified and -scheme is not passed then "Release" is used.
 
     Schemes:
         VoiceAgent
@@ -6639,7 +6639,7 @@ Output mode: content
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
 
 **Chunk 1**
 Lines added: 8, lines removed: 4
@@ -6650,14 +6650,14 @@ Lines added: 8, lines removed: 4
           WindowGroup {
 -             AgentView()
 -                 .onAppear {
--                     print(&quot;[VoiceAgentApp] AgentView appeared&quot;)
+-                     print("[VoiceAgentApp] AgentView appeared")
 -                 }
 +             ZStack {
 +                 Color.white.ignoresSafeArea()
 +                 
 +                 AgentView()
 +                     .onAppear {
-+                         print(&quot;[VoiceAgentApp] AgentView appeared&quot;)
++                         print("[VoiceAgentApp] AgentView appeared")
 +                     }
 +             }
           }
@@ -6806,7 +6806,7 @@ App 已初始化。检查 `AgentViewModel` 的初始状态，确保 `showConfigV
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/VoiceAgentApp.swift</summary>
 
 **Chunk 1**
 Lines added: 9, lines removed: 4
@@ -6817,16 +6817,16 @@ Lines added: 9, lines removed: 4
                   
 -                 AgentView()
 -                     .onAppear {
--                         print(&quot;[VoiceAgentApp] AgentView appeared&quot;)
+-                         print("[VoiceAgentApp] AgentView appeared")
 -                     }
 +                 Group {
 +                     AgentView()
 +                         .onAppear {
-+                             print(&quot;[VoiceAgentApp] AgentView appeared&quot;)
++                             print("[VoiceAgentApp] AgentView appeared")
 +                         }
 +                 }
 +                 .onAppear {
-+                     print(&quot;[VoiceAgentApp] WindowGroup content appeared&quot;)
++                     print("[VoiceAgentApp] WindowGroup content appeared")
 +                 }
               }
           }
@@ -6840,7 +6840,7 @@ Lines added: 9, lines removed: 4
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 11, lines removed: 1
@@ -6858,14 +6858,14 @@ Lines added: 11, lines removed: 1
                       ConfigView(viewModel: viewModel)
                           .frame(maxWidth: .infinity, maxHeight: .infinity)
                           .onAppear {
--                             print(&quot;[AgentView] ConfigView appeared&quot;)
-+                             print(&quot;[AgentView] ConfigView appeared, showConfigView: \(viewModel.showConfigView)&quot;)
+-                             print("[AgentView] ConfigView appeared")
++                             print("[AgentView] ConfigView appeared, showConfigView: \(viewModel.showConfigView)")
 +                         }
 +                 } else {
-+                     Text(&quot;showConfigView is false&quot;)
++                     Text("showConfigView is false")
 +                         .foregroundColor(.red)
 +                         .onAppear {
-+                             print(&quot;[AgentView] showConfigView is false!&quot;)
++                             print("[AgentView] showConfigView is false!")
                           }
                   }
 ```
@@ -6877,8 +6877,8 @@ Lines added: 1, lines removed: 1
 @@ -33,5 +43,5 @@
                           .frame(maxWidth: .infinity, maxHeight: .infinity)
                           .onAppear {
--                             print(&quot;[AgentView] ChatView appeared&quot;)
-+                             print(&quot;[AgentView] ChatView appeared, showChatView: \(viewModel.showChatView)&quot;)
+-                             print("[AgentView] ChatView appeared")
++                             print("[AgentView] ChatView appeared, showChatView: \(viewModel.showChatView)")
                           }
                   }
 ```
@@ -6951,7 +6951,7 @@ KeyCenter 配置看起来正确。引擎初始化可能在主线程阻塞。将�
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentViewModel.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentViewModel.swift</summary>
 
 **Chunk 1**
 Lines added: 4, lines removed: 1
@@ -6959,7 +6959,7 @@ Lines added: 4, lines removed: 1
 ```diff
 @@ -40,5 +40,8 @@
           super.init()
-          print(&quot;[AgentViewModel] AgentViewModel initialized&quot;)
+          print("[AgentViewModel] AgentViewModel initialized")
 -         initializeEngines()
 +         // 异步初始化引擎，避免阻塞主线程
 +         DispatchQueue.main.async { [weak self] in
@@ -7011,7 +7011,7 @@ Lint results
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 4, lines removed: 2
@@ -7024,10 +7024,10 @@ Lines added: 4, lines removed: 2
 +     @StateObject private var viewModel: AgentViewModel
       
       init() {
--         print(&quot;[AgentView] AgentView initialized&quot;)
-+         print(&quot;[AgentView] AgentView init() called&quot;)
+-         print("[AgentView] AgentView initialized")
++         print("[AgentView] AgentView init() called")
 +         _viewModel = StateObject(wrappedValue: AgentViewModel())
-+         print(&quot;[AgentView] AgentView initialized, viewModel created&quot;)
++         print("[AgentView] AgentView initialized, viewModel created")
       }
       
 ```
@@ -7110,7 +7110,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 4, lines removed: undefined
@@ -7135,7 +7135,7 @@ Lines added: 4, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: undefined
@@ -7169,7 +7169,7 @@ Lines added: 1, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: undefined
@@ -7191,7 +7191,7 @@ Lines added: 1, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -7241,7 +7241,7 @@ Lint results
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-swiftui/VoiceAgent/Chat/AgentView.swift</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: undefined
@@ -7394,7 +7394,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 879, lines removed: 115
@@ -7402,8 +7402,8 @@ Lines added: 879, lines removed: 115
 ```diff
 @@ -7,117 +7,881 @@
   
-  #import &quot;ViewController.h&quot;
-- #import &quot;ChatViewController.h&quot;
+  #import "ViewController.h"
+- #import "ChatViewController.h"
 - #import &lt;Masonry/Masonry.h&gt;
 - 
 - @interface ViewController () &lt;UITextFieldDelegate&gt;
@@ -7430,18 +7430,18 @@ Lines added: 879, lines removed: 115
 - - (void)setupUI {
 -     self.view.backgroundColor = [UIColor systemBackgroundColor];
 -     
--     self.title = @&quot;VoiceAgent&quot;;
+-     self.title = @"VoiceAgent";
 -     self.navigationController.navigationBar.prefersLargeTitles = NO;
 -     
 -     // Logo ImageView
 -     self.logoImageView = [[UIImageView alloc] init];
--     self.logoImageView.image = [UIImage imageNamed:@&quot;logo&quot;];
+-     self.logoImageView.image = [UIImage imageNamed:@"logo"];
 -     self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
 -     [self.view addSubview:self.logoImageView];
 -     
 -     // Channel Name TextField
 -     self.channelNameTextField = [[UITextField alloc] init];
--     self.channelNameTextField.placeholder = @&quot;输入频道名称&quot;;
+-     self.channelNameTextField.placeholder = @"输入频道名称";
 -     self.channelNameTextField.borderStyle = UITextBorderStyleRoundedRect;
 -     self.channelNameTextField.delegate = self;
 -     [self.channelNameTextField addTarget:self 
@@ -7451,7 +7451,7 @@ Lines added: 879, lines removed: 115
 -     
 -     // Start Button
 -     self.startButton = [UIButton buttonWithType:UIButtonTypeSystem];
--     [self.startButton setTitle:@&quot;Start&quot; forState:UIControlStateNormal];
+-     [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
 -     [self.startButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
 -     [self.startButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] 
 -                             forState:UIControlStateDisabled];
@@ -7518,14 +7518,14 @@ Lines added: 879, lines removed: 115
 - 
 - @end
 - 
-+ #import &quot;AgentStateView.h&quot;
-+ #import &quot;TranscriptCell.h&quot;
-+ #import &quot;KeyCenter.h&quot;
-+ #import &quot;AgentManager.h&quot;
++ #import "AgentStateView.h"
++ #import "TranscriptCell.h"
++ #import "KeyCenter.h"
++ #import "AgentManager.h"
 + #import &lt;Masonry/Masonry.h&gt;
 + #import &lt;AgoraRtcKit/AgoraRtcKit.h&gt;
 + #import &lt;AgoraRtmKit/AgoraRtmKit.h&gt;
-+ #import &quot;VoiceAgent-Swift.h&quot;
++ #import "VoiceAgent-Swift.h"
 + 
 + // MARK: - Initialization Operation
 + @interface InitializationOperation : NSOperation
@@ -7630,7 +7630,7 @@ Lines added: 879, lines removed: 115
 + - (void)setupUI {
 +     self.view.backgroundColor = [UIColor whiteColor];
 +     
-+     self.title = @&quot;VoiceAgent&quot;;
++     self.title = @"VoiceAgent";
 +     self.navigationController.navigationBar.prefersLargeTitles = NO;
 +     
 +     // Config Background View
@@ -7640,13 +7640,13 @@ Lines added: 879, lines removed: 115
 +     
 +     // Logo ImageView
 +     self.logoImageView = [[UIImageView alloc] init];
-+     self.logoImageView.image = [UIImage imageNamed:@&quot;logo&quot;];
++     self.logoImageView.image = [UIImage imageNamed:@"logo"];
 +     self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
 +     [self.configBackgroundView addSubview:self.logoImageView];
 +     
 +     // Channel Name TextField
 +     self.channelNameTextField = [[UITextField alloc] init];
-+     self.channelNameTextField.placeholder = @&quot;输入频道名称&quot;;
++     self.channelNameTextField.placeholder = @"输入频道名称";
 +     self.channelNameTextField.borderStyle = UITextBorderStyleRoundedRect;
 +     self.channelNameTextField.delegate = self;
 +     [self.channelNameTextField addTarget:self 
@@ -7656,7 +7656,7 @@ Lines added: 879, lines removed: 115
 +     
 +     // Start Button
 +     self.startButton = [UIButton buttonWithType:UIButtonTypeSystem];
-+     [self.startButton setTitle:@&quot;Start&quot; forState:UIControlStateNormal];
++     [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
 +     [self.startButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
 +     [self.startButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] 
 +                             forState:UIControlStateDisabled];
@@ -7680,7 +7680,7 @@ Lines added: 879, lines removed: 115
 +     self.tableView.dataSource = self;
 +     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 +     self.tableView.backgroundColor = [UIColor clearColor];
-+     [self.tableView registerClass:[TranscriptCell class] forCellReuseIdentifier:@&quot;TranscriptCell&quot;];
++     [self.tableView registerClass:[TranscriptCell class] forCellReuseIdentifier:@"TranscriptCell"];
 +     [self.chatBackgroundView addSubview:self.tableView];
 +     
 +     // Status View
@@ -7699,14 +7699,14 @@ Lines added: 879, lines removed: 115
 +     
 +     // Mic Button
 +     self.micButton = [UIButton buttonWithType:UIButtonTypeSystem];
-+     [self.micButton setImage:[UIImage systemImageNamed:@&quot;mic.fill&quot;] forState:UIControlStateNormal];
++     [self.micButton setImage:[UIImage systemImageNamed:@"mic.fill"] forState:UIControlStateNormal];
 +     self.micButton.tintColor = [UIColor blackColor];
 +     [self.micButton addTarget:self action:@selector(toggleMicrophone) forControlEvents:UIControlEventTouchUpInside];
 +     [self.controlBarView addSubview:self.micButton];
 +     
 +     // End Call Button
 +     self.endCallButton = [UIButton buttonWithType:UIButtonTypeSystem];
-+     [self.endCallButton setImage:[UIImage systemImageNamed:@&quot;phone.down.fill&quot;] forState:UIControlStateNormal];
++     [self.endCallButton setImage:[UIImage systemImageNamed:@"phone.down.fill"] forState:UIControlStateNormal];
 +     self.endCallButton.tintColor = [UIColor whiteColor];
 +     self.endCallButton.backgroundColor = [UIColor redColor];
 +     self.endCallButton.layer.cornerRadius = 25;
@@ -7781,7 +7781,7 @@ Lines added: 879, lines removed: 115
 + }
 + 
 + - (void)initializeRTM {
-+     AgoraRtmClientConfig *rtmConfig = [[AgoraRtmClientConfig alloc] initWithAppId:[KeyCenter AG_APP_ID] userId:[NSString stringWithFormat:@&quot;%ld&quot;, (long)self.uid]];
++     AgoraRtmClientConfig *rtmConfig = [[AgoraRtmClientConfig alloc] initWithAppId:[KeyCenter AG_APP_ID] userId:[NSString stringWithFormat:@"%ld", (long)self.uid]];
 +     rtmConfig.areaCode = AgoraRtmAreaCodeCN | AgoraRtmAreaCodeNA;
 +     rtmConfig.presenceTimeout = 30;
 +     rtmConfig.heartbeatInterval = 10;
@@ -7790,9 +7790,9 @@ Lines added: 879, lines removed: 115
 +     NSError *initError = nil;
 +     self.rtmEngine = [[AgoraRtmClientKit alloc] initWithConfig:rtmConfig delegate:self error:&amp;initError];
 +     if (initError) {
-+         NSLog(@&quot;[Engine Init] RTM initialization failed: %@&quot;, initError);
++         NSLog(@"[Engine Init] RTM initialization failed: %@", initError);
 +     } else {
-+         NSLog(@&quot;[Engine Init] RTM initialized successfully&quot;);
++         NSLog(@"[Engine Init] RTM initialized successfully");
 +     }
 + }
 + 
@@ -7811,19 +7811,19 @@ Lines added: 879, lines removed: 115
 +     cameraConfig.cameraDirection = AgoraCameraDirectionRear;
 +     [self.rtcEngine setCameraCapturerConfiguration:cameraConfig];
 +     
-+     [self.rtcEngine setParameters:@&quot;{\&quot;che.audio.enable.predump\&quot;:{\&quot;enable\&quot;:\&quot;true\&quot;,\&quot;duration\&quot;:\&quot;60\&quot;}}&quot;];
++     [self.rtcEngine setParameters:@"{\"che.audio.enable.predump\":{\"enable\":\"true\",\"duration\":\"60\"}}"];
 +     
-+     NSLog(@&quot;[Engine Init] RTC initialized successfully&quot;);
++     NSLog(@"[Engine Init] RTC initialized successfully");
 + }
 + 
 + - (void)initializeConvoAIAPI {
 +     if (!self.rtcEngine) {
-+         NSLog(@&quot;[Engine Init] RTC engine is nil, cannot init ConvoAI API&quot;);
++         NSLog(@"[Engine Init] RTC engine is nil, cannot init ConvoAI API");
 +         return;
 +     }
 +     
 +     if (!self.rtmEngine) {
-+         NSLog(@&quot;[Engine Init] RTM engine is nil, cannot init ConvoAI API&quot;);
++         NSLog(@"[Engine Init] RTM engine is nil, cannot init ConvoAI API");
 +         return;
 +     }
 +     
@@ -7831,7 +7831,7 @@ Lines added: 879, lines removed: 115
 +     self.convoAIAPI = [[ConversationalAIAPIImpl alloc] initWithConfig:config];
 +     [self.convoAIAPI addHandlerWithHandler:self];
 +     
-+     NSLog(@&quot;[Engine Init] ConvoAI API initialized successfully&quot;);
++     NSLog(@"[Engine Init] ConvoAI API initialized successfully");
 + }
 + 
 + // MARK: - Connection Flow
@@ -7849,7 +7849,7 @@ Lines added: 879, lines removed: 115
 +     
 +     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
 +     queue.maxConcurrentOperationCount = 1;
-+     queue.name = @&quot;com.voiceagent.connection&quot;;
++     queue.name = @"com.voiceagent.connection";
 +     
 +     // 1. 生成用户token
 +     InitializationOperation *generateUserTokenOp = [self createGenerateUserTokenOperation];
@@ -7982,16 +7982,16 @@ Lines added: 879, lines removed: 115
 +     NSArray&lt;NSNumber *&gt; *types = @[@1, @2];
 +     
 +     [AgentManager generateTokenWithChannelName:self.channel 
-+                                            uid:[NSString stringWithFormat:@&quot;%ld&quot;, (long)self.uid] 
++                                            uid:[NSString stringWithFormat:@"%ld", (long)self.uid] 
 +                                         types:types 
 +                                       success:^(NSString * _Nullable token) {
 +         if (token &amp;&amp; token.length &gt; 0) {
 +             self.token = token;
 +             success = YES;
 +         } else {
-+             blockError = [NSError errorWithDomain:@&quot;generateUserToken&quot; 
++             blockError = [NSError errorWithDomain:@"generateUserToken" 
 +                                              code:-1 
-+                                          userInfo:@{NSLocalizedDescriptionKey: @&quot;获取 token 失败，请重试&quot;}];
++                                          userInfo:@{NSLocalizedDescriptionKey: @"获取 token 失败，请重试"}];
 +         }
 +         dispatch_semaphore_signal(semaphore);
 +     }];
@@ -7999,7 +7999,7 @@ Lines added: 879, lines removed: 115
 +     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 +     
 +     if (!success &amp;&amp; error) {
-+         *error = blockError ?: [NSError errorWithDomain:@&quot;generateUserToken&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: @&quot;获取 token 失败，请重试&quot;}];
++         *error = blockError ?: [NSError errorWithDomain:@"generateUserToken" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"获取 token 失败，请重试"}];
 +     }
 +     
 +     return success;
@@ -8013,16 +8013,16 @@ Lines added: 879, lines removed: 115
 +     NSArray&lt;NSNumber *&gt; *types = @[@1, @2];
 +     
 +     [AgentManager generateTokenWithChannelName:self.channel 
-+                                            uid:[NSString stringWithFormat:@&quot;%ld&quot;, (long)self.agentUid] 
++                                            uid:[NSString stringWithFormat:@"%ld", (long)self.agentUid] 
 +                                         types:types 
 +                                       success:^(NSString * _Nullable token) {
 +         if (token &amp;&amp; token.length &gt; 0) {
 +             self.agentToken = token;
 +             success = YES;
 +         } else {
-+             blockError = [NSError errorWithDomain:@&quot;generateAgentToken&quot; 
++             blockError = [NSError errorWithDomain:@"generateAgentToken" 
 +                                              code:-1 
-+                                          userInfo:@{NSLocalizedDescriptionKey: @&quot;获取 token 失败，请重试&quot;}];
++                                          userInfo:@{NSLocalizedDescriptionKey: @"获取 token 失败，请重试"}];
 +         }
 +         dispatch_semaphore_signal(semaphore);
 +     }];
@@ -8030,7 +8030,7 @@ Lines added: 879, lines removed: 115
 +     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 +     
 +     if (!success &amp;&amp; error) {
-+         *error = blockError ?: [NSError errorWithDomain:@&quot;generateAgentToken&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: @&quot;获取 token 失败，请重试&quot;}];
++         *error = blockError ?: [NSError errorWithDomain:@"generateAgentToken" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"获取 token 失败，请重试"}];
 +     }
 +     
 +     return success;
@@ -8040,7 +8040,7 @@ Lines added: 879, lines removed: 115
 + - (BOOL)loginRTM:(NSError **)error {
 +     if (!self.rtmEngine) {
 +         if (error) {
-+             *error = [NSError errorWithDomain:@&quot;loginRTM&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: @&quot;RTM engine 未初始化&quot;}];
++             *error = [NSError errorWithDomain:@"loginRTM" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"RTM engine 未初始化"}];
 +         }
 +         return NO;
 +     }
@@ -8053,7 +8053,7 @@ Lines added: 879, lines removed: 115
 +         if (errorInfo == nil) {
 +             success = YES;
 +         } else {
-+             blockError = [NSError errorWithDomain:@&quot;loginRTM&quot; code:errorInfo.errorCode userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@&quot;rtm 登录失败: %@&quot;, errorInfo.reason]}];
++             blockError = [NSError errorWithDomain:@"loginRTM" code:errorInfo.errorCode userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"rtm 登录失败: %@", errorInfo.reason]}];
 +         }
 +         dispatch_semaphore_signal(semaphore);
 +     }];
@@ -8061,7 +8061,7 @@ Lines added: 879, lines removed: 115
 +     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 +     
 +     if (!success &amp;&amp; error) {
-+         *error = blockError ?: [NSError errorWithDomain:@&quot;loginRTM&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: @&quot;rtm 登录失败&quot;}];
++         *error = blockError ?: [NSError errorWithDomain:@"loginRTM" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"rtm 登录失败"}];
 +     }
 +     
 +     return success;
@@ -8070,7 +8070,7 @@ Lines added: 879, lines removed: 115
 + - (BOOL)joinRTCChannel:(NSError **)error {
 +     if (!self.rtcEngine) {
 +         if (error) {
-+             *error = [NSError errorWithDomain:@&quot;joinRTCChannel&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: @&quot;RTC engine 未初始化&quot;}];
++             *error = [NSError errorWithDomain:@"joinRTCChannel" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"RTC engine 未初始化"}];
 +         }
 +         return NO;
 +     }
@@ -8085,7 +8085,7 @@ Lines added: 879, lines removed: 115
 +     NSInteger result = [self.rtcEngine joinChannelByToken:self.token channelId:self.channel uid:self.uid mediaOptions:options joinSuccess:nil];
 +     if (result != 0) {
 +         if (error) {
-+             *error = [NSError errorWithDomain:@&quot;joinRTCChannel&quot; code:result userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@&quot;加入 RTC 频道失败，错误码: %ld&quot;, (long)result]}];
++             *error = [NSError errorWithDomain:@"joinRTCChannel" code:result userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"加入 RTC 频道失败，错误码: %ld", (long)result]}];
 +         }
 +         return NO;
 +     }
@@ -8096,7 +8096,7 @@ Lines added: 879, lines removed: 115
 + - (BOOL)subscribeConvoAIMessage:(NSError **)error {
 +     if (!self.convoAIAPI) {
 +         if (error) {
-+             *error = [NSError errorWithDomain:@&quot;subscribeConvoAIMessage&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: @&quot;ConvoAI API 未初始化&quot;}];
++             *error = [NSError errorWithDomain:@"subscribeConvoAIMessage" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"ConvoAI API 未初始化"}];
 +         }
 +         return NO;
 +     }
@@ -8107,7 +8107,7 @@ Lines added: 879, lines removed: 115
 +     
 +     [self.convoAIAPI subscribeMessageWithChannelName:self.channel completion:^(ConversationalAIAPIError * _Nullable err) {
 +         if (err) {
-+             blockError = [NSError errorWithDomain:@&quot;subscribeConvoAIMessage&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@&quot;订阅消息失败: %@&quot;, err.message]}];
++             blockError = [NSError errorWithDomain:@"subscribeConvoAIMessage" code:-1 userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"订阅消息失败: %@", err.message]}];
 +             success = NO;
 +         }
 +         dispatch_semaphore_signal(semaphore);
@@ -8129,24 +8129,24 @@ Lines added: 879, lines removed: 115
 +     __block NSError *blockError = nil;
 +     
 +     NSDictionary *parameter = @{
-+         @&quot;name&quot;: self.channel,
-+         @&quot;pipeline_id&quot;: [KeyCenter AG_PIPELINE_ID],
-+         @&quot;properties&quot;: @{
-+             @&quot;channel&quot;: self.channel,
-+             @&quot;agent_rtc_uid&quot;: [NSString stringWithFormat:@&quot;%ld&quot;, (long)self.agentUid],
-+             @&quot;remote_rtc_uids&quot;: @[@&quot;*&quot;],
-+             @&quot;token&quot;: self.agentToken
++         @"name": self.channel,
++         @"pipeline_id": [KeyCenter AG_PIPELINE_ID],
++         @"properties": @{
++             @"channel": self.channel,
++             @"agent_rtc_uid": [NSString stringWithFormat:@"%ld", (long)self.agentUid],
++             @"remote_rtc_uids": @[@"*"],
++             @"token": self.agentToken
 +         }
 +     };
 +     
 +     [AgentManager startAgentWithParameter:parameter completion:^(NSString * _Nullable agentId, NSError * _Nullable err) {
 +         if (err) {
-+             blockError = [NSError errorWithDomain:@&quot;startAgent&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: err.localizedDescription}];
++             blockError = [NSError errorWithDomain:@"startAgent" code:-1 userInfo:@{NSLocalizedDescriptionKey: err.localizedDescription}];
 +         } else if (agentId) {
 +             self.agentId = agentId;
 +             success = YES;
 +         } else {
-+             blockError = [NSError errorWithDomain:@&quot;startAgent&quot; code:-1 userInfo:@{NSLocalizedDescriptionKey: @&quot;请求失败&quot;}];
++             blockError = [NSError errorWithDomain:@"startAgent" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"请求失败"}];
 +         }
 +         dispatch_semaphore_signal(semaphore);
 +     }];
@@ -8187,9 +8187,9 @@ Lines added: 879, lines removed: 115
 +     self.isMicMuted = NO;
 +     self.currentAgentState = 5; // unknown
 +     [self.statusView updateState:self.currentAgentState];
-+     self.agentId = @&quot;&quot;;
-+     self.token = @&quot;&quot;;
-+     self.agentToken = @&quot;&quot;;
++     self.agentId = @"";
++     self.token = @"";
++     self.agentToken = @"";
 + }
 + 
 + // MARK: - Actions
@@ -8203,7 +8203,7 @@ Lines added: 879, lines removed: 115
 + 
 + - (void)toggleMicrophone {
 +     self.isMicMuted = !self.isMicMuted;
-+     NSString *imageName = self.isMicMuted ? @&quot;mic.slash.fill&quot; : @&quot;mic.fill&quot;;
++     NSString *imageName = self.isMicMuted ? @"mic.slash.fill" : @"mic.fill";
 +     [self.micButton setImage:[UIImage systemImageNamed:imageName] forState:UIControlStateNormal];
 +     [self.rtcEngine adjustRecordingSignalVolume:self.isMicMuted ? 0 : 100];
 + }
@@ -8294,7 +8294,7 @@ Lines added: 879, lines removed: 115
 + }
 + 
 + - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-+     TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;TranscriptCell&quot; forIndexPath:indexPath];
++     TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TranscriptCell" forIndexPath:indexPath];
 +     [cell configureWithTranscript:self.transcripts[indexPath.row]];
 +     return cell;
 + }
@@ -8305,25 +8305,25 @@ Lines added: 879, lines removed: 115
 + 
 + // MARK: - AgoraRtcEngineDelegate
 + - (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed {
-+     NSLog(@&quot;[RTC Call Back] didJoinedOfUid uid: %lu&quot;, (unsigned long)uid);
++     NSLog(@"[RTC Call Back] didJoinedOfUid uid: %lu", (unsigned long)uid);
 + }
 + 
 + - (void)rtcEngine:(AgoraRtcEngineKit *)engine didOfflineOfUid:(NSUInteger)uid reason:(AgoraUserOfflineReason)reason {
-+     NSLog(@&quot;[RTC Call Back] didOfflineOfUid uid: %lu&quot;, (unsigned long)uid);
++     NSLog(@"[RTC Call Back] didOfflineOfUid uid: %lu", (unsigned long)uid);
 + }
 + 
 + // MARK: - AgoraRtmClientDelegate
 + - (void)rtmKit:(AgoraRtmClientKit *)rtmKit didReceiveLinkStateEvent:(AgoraRtmLinkStateEvent *)event {
-+     NSLog(@&quot;&lt;&lt;&lt; [rtmKit:didReceiveLinkStateEvent]&quot;);
++     NSLog(@"&lt;&lt;&lt; [rtmKit:didReceiveLinkStateEvent]");
 +     switch (event.currentState) {
 +         case AgoraRtmClientConnectionStateConnected:
-+             NSLog(@&quot;RTM connected successfully&quot;);
++             NSLog(@"RTM connected successfully");
 +             break;
 +         case AgoraRtmClientConnectionStateDisconnected:
-+             NSLog(@&quot;RTM disconnected&quot;);
++             NSLog(@"RTM disconnected");
 +             break;
 +         case AgoraRtmClientConnectionStateFailed:
-+             NSLog(@&quot;RTM connection failed, need to re-login&quot;);
++             NSLog(@"RTM connection failed, need to re-login");
 +             break;
 +         default:
 +             break;
@@ -8332,19 +8332,19 @@ Lines added: 879, lines removed: 115
 + 
 + // MARK: - ConversationalAIAPIEventHandler
 + - (void)onAgentVoiceprintStateChangedWithAgentUserId:(NSString *)agentUserId event:(VoiceprintStateChangeEvent *)event {
-+     NSLog(@&quot;onAgentVoiceprintStateChanged: %@&quot;, event);
++     NSLog(@"onAgentVoiceprintStateChanged: %@", event);
 + }
 + 
 + - (void)onMessageErrorWithAgentUserId:(NSString *)agentUserId error:(MessageError *)error {
-+     NSLog(@&quot;onMessageError: %@&quot;, error);
++     NSLog(@"onMessageError: %@", error);
 + }
 + 
 + - (void)onMessageReceiptUpdatedWithAgentUserId:(NSString *)agentUserId messageReceipt:(MessageReceipt *)messageReceipt {
-+     NSLog(@&quot;onMessageReceiptUpdated: %@&quot;, messageReceipt);
++     NSLog(@"onMessageReceiptUpdated: %@", messageReceipt);
 + }
 + 
 + - (void)onAgentStateChangedWithAgentUserId:(NSString *)agentUserId event:(StateChangeEvent *)event {
-+     NSLog(@&quot;onAgentStateChanged: %@&quot;, event);
++     NSLog(@"onAgentStateChanged: %@", event);
 +     dispatch_async(dispatch_get_main_queue(), ^{
 +         self.currentAgentState = event.state;
 +         [self updateStatusView];
@@ -8352,15 +8352,15 @@ Lines added: 879, lines removed: 115
 + }
 + 
 + - (void)onAgentInterruptedWithAgentUserId:(NSString *)agentUserId event:(InterruptEvent *)event {
-+     NSLog(@&quot;&lt;&lt;&lt; [onAgentInterrupted]&quot;);
++     NSLog(@"&lt;&lt;&lt; [onAgentInterrupted]");
 + }
 + 
 + - (void)onAgentMetricsWithAgentUserId:(NSString *)agentUserId metrics:(Metric *)metrics {
-+     NSLog(@&quot;&lt;&lt;&lt; [onAgentMetrics] metrics: %@&quot;, metrics);
++     NSLog(@"&lt;&lt;&lt; [onAgentMetrics] metrics: %@", metrics);
 + }
 + 
 + - (void)onAgentErrorWithAgentUserId:(NSString *)agentUserId error:(ModuleError *)error {
-+     NSLog(@&quot;&lt;&lt;&lt; [onAgentError] error: %@&quot;, error);
++     NSLog(@"&lt;&lt;&lt; [onAgentError] error: %@", error);
 + }
 + 
 + - (void)onTranscriptUpdatedWithAgentUserId:(NSString *)agentUserId transcript:(Transcript *)transcript {
@@ -8392,7 +8392,7 @@ Lines added: 879, lines removed: 115
 + }
 + 
 + - (void)onDebugLogWithLog:(NSString *)log {
-+     NSLog(@&quot;%@&quot;, log);
++     NSLog(@"%@", log);
 + }
 + 
 + @end
@@ -8522,7 +8522,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ConfigBackgroundView.h</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ConfigBackgroundView.h</summary>
 
 **Chunk 1**
 Lines added: 23, lines removed: 1
@@ -8563,7 +8563,7 @@ Lines added: 23, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ConfigBackgroundView.m</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ConfigBackgroundView.m</summary>
 
 **Chunk 1**
 Lines added: 90, lines removed: 1
@@ -8578,7 +8578,7 @@ Lines added: 90, lines removed: 1
 + //  Created by qinhui on 2025/11/17.
 + //
 + 
-+ #import &quot;ConfigBackgroundView.h&quot;
++ #import "ConfigBackgroundView.h"
 + #import &lt;Masonry/Masonry.h&gt;
 + 
 + @interface ConfigBackgroundView ()
@@ -8609,19 +8609,19 @@ Lines added: 90, lines removed: 1
 +     
 +     // Logo ImageView
 +     self.logoImageView = [[UIImageView alloc] init];
-+     self.logoImageView.image = [UIImage imageNamed:@&quot;logo&quot;];
++     self.logoImageView.image = [UIImage imageNamed:@"logo"];
 +     self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
 +     [self addSubview:self.logoImageView];
 +     
 +     // Channel Name TextField
 +     self.channelNameTextField = [[UITextField alloc] init];
-+     self.channelNameTextField.placeholder = @&quot;输入频道名称&quot;;
++     self.channelNameTextField.placeholder = @"输入频道名称";
 +     self.channelNameTextField.borderStyle = UITextBorderStyleRoundedRect;
 +     [self addSubview:self.channelNameTextField];
 +     
 +     // Start Button
 +     self.startButton = [UIButton buttonWithType:UIButtonTypeSystem];
-+     [self.startButton setTitle:@&quot;Start&quot; forState:UIControlStateNormal];
++     [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
 +     [self.startButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
 +     [self.startButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] 
 +                             forState:UIControlStateDisabled];
@@ -8671,7 +8671,7 @@ Lines added: 90, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.h</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.h</summary>
 
 **Chunk 1**
 Lines added: 27, lines removed: 1
@@ -8687,8 +8687,8 @@ Lines added: 27, lines removed: 1
 + //
 + 
 + #import &lt;UIKit/UIKit.h&gt;
-+ #import &quot;AgentStateView.h&quot;
-+ #import &quot;VoiceAgent-Swift.h&quot;
++ #import "AgentStateView.h"
++ #import "VoiceAgent-Swift.h"
 + 
 + NS_ASSUME_NONNULL_BEGIN
 + 
@@ -8716,7 +8716,7 @@ Lines added: 27, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.m</summary>
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.m</summary>
 
 **Chunk 1**
 Lines added: 116, lines removed: 1
@@ -8731,8 +8731,8 @@ Lines added: 116, lines removed: 1
 + //  Created by qinhui on 2025/11/17.
 + //
 + 
-+ #import &quot;ChatBackgroundView.h&quot;
-+ #import &quot;TranscriptCell.h&quot;
++ #import "ChatBackgroundView.h"
++ #import "TranscriptCell.h"
 + #import &lt;Masonry/Masonry.h&gt;
 + 
 + @interface ChatBackgroundView ()
@@ -8767,7 +8767,7 @@ Lines added: 116, lines removed: 1
 +     self.tableView = [[UITableView alloc] init];
 +     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 +     self.tableView.backgroundColor = [UIColor clearColor];
-+     [self.tableView registerClass:[TranscriptCell class] forCellReuseIdentifier:@&quot;TranscriptCell&quot;];
++     [self.tableView registerClass:[TranscriptCell class] forCellReuseIdentifier:@"TranscriptCell"];
 +     [self addSubview:self.tableView];
 +     
 +     // Status View
@@ -8786,13 +8786,13 @@ Lines added: 116, lines removed: 1
 +     
 +     // Mic Button
 +     self.micButton = [UIButton buttonWithType:UIButtonTypeSystem];
-+     [self.micButton setImage:[UIImage systemImageNamed:@&quot;mic.fill&quot;] forState:UIControlStateNormal];
++     [self.micButton setImage:[UIImage systemImageNamed:@"mic.fill"] forState:UIControlStateNormal];
 +     self.micButton.tintColor = [UIColor blackColor];
 +     [self.controlBarView addSubview:self.micButton];
 +     
 +     // End Call Button
 +     self.endCallButton = [UIButton buttonWithType:UIButtonTypeSystem];
-+     [self.endCallButton setImage:[UIImage systemImageNamed:@&quot;phone.down.fill&quot;] forState:UIControlStateNormal];
++     [self.endCallButton setImage:[UIImage systemImageNamed:@"phone.down.fill"] forState:UIControlStateNormal];
 +     self.endCallButton.tintColor = [UIColor whiteColor];
 +     self.endCallButton.backgroundColor = [UIColor redColor];
 +     self.endCallButton.layer.cornerRadius = 25;
@@ -8830,7 +8830,7 @@ Lines added: 116, lines removed: 1
 + }
 + 
 + - (void)updateMicButtonState:(BOOL)isMuted {
-+     NSString *imageName = isMuted ? @&quot;mic.slash.fill&quot; : @&quot;mic.fill&quot;;
++     NSString *imageName = isMuted ? @"mic.slash.fill" : @"mic.fill";
 +     [self.micButton setImage:[UIImage systemImageNamed:imageName] forState:UIControlStateNormal];
 + }
 + 
@@ -8878,7 +8878,7 @@ Lines added: 116, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 2
@@ -8886,13 +8886,13 @@ Lines added: 2, lines removed: 2
 ```diff
 @@ -7,6 +7,6 @@
   
-  #import &quot;ViewController.h&quot;
-- #import &quot;AgentStateView.h&quot;
-- #import &quot;TranscriptCell.h&quot;
-+ #import &quot;ConfigBackgroundView.h&quot;
-+ #import &quot;ChatBackgroundView.h&quot;
-  #import &quot;KeyCenter.h&quot;
-  #import &quot;AgentManager.h&quot;
+  #import "ViewController.h"
+- #import "AgentStateView.h"
+- #import "TranscriptCell.h"
++ #import "ConfigBackgroundView.h"
++ #import "ChatBackgroundView.h"
+  #import "KeyCenter.h"
+  #import "AgentManager.h"
 ```
 
 </details>
@@ -8903,7 +8903,7 @@ Lines added: 2, lines removed: 2
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 3, lines removed: 13
@@ -8940,7 +8940,7 @@ Lines added: 3, lines removed: 13
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 17, lines removed: 122
@@ -8963,13 +8963,13 @@ Lines added: 17, lines removed: 122
 -     
 -     // Logo ImageView
 -     self.logoImageView = [[UIImageView alloc] init];
--     self.logoImageView.image = [UIImage imageNamed:@&quot;logo&quot;];
+-     self.logoImageView.image = [UIImage imageNamed:@"logo"];
 -     self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
 -     [self.configBackgroundView addSubview:self.logoImageView];
 -     
 -     // Channel Name TextField
 -     self.channelNameTextField = [[UITextField alloc] init];
--     self.channelNameTextField.placeholder = @&quot;输入频道名称&quot;;
+-     self.channelNameTextField.placeholder = @"输入频道名称";
 -     self.channelNameTextField.borderStyle = UITextBorderStyleRoundedRect;
 -     self.channelNameTextField.delegate = self;
 -     [self.channelNameTextField addTarget:self 
@@ -8979,7 +8979,7 @@ Lines added: 17, lines removed: 122
 -     
 -     // Start Button
 -     self.startButton = [UIButton buttonWithType:UIButtonTypeSystem];
--     [self.startButton setTitle:@&quot;Start&quot; forState:UIControlStateNormal];
+-     [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
 -     [self.startButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
 -     [self.startButton setTitleColor:[[UIColor whiteColor] colorWithAlphaComponent:0.5] 
 -                             forState:UIControlStateDisabled];
@@ -9012,7 +9012,7 @@ Lines added: 17, lines removed: 122
 -     self.tableView.dataSource = self;
 -     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 -     self.tableView.backgroundColor = [UIColor clearColor];
--     [self.tableView registerClass:[TranscriptCell class] forCellReuseIdentifier:@&quot;TranscriptCell&quot;];
+-     [self.tableView registerClass:[TranscriptCell class] forCellReuseIdentifier:@"TranscriptCell"];
 -     [self.chatBackgroundView addSubview:self.tableView];
 -     
 -     // Status View
@@ -9031,14 +9031,14 @@ Lines added: 17, lines removed: 122
 -     
 -     // Mic Button
 -     self.micButton = [UIButton buttonWithType:UIButtonTypeSystem];
--     [self.micButton setImage:[UIImage systemImageNamed:@&quot;mic.fill&quot;] forState:UIControlStateNormal];
+-     [self.micButton setImage:[UIImage systemImageNamed:@"mic.fill"] forState:UIControlStateNormal];
 -     self.micButton.tintColor = [UIColor blackColor];
 -     [self.micButton addTarget:self action:@selector(toggleMicrophone) forControlEvents:UIControlEventTouchUpInside];
 -     [self.controlBarView addSubview:self.micButton];
 -     
 -     // End Call Button
 -     self.endCallButton = [UIButton buttonWithType:UIButtonTypeSystem];
--     [self.endCallButton setImage:[UIImage systemImageNamed:@&quot;phone.down.fill&quot;] forState:UIControlStateNormal];
+-     [self.endCallButton setImage:[UIImage systemImageNamed:@"phone.down.fill"] forState:UIControlStateNormal];
 -     self.endCallButton.tintColor = [UIColor whiteColor];
 -     self.endCallButton.backgroundColor = [UIColor redColor];
 -     self.endCallButton.layer.cornerRadius = 25;
@@ -9198,7 +9198,7 @@ Output mode: content
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -9221,7 +9221,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 2
@@ -9236,8 +9236,8 @@ Lines added: 2, lines removed: 2
       self.currentAgentState = 5; // unknown
 -     [self.statusView updateState:self.currentAgentState];
 +     [self.chatBackgroundView updateStatusView:self.currentAgentState];
-      self.agentId = @&quot;&quot;;
-      self.token = @&quot;&quot;;
+      self.agentId = @"";
+      self.token = @"";
 ```
 
 </details>
@@ -9248,7 +9248,7 @@ Lines added: 2, lines removed: 2
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 2
@@ -9257,7 +9257,7 @@ Lines added: 1, lines removed: 2
 @@ -577,6 +577,5 @@
   - (void)toggleMicrophone {
       self.isMicMuted = !self.isMicMuted;
--     NSString *imageName = self.isMicMuted ? @&quot;mic.slash.fill&quot; : @&quot;mic.fill&quot;;
+-     NSString *imageName = self.isMicMuted ? @"mic.slash.fill" : @"mic.fill";
 -     [self.micButton setImage:[UIImage systemImageNamed:imageName] forState:UIControlStateNormal];
 +     [self.chatBackgroundView updateMicButtonState:self.isMicMuted];
       [self.rtcEngine adjustRecordingSignalVolume:self.isMicMuted ? 0 : 100];
@@ -9272,7 +9272,7 @@ Lines added: 1, lines removed: 2
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 5
@@ -9303,7 +9303,7 @@ Lines added: 2, lines removed: 5
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -9344,7 +9344,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 2
@@ -9527,7 +9527,7 @@ Output mode: content
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.h</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.h</summary>
 
 **Chunk 1**
 Lines added: 12, lines removed: 2
@@ -9575,7 +9575,7 @@ Lines added: 2, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.m</summary>
 
 **Chunk 1**
 Lines added: 29, lines removed: undefined
@@ -9603,7 +9603,7 @@ Lines added: 29, lines removed: undefined
 + }
 + 
 + - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-+     TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;TranscriptCell&quot; forIndexPath:indexPath];
++     TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TranscriptCell" forIndexPath:indexPath];
 +     Transcript *transcript = [self.dataSource chatBackgroundView:self transcriptAtIndex:indexPath.row];
 +     [cell configureWithTranscript:transcript];
 +     return cell;
@@ -9625,7 +9625,7 @@ Lines added: 29, lines removed: undefined
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -9648,7 +9648,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 2
@@ -9672,7 +9672,7 @@ Lines added: 1, lines removed: 2
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -9695,7 +9695,7 @@ Lines added: 1, lines removed: 1
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 4, lines removed: 10
@@ -9712,7 +9712,7 @@ Lines added: 4, lines removed: 10
   }
   
 - - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
--     TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;TranscriptCell&quot; forIndexPath:indexPath];
+-     TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TranscriptCell" forIndexPath:indexPath];
 -     [cell configureWithTranscript:self.transcripts[indexPath.row]];
 -     return cell;
 - }
@@ -9733,7 +9733,7 @@ Lines added: 4, lines removed: 10
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 **Chunk 1**
 Lines added: 2, lines removed: 6
@@ -9854,7 +9854,7 @@ Lint errors for `ios-oc/VoiceAgent/ChatBackgroundView.h`
 
 <tool-use data-tool-type="write" data-tool-name="search_replace">
 
-<details><summary>Tool use: **code_edit** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.h</summary>
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ChatBackgroundView.h</summary>
 
 **Chunk 1**
 Lines added: 1, lines removed: 1
@@ -9924,15 +9924,67 @@ _**Agent (model default, mode Agent)**_
 
 ---
 
+检查 `ViewController.m` 中 `cell` 的使用：
 
 
 ---
 
-<tool-use data-tool-type="unknown" data-tool-name="grep">
+<tool-use data-tool-type="search" data-tool-name="grep">
 <details>
-<summary>Tool use: **grep**</summary>
+<summary>Tool use: **grep** • Grep for "cell" in "/Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m" • 5 matches</summary>
 
-Status: **loading**
+Output mode: content
+
+
+| File | Content | Line |
+|------|------|------|
+| `ios-oc/VoiceAgent/ViewController.m` | `if (self.isCancelled) \{` | L40 |
+| `ios-oc/VoiceAgent/ViewController.m` | `- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath \{` | L665 |
+| `ios-oc/VoiceAgent/ViewController.m` | `TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TranscriptCell" forIndexPath:indexPath];` | L666 |
+| `ios-oc/VoiceAgent/ViewController.m` | `[cell configureWithTranscript:self.transcripts[indexPath.row]];` | L667 |
+| `ios-oc/VoiceAgent/ViewController.m` | `return cell;` | L668 |
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+检查导入和声明，确认问题：
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="grep">
+<details>
+<summary>Tool use: **grep** • Grep for "TranscriptCell" in "/Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m" • 1 match</summary>
+
+Output mode: content
+
+
+| File | Content | Line |
+|------|------|------|
+| `ios-oc/VoiceAgent/ViewController.m` | `TranscriptCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TranscriptCell" forIndexPath:indexPath];` | L666 |
 
 
 </details>
@@ -9944,20 +9996,37 @@ Status: **loading**
 
 ---
 
+缺少 `TranscriptCell` 的导入。添加导入并检查其他问题：
 
 
 ---
 
+<tool-use data-tool-type="write" data-tool-name="search_replace">
 
+<details><summary>Tool use: **search_replace** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
+
+**Chunk 1**
+Lines added: 1, lines removed: 2
+
+```diff
+@@ -7,6 +7,5 @@
+  
+  #import "ViewController.h"
+- #import "ConfigBackgroundView.h"
+- #import "ChatBackgroundView.h"
++ #import "TranscriptCell.h"
+  #import "KeyCenter.h"
+  #import "AgentManager.h"
+```
+
+</details>
+
+</tool-use>
 
 ---
 
-<tool-use data-tool-type="unknown" data-tool-name="read_file">
-<details>
-<summary>Tool use: **read_file**</summary>
-
-Status: **loading**
-
+<tool-use data-tool-type="read" data-tool-name="read_file">
+<details><summary>Tool use: **read_file** • Read file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ViewController.m</summary>
 
 </details>
 </tool-use>
@@ -9968,51 +10037,39 @@ Status: **loading**
 
 ---
 
+代码仍在使用 `ConfigBackgroundView` 和 `ChatBackgroundView`，但这些文件已被删除。重新创建这些文件：
 
 
 ---
 
+<tool-use data-tool-type="write" data-tool-name="write">
 
+<details><summary>Tool use: **write** • Edit file: /Users/qinhui/Desktop/VoiceAgentDemo/github/Agora-AI-Recipes-Starter/ios-oc/VoiceAgent/ConfigBackgroundView.h</summary>
 
----
+**Chunk 1**
+Lines added: 3, lines removed: 3
 
-<tool-use data-tool-type="unknown" data-tool-name="search_replace">
-<details>
-<summary>Tool use: **search_replace**</summary>
-
-Status: **loading**
-
+```diff
+@@ -12,7 +12,7 @@
+  @interface ConfigBackgroundView : UIView
+  
+- @property(nonatomic, strong, readonly) UIImageView *logoImageView;
+- @property(nonatomic, strong, readonly) UITextField *channelNameTextField;
+- @property(nonatomic, strong, readonly) UIButton *startButton;
++ @property (nonatomic, strong, readonly) UIImageView *logoImageView;
++ @property (nonatomic, strong, readonly) UITextField *channelNameTextField;
++ @property (nonatomic, strong, readonly) UIButton *startButton;
+  
+  - (void)updateButtonState:(BOOL)isEnabled;
+```
 
 </details>
+
 </tool-use>
 
 ---
 
-
-
----
-
-
-
----
-
-
-
----
-
-<tool-use data-tool-type="unknown" data-tool-name="write">
-<details>
-<summary>Tool use: **write**</summary>
-
-Status: **loading**
-
-
-</details>
-</tool-use>
-
----
-
-
+Cancelled
 
 ---
 
