@@ -181,6 +181,33 @@ Thumbs.db
 **/env.properties
 **/env.example.json
 **/env.example.properties
+**/.env
+**/.env.local
+**/.env.*.local
+
+# React Native
+**/node_modules/
+**/yarn.lock
+**/package-lock.json
+**/.bundle/
+**/vendor/bundle/
+**/ios/Pods/
+**/ios/*.xcworkspace
+**/ios/build/
+**/android/build/
+**/android/app/build/
+**/android/.gradle/
+**/.expo/
+**/.expo-shared/
+**/dist/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/.metro-health-check*
+**/coverage/
+**/.watchmanconfig
+**/KeyCenterConfig.ts
+**/KeyCenterConfig.js
 
 # SpecStory (if applicable)
 .specstory/
@@ -199,4 +226,3 @@ Thumbs.db
 **/.temp/
 **/tmp/
 **/*.cache
-
