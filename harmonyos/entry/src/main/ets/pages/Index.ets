@@ -1,11 +1,11 @@
-import { AgentHome } from './AgentHome';
+import { AgentChat } from './AgentChat';
 
 @Entry
 @Component
 export struct Index {
   build() {
     Column() {
-      AgentHome()
+      AgentChat()
     }
     .width('100%')
     .height('100%')
