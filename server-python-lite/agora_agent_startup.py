@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 """
-Agora Agent Starter Server (Lite)
-基于 Flask 的 HTTP 服务器，用于启动和停止 Agora 对话式 AI Agent
-服务器端配置（basic_key, basic_secret, pipeline_id）从本地环境变量加载
-客户端配置（appid, appcert）通过 HTTP 请求提供
+Agora Agent Starter Script (Lite)
+命令行脚本，用于启动和停止 Agora 对话式 AI Agent
+所有配置从本地环境变量加载（.env.local 文件）
 """
+import argparse
 import base64
 import json
 import os
-import socket
 import sys
 import time
 from typing import Optional, Dict, Any, List
 import requests
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 # 加载 .env.local 文件以获取配置
 # 注意：需要 python-dotenv 包，安装命令：pip install python-dotenv
@@ -168,6 +165,8 @@ class AgoraStarterServer:
                 error_body = response.json()
                 if "detail" in error_body:
                     error_detail = error_body["detail"]
+                elif "message" in error_body:
+                    error_detail = error_body["message"]
             except:
                 pass
             
@@ -380,106 +379,104 @@ class AgoraStarterServer:
         return token
 
 
-# Flask 应用设置
-app = Flask(__name__)
-CORS(app)  # 启用 CORS 以支持跨域请求
-
-# 存储活跃的 Agent（生产环境应使用数据库）
-active_agents: Dict[str, str] = {}  # channel_name -> agent_id
-
-# 服务器端配置（从本地环境变量加载）
-# 这些配置不应暴露给客户端
-SERVER_BASIC_KEY = os.getenv("AGORA_BASIC_KEY", "")
-SERVER_BASIC_SECRET = os.getenv("AGORA_BASIC_SECRET", "")
-SERVER_PIPELINE_ID = os.getenv("AGORA_PIPELINE_ID", "")
+# 存储 agent_id 的文件路径
+AGENT_ID_FILE = ".agent_id"
 
 
-def validate_server_config():
+def save_agent_id(agent_id: str):
+    """保存 agent_id 到文件"""
+    try:
+        # 获取脚本所在目录的绝对路径
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        agent_id_path = os.path.join(script_dir, AGENT_ID_FILE)
+        with open(agent_id_path, 'w') as f:
+            f.write(agent_id)
+    except Exception as e:
+        print(f"[WARN] 无法保存 agent_id 到文件: {e}", file=sys.stderr)
+
+
+def load_agent_id() -> Optional[str]:
+    """从文件加载 agent_id"""
+    try:
+        # 获取脚本所在目录的绝对路径
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        agent_id_path = os.path.join(script_dir, AGENT_ID_FILE)
+        if os.path.exists(agent_id_path):
+            with open(agent_id_path, 'r') as f:
+                return f.read().strip()
+    except Exception as e:
+        print(f"[WARN] 无法从文件读取 agent_id: {e}", file=sys.stderr)
+    return None
+
+
+def delete_agent_id():
+    """删除 agent_id 文件"""
+    try:
+        # 获取脚本所在目录的绝对路径
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        agent_id_path = os.path.join(script_dir, AGENT_ID_FILE)
+        if os.path.exists(agent_id_path):
+            os.remove(agent_id_path)
+    except Exception as e:
+        print(f"[WARN] 无法删除 agent_id 文件: {e}", file=sys.stderr)
+
+
+def load_config():
     """
-    验证服务器端配置是否可用
+    从环境变量加载配置
+    返回配置字典
+    """
+    return {
+        "BASIC_KEY": os.getenv("AGORA_BASIC_KEY", ""),
+        "BASIC_SECRET": os.getenv("AGORA_BASIC_SECRET", ""),
+        "PIPELINE_ID": os.getenv("AGORA_PIPELINE_ID", ""),
+        "APP_ID": os.getenv("AGORA_APP_ID", ""),
+        "APP_CERT": os.getenv("AGORA_APP_CERT", ""),
+        "CHANNEL_NAME": os.getenv("AGORA_CHANNEL_NAME", "")
+    }
+
+
+def validate_config(config: Dict[str, str]):
+    """
+    验证配置是否可用
     如果缺少必需的配置，抛出 ValueError
     """
-    if not SERVER_BASIC_KEY or not SERVER_BASIC_SECRET:
+    missing = []
+    if not config.get("BASIC_KEY") or not config.get("BASIC_SECRET"):
+        missing.append("AGORA_BASIC_KEY 和 AGORA_BASIC_SECRET")
+    if not config.get("PIPELINE_ID"):
+        missing.append("AGORA_PIPELINE_ID")
+    if not config.get("APP_ID"):
+        missing.append("AGORA_APP_ID")
+    if not config.get("CHANNEL_NAME"):
+        missing.append("AGORA_CHANNEL_NAME")
+    
+    if missing:
         raise ValueError(
-            "服务器端配置缺失：AGORA_BASIC_KEY 和 AGORA_BASIC_SECRET "
-            "必须在 .env.local 文件或环境变量中设置"
-        )
-    if not SERVER_PIPELINE_ID:
-        raise ValueError(
-            "服务器端配置缺失：AGORA_PIPELINE_ID "
+            f"配置缺失：{', '.join(missing)} "
             "必须在 .env.local 文件或环境变量中设置"
         )
 
 
-@app.route('/agent/start', methods=['POST'])
-def start_agent():
+def cmd_start_agent(config: Dict[str, str], agent_rtc_uid: str = "1009527"):
     """
-    启动一个 Agora 对话式 AI Agent
-    服务器端配置（basic_key, basic_secret, pipeline_id）从本地环境变量加载
-    客户端配置（appid, appcert, channelName, agent_rtc_uid）在请求体中提供
-    
-    请求体 (JSON):
-    {
-        "appid": "YOUR_APP_ID",           // 必需：来自客户端
-        "appcert": "YOUR_APP_CERT",       // 可选：来自客户端
-        "channelName": "channel_name",    // 必需：来自客户端
-        "agent_rtc_uid": "1009527",       // 必需：来自客户端
-        "expire": 86400,                  // 可选：token 过期时间（秒）（默认：24 小时）
-        "remote_rtc_uids": ["*"]          // 可选：远程 RTC UIDs 列表（默认：["*"]）
-    }
-    
-    响应 (JSON):
-    {
-        "agent_id": "agent_id",
-        "channel_name": "channel_name"
-    }
+    启动 Agent 的命令行函数
     """
     try:
-        # 验证服务器端配置
-        validate_server_config()
+        # 验证配置
+        validate_config(config)
         
-        # 解析请求体
-        data = request.get_json()
-        if not data:
-            return jsonify({
-                "code": 1,
-                "msg": "Request body is required",
-                "data": None
-            }), 200
+        app_id = config["APP_ID"].strip()
+        app_cert = config.get("APP_CERT", "").strip()
+        channel_name = config["CHANNEL_NAME"].strip()
+        basic_key = config["BASIC_KEY"].strip()
+        basic_secret = config["BASIC_SECRET"].strip()
+        pipeline_id = config["PIPELINE_ID"].strip()
         
-        # 提取客户端配置
-        app_id = data.get("appid", "").strip()
-        app_cert = data.get("appcert", "").strip()
-        channel_name = data.get("channelName", "").strip()
-        agent_rtc_uid = data.get("agent_rtc_uid", "").strip()
-        expire_seconds = data.get("expire")
-        remote_rtc_uids = data.get("remote_rtc_uids", ["*"])
-        
-        # 验证必需的客户端参数
-        if not app_id:
-            return jsonify({
-                "code": 1,
-                "msg": "appid is required in request body",
-                "data": None
-            }), 200
-        if not channel_name:
-            return jsonify({
-                "code": 1,
-                "msg": "channelName is required in request body",
-                "data": None
-            }), 200
-        if not agent_rtc_uid:
-            return jsonify({
-                "code": 1,
-                "msg": "agent_rtc_uid is required in request body",
-                "data": None
-            }), 200
-        
-        # 默认 token 类型：RTC 和 RTM（参考 Android 代码的默认行为）
+        # 默认 token 类型：RTC 和 RTM
         token_types = [1, 2]  # 1=RTC, 2=RTM
         
         # 创建 AgoraStarterServer 实例（用于生成 Token）
-        # 注意：生成 Token 不需要 basic_key/basic_secret 和 pipeline_id
         token_server = AgoraStarterServer(
             app_id=app_id,
             basic_key="dummy",  # 占位符，生成 Token 不需要 Basic Auth
@@ -489,231 +486,151 @@ def start_agent():
             app_cert=app_cert if app_cert else None
         )
         
-        # 自动生成 Token
-        print(f"[INFO] Generating token for app_id={app_id}, channel={channel_name}...")
+        # 生成 Token
+        print(f"[INFO] 正在生成 Token (app_id={app_id}, channel={channel_name})...")
         token = token_server.generate_token(
             channel_name=channel_name,
             uid=agent_rtc_uid,
-            token_types=token_types,
-            expire_seconds=expire_seconds
+            token_types=token_types
         )
-        print(f"[INFO] Token generated successfully")
+        print(f"[INFO] Token 生成成功")
         
         # 创建用于启动 Agent 的 AgoraStarterServer 实例
-        # 使用服务器端配置（basic_key, basic_secret, pipeline_id）从环境变量
         server = AgoraStarterServer(
             app_id=app_id,
-            basic_key=SERVER_BASIC_KEY,
-            basic_secret=SERVER_BASIC_SECRET,
-            pipeline_id=SERVER_PIPELINE_ID,
+            basic_key=basic_key,
+            basic_secret=basic_secret,
+            pipeline_id=pipeline_id,
             channel_name=channel_name,
             app_cert=app_cert if app_cert else None
         )
         
-        # 使用生成的 Token 启动 Agent（使用 channelName 作为 Agent name）
-        print(f"[INFO] Starting agent for app_id={app_id}, channel={channel_name}...")
+        # 启动 Agent
+        print(f"[INFO] 正在启动 Agent (app_id={app_id}, channel={channel_name})...")
         agent_data = server.start_agent(
-            name=channel_name,  # 使用 channelName 作为 Agent name
+            name=channel_name,
             agent_rtc_uid=agent_rtc_uid,
             token=token,
-            channel=channel_name,
-            remote_rtc_uids=remote_rtc_uids
+            channel=channel_name
         )
         
-        # 存储 agent ID 用于跟踪
         agent_id = agent_data.get("agent_id", "")
-        active_agents[channel_name] = agent_id
+        if not agent_id:
+            raise RuntimeError("无法从响应中获取 agent_id")
         
-        print(f"[INFO] Agent started successfully. Agent ID: {agent_id}")
+        # 保存 agent_id 供下次使用
+        save_agent_id(agent_id)
         
-        # 返回统一格式：成功
-        return jsonify({
-            "code": 0,
-            "msg": "",
-            "data": agent_data
-        })
+        print(f"[INFO] Agent 启动成功！")
+        print(f"[INFO] Agent ID: {agent_id}")
+        print(f"[INFO] Channel: {channel_name}")
+        print(f"[INFO] Agent RTC UID: {agent_rtc_uid}")
+        print(f"\n💡 现在可以打开 Web 应用，加入频道 {channel_name} 来体验对话式 AI")
+        
+        return 0
         
     except Exception as e:
-        # 统一错误处理
-        error_msg = str(e)
-        print(f"[ERROR] Error: {error_msg}")
+        print(f"[ERROR] 启动 Agent 失败: {e}", file=sys.stderr)
         import traceback
-        error_trace = traceback.format_exc()
-        print(f"[ERROR] Traceback:\n{error_trace}")
-        return jsonify({
-            "code": 1,
-            "msg": error_msg,
-            "data": None
-        }), 200
+        traceback.print_exc()
+        return 1
 
 
-@app.route('/agent/stop', methods=['POST'])
-def stop_agent():
+def cmd_stop_agent(config: Dict[str, str], agent_id: Optional[str] = None):
     """
-    停止一个 Agora 对话式 AI Agent
-    服务器端配置（basic_key, basic_secret）从本地环境变量加载
-    客户端配置（appid）在请求体中提供
-    
-    请求体 (JSON):
-    {
-        "appid": "YOUR_APP_ID",    // 必需：来自客户端
-        "agent_id": "agent_id"     // 必需：要停止的 Agent ID
-    }
-    
-    响应 (JSON):
-    {
-        "message": "Agent stopped successfully",
-        "agent_id": "agent_id"
-    }
+    停止 Agent 的命令行函数
     """
     try:
-        # 验证服务器端配置
-        validate_server_config()
+        # 验证配置（停止只需要 basic_key 和 basic_secret）
+        basic_key = config.get("BASIC_KEY", "")
+        basic_secret = config.get("BASIC_SECRET", "")
+        app_id = config.get("APP_ID", "")
         
-        # 解析请求体
-        data = request.get_json()
-        if not data:
-            return jsonify({
-                "code": 1,
-                "msg": "Request body is required",
-                "data": None
-            }), 200
-        
-        # 提取客户端配置
-        app_id = data.get("appid", "").strip()
-        agent_id = data.get("agent_id", "").strip()
-        
-        # 验证必需参数
+        if not basic_key or not basic_secret:
+            raise ValueError("配置缺失：AGORA_BASIC_KEY 和 AGORA_BASIC_SECRET 必须在 .env.local 文件或环境变量中设置")
         if not app_id:
-            return jsonify({
-                "code": 1,
-                "msg": "appid is required in request body",
-                "data": None
-            }), 200
+            raise ValueError("配置缺失：AGORA_APP_ID 必须在 .env.local 文件或环境变量中设置")
+        
+        # 如果没有提供 agent_id，尝试从文件加载上一次的
         if not agent_id:
-            return jsonify({
-                "code": 1,
-                "msg": "agent_id is required in request body",
-                "data": None
-            }), 200
+            agent_id = load_agent_id()
+            if not agent_id:
+                print("[ERROR] 未找到 agent_id。", file=sys.stderr)
+                print("[ERROR] 请提供 --agent-id 参数，或确保之前已成功启动过 Agent。", file=sys.stderr)
+                print("[ERROR] 使用方式: python agora_agent_startup.py stop --agent-id <agent_id>", file=sys.stderr)
+                return 1
+            print(f"[INFO] 使用上一次的 Agent ID: {agent_id}")
         
         # 创建 AgoraStarterServer 实例
-        # 注意：停止命令不需要 pipeline_id 和 channel_name，传入空字符串作为占位符
         server = AgoraStarterServer(
             app_id=app_id,
-            basic_key=SERVER_BASIC_KEY,
-            basic_secret=SERVER_BASIC_SECRET,
+            basic_key=basic_key,
+            basic_secret=basic_secret,
             pipeline_id="",  # 占位符，停止 Agent 不需要 Pipeline ID
             channel_name="",  # 占位符，停止 Agent 不需要 channel_name
             app_cert=None
         )
         
         # 停止 Agent
-        print(f"[INFO] Stopping agent: app_id={app_id}, agent_id={agent_id}...")
+        print(f"[INFO] 正在停止 Agent (agent_id={agent_id})...")
         server.stop_agent(agent_id)
         
-        # 从活跃 Agent 中移除（通过 agent_id 查找 channel_name）
-        channel_to_remove = None
-        for channel_name, stored_agent_id in active_agents.items():
-            if stored_agent_id == agent_id:
-                channel_to_remove = channel_name
-                break
+        # 删除保存的 agent_id 文件
+        delete_agent_id()
         
-        if channel_to_remove:
-            del active_agents[channel_to_remove]
-        
-        print(f"[INFO] Agent stopped successfully. Agent ID: {agent_id}")
-        
-        # 返回统一格式：成功
-        return jsonify({
-            "code": 0,
-            "msg": "",
-            "data": None
-        })
+        print(f"[INFO] Agent 停止成功！")
+        return 0
         
     except Exception as e:
-        # 统一错误处理
-        error_msg = str(e)
-        print(f"[ERROR] Error: {error_msg}")
+        print(f"[ERROR] 停止 Agent 失败: {e}", file=sys.stderr)
         import traceback
-        error_trace = traceback.format_exc()
-        print(f"[ERROR] Traceback:\n{error_trace}")
-        return jsonify({
-            "code": 1,
-            "msg": error_msg,
-            "data": None
-        }), 200
-
-
-def get_local_ip_address():
-    """
-    获取可以从其他设备访问的主要本地 IP 地址
-    返回单个 IP 地址（排除回环、VPN 和虚拟接口）
-    
-    此方法通过连接到远程地址来确定用于互联网访问的网络接口，
-    这通常是客户端应该使用的接口。
-    """
-    try:
-        # 连接到远程地址以确定主要网络接口
-        # 这是最可靠的方法，因为它返回实际用于互联网连接的接口的 IP
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            # 连接到远程地址（实际上不发送数据）
-            s.connect(("8.8.8.8", 80))
-            local_ip = s.getsockname()[0]
-            if local_ip and local_ip != "127.0.0.1":
-                return local_ip
-        except Exception:
-            pass
-        finally:
-            s.close()
-    except Exception:
-        pass
-    
-    # 回退：如果上述方法失败，返回 None
-    # 用户需要手动查找 IP
-    return None
-
-
-def print_connection_info(port: int):
-    """
-    打印客户端连接信息
-    """
-    local_ip = get_local_ip_address()
-    print(f"\nServer URL: http://localhost:{port}")
-    if local_ip:
-        print(f"Network URL: http://{local_ip}:{port}")
+        traceback.print_exc()
+        return 1
 
 
 if __name__ == '__main__':
-    # 启动前验证服务器端配置
-    try:
-        validate_server_config()
-    except ValueError as e:
-        print(f"[ERROR] Server configuration error: {e}", file=sys.stderr)
-        print(f"\n💡 请在 .env.local 文件中设置以下环境变量：", file=sys.stderr)
-        print(f"   AGORA_BASIC_KEY=<your_basic_key>", file=sys.stderr)
-        print(f"   AGORA_BASIC_SECRET=<your_basic_secret>", file=sys.stderr)
-        print(f"   AGORA_PIPELINE_ID=<your_pipeline_id>", file=sys.stderr)
+    parser = argparse.ArgumentParser(
+        description='Agora Agent Starter Script (Lite) - 启动和停止 Agora 对话式 AI Agent'
+    )
+    subparsers = parser.add_subparsers(dest='command', help='可用命令')
+    
+    # start 命令
+    start_parser = subparsers.add_parser('start', help='启动 Agent')
+    start_parser.add_argument(
+        '--agent-rtc-uid',
+        type=str,
+        default='1009527',
+        help='Agent RTC UID（默认: 1009527）'
+    )
+    
+    # stop 命令
+    stop_parser = subparsers.add_parser('stop', help='停止 Agent')
+    stop_parser.add_argument(
+        '--agent-id',
+        type=str,
+        default=None,
+        metavar='AGENT_ID',
+        help='Agent ID（可选，如果不提供则使用上一次启动的 Agent ID）'
+    )
+    
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
         sys.exit(1)
     
-    # 服务器配置
-    host = "0.0.0.0"  # 监听所有网络接口
-    port = 8080  # 默认端口
-    
-    print(f"Starting server on port {port}...")
-    print_connection_info(port)
-    
+    # 加载 .env.local 文件
     try:
-        app.run(host=host, port=port, debug=True)
-    except OSError as e:
-        if "Address already in use" in str(e) or e.errno == 48:
-            print(f"\n❌ Error: Port {port} is already in use.", file=sys.stderr)
-            print(f"\n💡 Solutions:", file=sys.stderr)
-            print(f"  1. Use a different port:", file=sys.stderr)
-            print(f"     python server_startup_lite.py --port <port>", file=sys.stderr)
-            print(f"  2. Find and stop the process using port {port}:", file=sys.stderr)
-            print(f"     lsof -ti:{port} | xargs kill -9", file=sys.stderr)
-            sys.exit(1)
-        else:
-            raise
+        from dotenv import load_dotenv
+        load_dotenv(".env.local")
+    except ImportError:
+        pass
+    
+    # 加载配置
+    config = load_config()
+    
+    # 执行命令
+    if args.command == 'start':
+        sys.exit(cmd_start_agent(config, args.agent_rtc_uid))
+    elif args.command == 'stop':
+        sys.exit(cmd_stop_agent(config, args.agent_id))
