@@ -21,9 +21,7 @@ import org.json.JSONObject
  */
 object AgentStarter {
     private const val JSON_MEDIA_TYPE = "application/json; charset=utf-8"
-    // Switch between local server and Agora API by commenting/uncommenting the lines below
     private const val AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
-//    private const val AGORA_API_BASE_URL = "http://10.103.1.61:8080"  // Local server (for development)
     private const val DEFAULT_AGENT_RTC_UID = "1009527"
 
     private val okHttpClient: OkHttpClient by lazy {
