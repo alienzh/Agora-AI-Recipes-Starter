@@ -21,7 +21,7 @@
 ## 安装依赖
 
 ```bash
-cd server-python
+cd server-python-lite
 pip install -r requirements.txt
 ```
 
@@ -37,7 +37,7 @@ pip install -r requirements.txt
 
 1. 复制示例配置文件：
 ```bash
-cd server-python
+cd server-python-lite
 cp .env.example .env.local
 ```
 
