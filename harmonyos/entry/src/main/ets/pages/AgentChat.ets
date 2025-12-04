@@ -1,7 +1,6 @@
-import { AgentChatController, ConnectionState, ConversationUiState } from './AgentChatController';
-import { Transcript, AgentState, TranscriptType, TranscriptStatus } from '../convoaiApi/IConversationalAIAPI';
-import { TranscriptDataSource } from './common/TranscriptDataSource';
-import PermissionHelper from '../common/PermissionHelper';
+import { AgentChatController, ConnectionState, ConversationUiState, Transcript, AgentState, TranscriptType, TranscriptStatus } from './AgentChatController';
+import { TranscriptDataSource } from './components/TranscriptDataSource';
+import PermissionHelper from '../utils/PermissionHelper';
 import { common } from '@kit.AbilityKit';
 import { promptAction } from '@kit.ArkUI';
 

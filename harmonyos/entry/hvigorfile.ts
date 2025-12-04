@@ -11,7 +11,7 @@ function generateKeyCenterConfig() {
     const entryDir = __dirname || path.dirname(process.argv[1] || '.');
     const projectRoot = path.resolve(entryDir, '..');
     const envFile = path.join(projectRoot, 'env.json');
-    const outputFile = path.join(entryDir, 'src', 'main', 'ets', 'common', 'KeyCenterConfig.ets');
+    const outputFile = path.join(entryDir, 'src', 'main', 'ets', 'config', 'KeyCenterConfig.ets');
     
     let config: Record<string, string> = {};
     

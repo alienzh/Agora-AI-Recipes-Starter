@@ -1,4 +1,4 @@
-import { Transcript, TranscriptType } from '../../convoaiApi/IConversationalAIAPI';
+import { Transcript, TranscriptType } from '../AgentChatController';
 
 /**
  * Basic data source for LazyForEach
@@ -102,7 +102,9 @@ export class TranscriptDataSource extends BasicDataSource {
    * Find index by turnId and type
    */
   findIndex(turnId: number, type: TranscriptType): number {
-    return this.dataArray.findIndex(t => t.turnId === turnId && t.type === type);
+    return this.dataArray.findIndex((t: Transcript): boolean => {
+      return t.turnId === turnId && t.type === type;
+    });
   }
 
   /**
