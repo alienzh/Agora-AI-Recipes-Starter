@@ -16,6 +16,13 @@ class AgentViewController: UIViewController {
     private let chatBackgroundView = ChatBackgroundView()
     private let debugInfoTextView = UITextView()
     
+    // MARK: - Remote View
+    private let remoteView = UIView()
+    private let remoteViewSmallSize = CGSize(width: 90, height: 120)
+    private let remoteViewSmallCornerRadius: CGFloat = 8
+    private let remoteViewExpandedCornerRadius: CGFloat = 0
+    private var isRemoteViewExpanded: Bool = false  // Default collapsed
+    
     // MARK: - State
     private let uid = Int.random(in: 1000...9999999)
     private var channel: String = ""
@@ -29,11 +36,13 @@ class AgentViewController: UIViewController {
     // MARK: - Agora Components
     private var token: String = ""
     private var agentToken: String = ""
+    private var avatarToken: String = ""
     private var agentId: String = ""
     private var rtcEngine: AgoraRtcEngineKit?
     private var rtmEngine: AgoraRtmClientKit?
     private var convoAIAPI: ConversationalAIAPI?
     private let agentUid = Int.random(in: 10000000...99999999)
+    private let avatarUid = Int.random(in: 10000000...99999999)
     
     // MARK: - Toast
     private var loadingToast: UIView?
@@ -68,6 +77,10 @@ class AgentViewController: UIViewController {
         initializeEngines()
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
+    
     // MARK: - UI Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground
@@ -100,6 +113,17 @@ class AgentViewController: UIViewController {
         chatBackgroundView.tableView.dataSource = self
         chatBackgroundView.micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
         chatBackgroundView.endCallButton.addTarget(self, action: #selector(endCall), for: .touchUpInside)
+        
+        // Remote Video View (added to chatBackgroundView, expandable/collapsible)
+        remoteView.backgroundColor = .black
+        remoteView.layer.cornerRadius = remoteViewSmallCornerRadius  // Default collapsed
+        remoteView.clipsToBounds = true
+        remoteView.isUserInteractionEnabled = true
+        chatBackgroundView.addSubview(remoteView)
+        
+        // Add tap gesture to toggle size
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleRemoteViewSize))
+        remoteView.addGestureRecognizer(tapGesture)
     }
     
     private func setupConstraints() {
@@ -120,6 +144,14 @@ class AgentViewController: UIViewController {
         chatBackgroundView.snp.makeConstraints { make in
             make.top.equalTo(debugInfoTextView.snp.bottom).offset(20)
             make.left.right.bottom.equalToSuperview()
+        }
+        
+        // Remote View (default collapsed, top-right corner of transcript area)
+        remoteView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(8)
+            make.right.equalToSuperview().inset(12)
+            make.width.equalTo(remoteViewSmallSize.width)
+            make.height.equalTo(remoteViewSmallSize.height)
         }
     }
     
@@ -180,7 +212,7 @@ class AgentViewController: UIViewController {
             return
         }
         
-        let config = ConversationalAIAPIConfig(rtcEngine: rtcEngine, rtmEngine: rtmEngine, renderMode: .words, enableLog: true)
+        let config = ConversationalAIAPIConfig(rtcEngine: rtcEngine, rtmEngine: rtmEngine, renderMode: .text, enableLog: true)
         let convoAIAPI = ConversationalAIAPIImpl(config: config)
         convoAIAPI.addHandler(handler: self)
         
@@ -210,7 +242,10 @@ class AgentViewController: UIViewController {
                 // 5. 生成agentToken
                 try await generateAgentToken()
                 
-                // 6. 启动agent
+                // 6. 生成avatarToken
+                try await generateAvatarToken()
+                
+                // 7. 启动agent
                 try await startAgent()
                 
                 await MainActor.run {
@@ -261,6 +296,19 @@ class AgentViewController: UIViewController {
         }
     }
     
+    private func generateAvatarToken() async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            NetworkManager.shared.generateToken(channelName: channel, uid: "\(avatarUid)", types: [.rtc]) { token in
+                guard let token = token else {
+                    continuation.resume(throwing: NSError(domain: "generateAvatarToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 avatar token 失败，请重试"]))
+                    return
+                }
+                self.avatarToken = token
+                continuation.resume()
+            }
+        }
+    }
+    
     // MARK: - Channel Connection
     @MainActor
     private func loginRTM() async throws {
@@ -291,6 +339,9 @@ class AgentViewController: UIViewController {
         guard let rtcEngine = self.rtcEngine else {
             throw NSError(domain: "joinRTCChannel", code: -1, userInfo: [NSLocalizedDescriptionKey: "RTC engine 未初始化"])
         }
+        
+        // Setup remote video
+        setupRemoteVideo()
         
         addDebugMessage("joinChannel 调用中...")
         
@@ -337,8 +388,14 @@ class AgentViewController: UIViewController {
                 "properties": [
                     "channel": channel,
                     "agent_rtc_uid": "\(agentUid)",
-                    "remote_rtc_uids": ["*"],
-                    "token": agentToken
+                    "remote_rtc_uids": ["\(uid)"],
+                    "token": agentToken,
+                    "avatar": [
+                        "params": [
+                            "agora_token": avatarToken,
+                            "agora_uid": "\(avatarUid)"
+                        ]
+                    ]
                 ]
             ]
             AgentManager.startAgent(parameter: parameter) { agentId, error in
@@ -389,6 +446,7 @@ class AgentViewController: UIViewController {
         agentId = ""
         token = ""
         agentToken = ""
+        avatarToken = ""
     }
     
     // MARK: - UI Updates
@@ -400,6 +458,43 @@ class AgentViewController: UIViewController {
     
     private func updateAgentStatusView() {
         chatBackgroundView.updateStatusView(state: currentAgentState)
+    }
+    
+    // MARK: - Remote Video Management
+    private func setupRemoteVideo() {
+        guard let rtcEngine = self.rtcEngine else { return }
+        
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = UInt(avatarUid)
+        videoCanvas.view = remoteView
+        videoCanvas.renderMode = .fit
+        rtcEngine.setupRemoteVideo(videoCanvas)
+        
+        chatBackgroundView.bringSubviewToFront(remoteView)
+        addDebugMessage("Remote video setup: uid=\(avatarUid)")
+    }
+    
+    @objc private func toggleRemoteViewSize() {
+        isRemoteViewExpanded.toggle()
+        
+        remoteView.snp.remakeConstraints { make in
+            if isRemoteViewExpanded {
+                // Expanded: cover transcript area
+                make.edges.equalTo(chatBackgroundView.tableView)
+            } else {
+                // Collapsed: small window at top-right corner
+                make.top.equalToSuperview().offset(8)
+                make.right.equalToSuperview().inset(12)
+                make.width.equalTo(remoteViewSmallSize.width)
+                make.height.equalTo(remoteViewSmallSize.height)
+            }
+        }
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) { [weak self] in
+            guard let self = self else { return }
+            self.remoteView.layer.cornerRadius = self.isRemoteViewExpanded ? self.remoteViewExpandedCornerRadius : self.remoteViewSmallCornerRadius
+            self.chatBackgroundView.layoutIfNeeded()
+        }
     }
     
     // MARK: - Actions
