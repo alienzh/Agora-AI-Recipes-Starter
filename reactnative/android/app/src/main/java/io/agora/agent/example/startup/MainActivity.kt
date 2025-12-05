@@ -1,4 +1,4 @@
-package com.reactnative
+package io.agora.agent.example.startup
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
