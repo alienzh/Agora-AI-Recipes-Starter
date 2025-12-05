@@ -23,7 +23,7 @@
 ### 前置条件
 
 - React Native 开发环境（Node.js >= 20.0.0）
-- React Native CLI 或 Expo CLI
+- React Native CLI（本项目使用 React Native CLI，不支持 Expo）
 - Agora 开发者账号 [Console](https://console.shengwang.cn/)
 - 已创建 Agora 项目并获取 App ID 和 App Certificate
 - 已创建 Conversational AI Pipeline 并获取 Pipeline ID [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio)
@@ -34,9 +34,10 @@
 
 - **开发环境**：
   - Node.js >= 20.0.0
-  - React Native CLI 或 Expo CLI
+  - React Native CLI（本项目使用 React Native CLI）
   - Android Studio（Android 开发）
   - Xcode（iOS 开发，仅 macOS）
+  - CocoaPods（iOS 开发，仅 macOS）
 
 - **运行环境**：
   - Android 设备或模拟器（API Level 26 或更高）
@@ -60,9 +61,9 @@ yarn install
 
 3. **配置环境变量**：
    
-   复制 `.env.example` 文件为 `.env`：
+   在项目根目录创建 `.env` 文件：
    ```bash
-   cp .env.example .env
+   touch .env
    ```
    
    编辑 `.env` 文件，填入你的实际配置值：
@@ -105,11 +106,18 @@ yarn install
 4. **iOS 依赖安装**（仅 iOS 开发需要）：
 ```bash
 cd ios
-pod install
+pod update
 cd ..
 ```
 
-5. **配置 Agent 启动方式**：
+5. **配置 iOS 签名**（仅真机运行需要）：
+   - 打开 `ios/reactnative.xcworkspace`（注意是 `.xcworkspace`，不是 `.xcodeproj`）
+   - 在 Xcode 中选择项目 `reactnative` → 选择 Target `reactnative` → 打开 `Signing & Capabilities` 标签
+   - 勾选 `Automatically manage signing`
+   - 选择你的 `Team`（需要 Apple Developer 账号）
+   - 修改 `Bundle Identifier` 为唯一的标识符（例如：`com.yourcompany.reactnative`）
+
+6. **配置 Agent 启动方式**：
    
    默认配置，无需额外设置。React Native 应用直接调用 Agora RESTful API 启动 Agent，方便开发者快速体验功能。
    
@@ -142,11 +150,15 @@ yarn android
 
 ### iOS
 
+**使用模拟器运行**：
 ```bash
 npm run ios
 # 或
 yarn ios
 ```
+
+**使用真机运行**：
+在 Xcode 中打开 `ios/reactnative.xcworkspace`，选择真机设备后点击运行。
 
 ## 测试验证
 
@@ -210,8 +222,7 @@ reactnative/
 │   │   └── MessageParser.ts   # 消息解析（已实现完整逻辑）
 │   └── types/                  # 类型定义
 │       └── index.ts
-├── .env                        # 环境配置（需要创建）
-├── .env.example                # 环境配置示例
+├── .env                        # 环境配置（需要手动创建）
 └── README.md                   # 本文档
 ```
 
@@ -250,64 +261,13 @@ reactnative/
 - **消息传递方式**：React Native 版本使用 RTC DataStream 进行消息传递，**不需要**单独开通 RTM 功能
 - **配置方式**：使用 `.env` 文件管理环境变量，通过编译时脚本生成 `KeyCenterConfig.ts`（不依赖 `react-native-config`）
 - **Token 生成**：开发环境使用客户端 TokenGenerator，生产环境必须使用服务端生成
+- **权限管理**：使用 `react-native-permissions` 处理 iOS/Android 权限，iOS 需要在 Podfile 中配置权限子模块
 - **UI 布局**：
   - 日志区域：显示 Agent 启动相关的状态日志（无时间戳，直接展示），自动滚动到底部
   - 转录区域：AGENT 消息左对齐，USER 消息右对齐，底部显示 Agent 状态（IDLE、SILENT、LISTENING、THINKING、SPEAKING）
   - 控制按钮：初始显示 "Start Agent"，启动成功后显示 "静音" 和 "停止 Agent"
   - 静音按钮：点击后文字和图标会变化（🎤 静音 / 🔇 取消静音）
   - 停止按钮：点击后直接执行停止操作，无确认弹框
-
-## 常见问题
-
-### iOS 相关问题
-
-#### CocoaPods 安装问题
-
-如果遇到 `pod: command not found` 错误：
-
-1. 确保已安装 CocoaPods：
-   ```bash
-   sudo gem install cocoapods
-   ```
-
-2. 如果使用 Homebrew 管理的 Ruby：
-   ```bash
-   gem install cocoapods
-   ```
-
-3. 确保 gem bin 目录在 PATH 中：
-   ```bash
-   export PATH="$HOME/.gem/ruby/$(ruby -e 'puts RUBY_VERSION')/bin:$PATH"
-   ```
-
-#### Xcode 路径问题
-
-如果遇到 `xcode-select: error: tool 'xcodebuild' requires Xcode` 错误：
-
-```bash
-sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
-```
-
-### Android 相关问题
-
-#### 权限问题
-
-确保在 `AndroidManifest.xml` 中添加了必要的权限：
-- `android.permission.RECORD_AUDIO`
-- `android.permission.INTERNET`
-
-### 通用问题
-
-#### Token 生成失败
-
-- 检查 `.env` 文件中的 `AGORA_APP_CERTIFICATE` 是否正确
-- 确保 App Certificate 与 App ID 匹配
-
-#### Agent 启动失败
-
-- 检查 `.env` 文件中的 `AGORA_REST_KEY`、`AGORA_REST_SECRET`、`AGORA_PIPELINE_ID` 是否正确
-- 确保已开通 Conversational AI 服务
-- 查看日志区域的具体错误信息
 
 ## 相关资源
 

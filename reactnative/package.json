@@ -9,7 +9,6 @@
     "preios": "npm run generate-config",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
     "log-android": "react-native log-android",
