@@ -4,10 +4,20 @@
 
 > **工程启动指引**：请先参考 [ios-swift 工程 README](../../ios-swift/README.md) 完成基础配置和环境搭建。
 
+## 权限要求
+
+Vision 功能需要**摄像头权限**，在 `Info.plist` 中配置：
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>App needs camera access for AI vision understanding</string>
+```
+
 ## Demo 效果
 
 - 默认状态：右上角小窗口显示本地摄像头画面
 - 点击放大窗口，再次点击收起成小窗
+- 点击视频开关按钮（挂断按钮右侧）可开关摄像头和视频流
 - AI 可以实时理解摄像头拍摄的内容并进行对话
 
 ---
@@ -23,6 +33,7 @@
 private let localView = UIView()
 private let localViewSmallSize = CGSize(width: 90, height: 120)
 private var isLocalViewExpanded: Bool = false
+private var isCameraOn: Bool = true
 ```
 
 ### 新增方法
@@ -38,6 +49,18 @@ private func setupLocalVideo() {
     videoCanvas.renderMode = .hidden
     rtcEngine.setupLocalVideo(videoCanvas)
 }
+
+// 切换摄像头开关
+@objc private func toggleVideo() {
+    isCameraOn.toggle()
+    if isCameraOn {
+        rtcEngine?.startPreview()
+        rtcEngine?.muteLocalVideoStream(false)
+    } else {
+        rtcEngine?.stopPreview()
+        rtcEngine?.muteLocalVideoStream(true)
+    }
+}
 ```
 
 ### 连接流程变更
@@ -49,35 +72,19 @@ options.publishCameraTrack = true  // 开启摄像头视频流
 options.autoSubscribeVideo = false  // 无需订阅远端视频
 ```
 
----
+### UI 新增组件
 
-## 2. 请求新增的参数
+在 `ChatBackgroundView` 中新增了视频开关按钮：
 
-Vision 功能**无需修改**启动 Agent 的请求参数，仅需在 Pipeline 中配置视觉理解模块。
-
-请求体与基础版本相同：
-
-```json
-{
-  "name": "channel_name",
-  "pipeline_id": "your_pipeline_id",
-  "properties": {
-    "channel": "channel_name",
-    "agent_rtc_uid": "agent_uid",
-    "remote_rtc_uids": ["*"],
-    "token": "agent_token"
-  }
-}
+```swift
+let videoToggleButton = UIButton(type: .system)
+// 放置在挂断按钮右侧
 ```
 
 ---
 
-## 3. Pipeline 新增的配置
+## 2. Pipeline 新增的配置
 
-在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 创建 Pipeline 时，需要配置视觉理解模块：
+未知
+TODO：支持Vison功能的条件
 
-1. 进入 Pipeline 编辑页面
-2. 打开`视觉设置`选项
-3. 打开`启用视觉理解`
-4. 配置视觉参数（如识别间隔、分辨率等）
-5. 保存并发布 Pipeline

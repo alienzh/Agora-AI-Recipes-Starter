@@ -28,6 +28,7 @@ class AgentViewController: UIViewController {
     private var channel: String = ""
     private var transcripts: [Transcript] = []
     private var isMicMuted: Bool = false
+    private var isCameraOn: Bool = true
     private var isLoading: Bool = false
     private var isError: Bool = false
     private var initializationError: Error?
@@ -111,6 +112,7 @@ class AgentViewController: UIViewController {
         chatBackgroundView.tableView.dataSource = self
         chatBackgroundView.micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
         chatBackgroundView.endCallButton.addTarget(self, action: #selector(endCall), for: .touchUpInside)
+        chatBackgroundView.videoToggleButton.addTarget(self, action: #selector(toggleVideo), for: .touchUpInside)
         
         // Local Video View (added to chatBackgroundView, expandable/collapsible)
         localView.backgroundColor = .black
@@ -418,6 +420,8 @@ class AgentViewController: UIViewController {
         chatBackgroundView.tableView.reloadData()
         clearDebugMessages()
         isMicMuted = false
+        isCameraOn = true
+        chatBackgroundView.updateVideoButtonState(isCameraOn: true)
         currentAgentState = .unknown
         chatBackgroundView.updateStatusView(state: .unknown)
         agentId = ""
@@ -492,6 +496,21 @@ class AgentViewController: UIViewController {
         isMicMuted.toggle()
         chatBackgroundView.updateMicButtonState(isMuted: isMicMuted)
         rtcEngine?.adjustRecordingSignalVolume(isMicMuted ? 0 : 100)
+    }
+    
+    @objc private func toggleVideo() {
+        isCameraOn.toggle()
+        chatBackgroundView.updateVideoButtonState(isCameraOn: isCameraOn)
+        
+        if isCameraOn {
+            rtcEngine?.startPreview()
+            rtcEngine?.muteLocalVideoStream(false)
+        } else {
+            rtcEngine?.stopPreview()
+            rtcEngine?.muteLocalVideoStream(true)
+        }
+        
+        addDebugMessage(isCameraOn ? "Camera on" : "Camera off")
     }
     
     @objc private func endCall() {

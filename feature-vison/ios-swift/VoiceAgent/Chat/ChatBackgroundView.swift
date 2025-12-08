@@ -15,6 +15,7 @@ class ChatBackgroundView: UIView {
     private let controlBarView = UIView()
     let micButton = UIButton(type: .system)
     let endCallButton = UIButton(type: .system)
+    let videoToggleButton = UIButton(type: .system)
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -56,6 +57,11 @@ class ChatBackgroundView: UIView {
         endCallButton.backgroundColor = .red
         endCallButton.layer.cornerRadius = 25
         controlBarView.addSubview(endCallButton)
+        
+        // Video Toggle Button
+        videoToggleButton.setImage(UIImage(systemName: "video.fill"), for: .normal)
+        videoToggleButton.tintColor = .black
+        controlBarView.addSubview(videoToggleButton)
     }
     
     private func setupConstraints() {
@@ -86,12 +92,23 @@ class ChatBackgroundView: UIView {
             make.center.equalToSuperview()
             make.width.height.equalTo(50)
         }
+        
+        videoToggleButton.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.left.equalTo(endCallButton.snp.right).offset(30)
+            make.width.height.equalTo(40)
+        }
     }
     
     // MARK: - Public Methods
     func updateMicButtonState(isMuted: Bool) {
         let imageName = isMuted ? "mic.slash.fill" : "mic.fill"
         micButton.setImage(UIImage(systemName: imageName), for: .normal)
+    }
+    
+    func updateVideoButtonState(isCameraOn: Bool) {
+        let imageName = isCameraOn ? "video.fill" : "video.slash.fill"
+        videoToggleButton.setImage(UIImage(systemName: imageName), for: .normal)
     }
     
     func updateStatusView(state: AgentState) {
