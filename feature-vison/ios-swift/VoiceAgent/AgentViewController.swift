@@ -414,6 +414,11 @@ class AgentViewController: UIViewController {
             
         })
         
+        // Collapse video view when agent stops
+        if isLocalViewExpanded {
+            toggleLocalViewSize()
+        }
+        
         switchToConfigView()
         
         transcripts.removeAll()
@@ -457,8 +462,8 @@ class AgentViewController: UIViewController {
     }
     
     @objc private func toggleLocalViewSize() {
-        // Only allow expand when camera is on
-        if !isCameraOn && !isLocalViewExpanded {
+        // Only allow expand when connected and camera is on
+        if (!isCameraOn || chatBackgroundView.isHidden) && !isLocalViewExpanded {
             return
         }
         

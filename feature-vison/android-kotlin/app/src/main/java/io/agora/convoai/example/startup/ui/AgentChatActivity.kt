@@ -71,9 +71,11 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
             setupRecyclerView()
 
             // Setup local video view click listener for expand/collapse
-            // Only allow expand when camera is on
+            // Only allow expand when connected and camera is on
             localVideoContainer.setOnClickListener {
-                if (viewModel.uiState.value.isCameraOn) {
+                val state = viewModel.uiState.value
+                val isConnected = state.connectionState == AgentChatViewModel.ConnectionState.Connected
+                if (isConnected && state.isCameraOn) {
                     toggleLocalViewSize()
                 }
             }
@@ -326,8 +328,8 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                         if (state.isCameraOn) R.drawable.ic_video_on else R.drawable.ic_video_off
                     )
 
-                    // Auto collapse video view when camera is turned off
-                    if (!state.isCameraOn && isLocalViewExpanded) {
+                    // Auto collapse video view when camera is turned off or agent stops
+                    if ((!state.isCameraOn || isIdle) && isLocalViewExpanded) {
                         isLocalViewExpanded = false
                         updateLocalViewSize()
                     }
