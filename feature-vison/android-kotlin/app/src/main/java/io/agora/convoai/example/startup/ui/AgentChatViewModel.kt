@@ -1,6 +1,8 @@
 package io.agora.convoai.example.startup.ui
 
 import android.util.Log
+import android.view.SurfaceView
+import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.agora.convoai.example.startup.AgentApp
@@ -15,6 +17,7 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtm.ErrorInfo
 import io.agora.rtm.LinkStateEvent
 import io.agora.rtm.PresenceEvent
@@ -73,6 +76,8 @@ class AgentChatViewModel : ViewModel() {
     // UI State - shared between AgentHomeFragment and VoiceAssistantFragment
     data class ConversationUiState constructor(
         val isMuted: Boolean = false,
+        // Camera state for vision feature
+        val isCameraOn: Boolean = true,
         // Connection state
         val connectionState: ConnectionState = ConnectionState.Idle
     )
@@ -102,6 +107,9 @@ class AgentChatViewModel : ViewModel() {
 
     // Agent management
     private var agentId: String? = null
+
+    // Local video view reference for vision feature
+    private var localVideoView: View? = null
 
     // RTC and RTM instances
     private var rtcEngine: RtcEngineEx? = null
@@ -408,6 +416,7 @@ class AgentChatViewModel : ViewModel() {
 
     /**
      * Join RTC channel
+     * For vision feature: publishCameraTrack = true, autoSubscribeVideo = false
      */
     private fun joinRtcChannel(rtcToken: String, channelName: String, uid: Int) {
         Log.d(TAG, "joinChannel channelName: $channelName, localUid: $uid")
@@ -415,9 +424,11 @@ class AgentChatViewModel : ViewModel() {
         val channelOptions = ChannelMediaOptions().apply {
             clientRoleType = CLIENT_ROLE_BROADCASTER
             publishMicrophoneTrack = true
-            publishCameraTrack = false
+            // Enable camera track for vision feature
+            publishCameraTrack = true
             autoSubscribeAudio = true
-            autoSubscribeVideo = true
+            // No need to subscribe remote video for vision AI
+            autoSubscribeVideo = false
         }
         val ret = rtcEngine?.joinChannel(rtcToken, channelName, uid, channelOptions)
         Log.d(TAG, "Joining RTC channel: $channelName, uid: $uid")
@@ -596,6 +607,43 @@ class AgentChatViewModel : ViewModel() {
     }
 
     /**
+     * Setup local video preview for vision feature
+     * @param view The view to render local video
+     */
+    fun setupLocalVideo(view: View) {
+        localVideoView = view
+        rtcEngine?.let { engine ->
+            engine.startPreview()
+            val videoCanvas = VideoCanvas(view, VideoCanvas.RENDER_MODE_HIDDEN, 0)
+            engine.setupLocalVideo(videoCanvas)
+            Log.d(TAG, "Local video preview setup completed")
+            addStatusLog("Local video preview started")
+        }
+    }
+
+    /**
+     * Toggle camera on/off for vision feature
+     */
+    fun toggleVideo() {
+        val newCameraState = !_uiState.value.isCameraOn
+        _uiState.value = _uiState.value.copy(
+            isCameraOn = newCameraState
+        )
+
+        rtcEngine?.let { engine ->
+            if (newCameraState) {
+                engine.startPreview()
+                engine.muteLocalVideoStream(false)
+                Log.d(TAG, "Camera turned ON")
+            } else {
+                engine.stopPreview()
+                engine.muteLocalVideoStream(true)
+                Log.d(TAG, "Camera turned OFF")
+            }
+        }
+    }
+
+    /**
      * Add a new transcript to the list
      */
     fun addTranscript(transcript: Transcript) {
@@ -659,10 +707,15 @@ class AgentChatViewModel : ViewModel() {
                     agentId = null
                 }
 
+                // Stop video preview and cleanup local video
+                rtcEngine?.stopPreview()
+                localVideoView = null
+
                 leaveRtcChannel()
                 rtcJoined = false
                 _uiState.value = _uiState.value.copy(
-                    connectionState = ConnectionState.Idle
+                    connectionState = ConnectionState.Idle,
+                    isCameraOn = true  // Reset camera state
                 )
                 _transcriptList.value = emptyList()
                 _agentState.value = AgentState.IDLE

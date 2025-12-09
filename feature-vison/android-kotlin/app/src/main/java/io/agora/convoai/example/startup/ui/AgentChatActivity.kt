@@ -39,6 +39,13 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
     private var autoScrollToBottom = true
     private var isScrollBottom = false
 
+    // Local video view state
+    private var isLocalViewExpanded: Boolean = false
+    private val localViewSmallWidth = 90  // dp
+    private val localViewSmallHeight = 120  // dp
+    private val localViewExpandedWidth = 180  // dp
+    private val localViewExpandedHeight = 240  // dp
+
     override fun getViewBinding(): ActivityAgentChatBinding {
         return ActivityAgentChatBinding.inflate(layoutInflater)
     }
@@ -65,19 +72,26 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
             // Setup RecyclerView for transcript list
             setupRecyclerView()
 
+            // Setup local video view click listener for expand/collapse
+            localVideoContainer.setOnClickListener {
+                toggleLocalViewSize()
+            }
+
             // Start button click listener
             btnStart.setOnClickListener {
                 // Generate random channel name each time joining channel
                 val channelName = AgentChatViewModel.generateRandomChannelName()
 
-                // Check microphone permission before joining channel
-                checkMicrophonePermission { granted ->
+                // Check camera and microphone permissions before joining channel (for vision feature)
+                checkCameraAndMicPermission { granted ->
                     if (granted) {
+                        // Setup local video preview
+                        viewModel.setupLocalVideo(localVideoView)
                         viewModel.joinChannelAndLogin(channelName)
                     } else {
                         Toast.makeText(
                             this@AgentChatActivity,
-                            "Microphone permission is required to join channel",
+                            "Camera and microphone permissions are required for vision AI",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -87,6 +101,11 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
             // Mute button click listener
             btnMute.setOnClickListener {
                 viewModel.toggleMute()
+            }
+
+            // Video toggle button click listener
+            btnVideo.setOnClickListener {
+                viewModel.toggleVideo()
             }
 
             // Stop button click listener
@@ -119,6 +138,71 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     )
                 }
             )
+        }
+    }
+
+    /**
+     * Check camera and microphone permissions for vision feature
+     */
+    private fun checkCameraAndMicPermission(granted: (Boolean) -> Unit) {
+        if (mPermissionHelp.hasCameraPerm() && mPermissionHelp.hasMicPerm()) {
+            granted.invoke(true)
+        } else {
+            mPermissionHelp.checkCameraAndMicPerms(
+                granted = { granted.invoke(true) },
+                unGranted = {
+                    showPermissionDialog(
+                        "Permission Required",
+                        "Camera and microphone permissions are required for vision AI. Please grant the permissions to continue.",
+                        onResult = {
+                            if (it) {
+                                // Try camera first, then mic
+                                mPermissionHelp.launchAppSettingForCamera(
+                                    granted = {
+                                        mPermissionHelp.launchAppSettingForMic(
+                                            granted = { granted.invoke(true) },
+                                            unGranted = { granted.invoke(false) }
+                                        )
+                                    },
+                                    unGranted = { granted.invoke(false) }
+                                )
+                            } else {
+                                granted.invoke(false)
+                            }
+                        }
+                    )
+                }
+            )
+        }
+    }
+
+    /**
+     * Toggle local video view size (small/expanded)
+     */
+    private fun toggleLocalViewSize() {
+        isLocalViewExpanded = !isLocalViewExpanded
+        updateLocalViewSize()
+    }
+
+    /**
+     * Update local video view size based on expanded state
+     */
+    private fun updateLocalViewSize() {
+        mBinding?.localVideoContainer?.let { container ->
+            val density = resources.displayMetrics.density
+            val width: Int
+            val height: Int
+            if (isLocalViewExpanded) {
+                width = (localViewExpandedWidth * density).toInt()
+                height = (localViewExpandedHeight * density).toInt()
+            } else {
+                width = (localViewSmallWidth * density).toInt()
+                height = (localViewSmallHeight * density).toInt()
+            }
+            val params = container.layoutParams
+            params.width = width
+            params.height = height
+            container.layoutParams = params
         }
     }
 
@@ -193,10 +277,14 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     // Update button visibility based on connection state
                     val isConnected = state.connectionState == AgentChatViewModel.ConnectionState.Connected
                     val isConnecting = state.connectionState == AgentChatViewModel.ConnectionState.Connecting
+                    val isIdle = state.connectionState == AgentChatViewModel.ConnectionState.Idle
 
                     // Show/hide buttons
                     llStart.visibility = if (isConnected) View.GONE else View.VISIBLE
                     llControls.visibility = if (isConnected) View.VISIBLE else View.GONE
+
+                    // Local video container stays visible even when camera is off (shows black screen)
+
                     // Update button loading state
                     if (isConnecting) {
                         btnStart.text = "Starting..."
@@ -209,6 +297,11 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     // Update mute button UI
                     btnMute.setImageResource(
                         if (state.isMuted) R.drawable.ic_mic_off else R.drawable.ic_mic
+                    )
+
+                    // Update video button UI
+                    btnVideo.setImageResource(
+                        if (state.isCameraOn) R.drawable.ic_video_on else R.drawable.ic_video_off
                     )
                 }
             }
