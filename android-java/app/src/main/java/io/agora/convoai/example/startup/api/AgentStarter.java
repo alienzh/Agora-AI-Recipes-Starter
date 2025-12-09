@@ -27,14 +27,8 @@ import java.util.concurrent.Executors;
 public class AgentStarter {
     private static final String JSON_MEDIA_TYPE = "application/json; charset=utf-8";
     
-    // Switch between local server and Agora API by commenting/uncommenting the lines below
-    
-    // Option 1: Agora RESTful API (Default, for quick experience)
     private static final String AGORA_API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects";
     
-    // Option 2: Local Python Server (For development testing reference)
-    // private static final String AGORA_API_BASE_URL = "http://<YOUR_COMPUTER_IP>:8080";
-
     private static final String DEFAULT_AGENT_RTC_UID = "1009527";
 
     private static final OkHttpClient okHttpClient = SecureOkHttpClient.create().build();

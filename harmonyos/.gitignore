@@ -15,4 +15,4 @@
 **/env.json
 entry/src/main/resources/rawfile/env.json
 # Auto-generated config file (generated from env.json at build time)
-entry/src/main/ets/common/KeyCenterConfig.ets
+entry/src/main/ets/config/KeyCenterConfig.ets

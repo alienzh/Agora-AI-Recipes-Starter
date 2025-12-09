@@ -1,0 +1,14 @@
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+/.idea/
+
+# Environment configuration (contains sensitive credentials)
+env.properties
+
+# Python virtual environment
+server/venv/
+/.kotlin/

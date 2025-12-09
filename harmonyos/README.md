@@ -27,6 +27,7 @@
 - Agora 开发者账号 [Console](https://console.shengwang.cn/)
 - 已创建 Agora 项目并获取 App ID 和 App Certificate
 - 已创建 Conversational AI Pipeline 并获取 Pipeline ID [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio)
+- 已下载 Agora RTC HarmonyOS SDK（AgoraRtcSdk.har）[下载地址](https://doc.shengwang.cn/doc/rtc/harmonyos/resources)
 
 ## 快速开始
 
@@ -51,6 +52,21 @@ cd Agora-AI-Recipes-Starter/harmonyos
 
 2. **配置 HarmonyOS 项目**：
 - 使用 DevEco Studio 打开项目
+- **添加 Agora RTC SDK**：
+  
+  将 Agora RTC SDK HAR 文件放入项目：
+  ```bash
+  # 下载 Agora RTC HarmonyOS SDK
+  # 从 https://doc.shengwang.cn/doc/rtc/harmonyos/downloads 下载最新版本的 SDK
+  # 将下载的 AgoraRtcSdk.har 文件复制到以下目录：
+  cp /path/to/AgoraRtcSdk.har entry/libs/AgoraRtcSdk.har
+  ```
+  
+  **注意**：
+  - 确保 `entry/libs/AgoraRtcSdk.har` 文件存在，否则项目无法编译
+  - SDK 下载地址：[Agora RTC HarmonyOS SDK 下载](https://doc.shengwang.cn/doc/rtc/harmonyos/downloads)
+  - 如果 `entry/libs/` 目录下只有 `PLACEHOLDER` 文件，需要将其替换为实际的 `AgoraRtcSdk.har` 文件
+  
 - 配置 Agora Key：
    
   复制 `env.example.json` 文件为 `env.json`：
@@ -84,7 +100,7 @@ cd Agora-AI-Recipes-Starter/harmonyos
   - `env.json` 文件包含敏感信息，不会被提交到版本控制系统。请确保不要将你的实际凭证提交到代码仓库。
   - 构建项目时，构建脚本会自动读取 `env.json` 并生成配置文件：
     - 构建脚本（`entry/hvigorfile.ts`）会在构建时读取 `harmonyos/env.json`
-    - 自动生成 `entry/src/main/ets/common/KeyCenterConfig.ets`
+    - 自动生成 `entry/src/main/ets/config/KeyCenterConfig.ets`
     - 配置会被编译到应用中
   - 如果 `env.json` 文件不存在或字段缺失，构建时会生成空字符串作为默认值
   - 每次启动时会自动生成随机的 channelName，格式为 `channel_harmonyos_XXXX`（XXXX 为 4 位随机数字），无需手动配置。
@@ -157,20 +173,27 @@ cd Agora-AI-Recipes-Starter/harmonyos
 ```
 harmonyos/
 ├── entry/
+│   ├── libs/                      # SDK 库文件
+│   │   └── AgoraRtcSdk.har        # Agora RTC SDK（需要下载并放入）
 │   └── src/main/ets/
+│       ├── ability/               # 能力相关
+│       │   ├── EntryAbility.ets   # 应用入口能力
+│       │   └── EntryBackupAbility.ets # 备份能力
 │       ├── api/                   # API 相关代码
 │       │   ├── AgentStarter.ets   # Agent 启动 API
 │       │   └── TokenGenerator.ets # Token 生成（仅用于开发测试）
-│       ├── common/                # 通用工具类
+│       ├── config/                # 配置相关
 │       │   ├── KeyCenter.ets     # Key 配置中心
-│       │   ├── PermissionHelper.ets # 权限管理
-│       │   └── TranscriptDataSource.ets # 转录数据源
-│       ├── convoaiApi/            # Conversational AI API
+│       │   └── KeyCenterConfig.ets # Key 配置（构建时自动生成）
 │       ├── pages/                 # 页面
 │       │   ├── Index.ets          # 应用入口（简单包装 AgentChat）
 │       │   ├── AgentChat.ets      # 主页面（单页面架构）
-│       │   └── AgentChatController.ets # 业务逻辑控制器
-│       └── entryability/          # Ability
+│       │   ├── AgentChatController.ets # 业务逻辑控制器
+│       │   └── components/        # 页面组件
+│       │       └── TranscriptDataSource.ets # 转录数据源
+│       └── utils/                 # 工具类
+│           ├── MessageParser.ets # 消息解析器
+│           └── PermissionHelper.ets # 权限管理
 ├── env.json                       # 环境配置（需要创建）
 ├── env.example.json               # 环境配置示例
 └── README.md                      # 本文档
@@ -185,14 +208,25 @@ harmonyos/
   
 - **`pages/AgentChatController.ets`**：业务逻辑控制器，负责：
   - RTC 引擎初始化和频道管理
-  - Conversational AI API 集成
+  - RTC DataStream 消息处理和解析
   - Agent 启动和停止
   - 状态管理（连接状态、静音状态、日志等）
   - 转录数据管理
+  - 消息解析和路由（assistant.transcription、user.transcription、message.state、message.interrupt）
 
 - **`api/AgentStarter.ets`**：Agent 启动 API 封装，支持：
   - 直接调用 Agora RESTful API（开发测试）
   - 通过业务后台服务器中转（生产环境）
+
+- **`utils/MessageParser.ets`**：消息解析器，负责：
+  - 解析 RTC DataStream 消息（可能被分割成多部分）
+  - Base64 解码和 JSON 解析
+  - 消息完整性验证
+
+- **`pages/components/TranscriptDataSource.ets`**：转录数据源，负责：
+  - 管理转录列表数据
+  - 提供 LazyForEach 数据源接口
+  - 自动通知 UI 更新
 
 ## 重要说明
 
@@ -202,11 +236,18 @@ harmonyos/
 - **状态管理**：使用轮询机制（每 100ms）更新 UI 状态，适合单页面架构，无需复杂的回调机制
 - **消息传递方式**：HarmonyOS 版本使用 RTC DataStream 进行消息传递，**不需要**单独开通 RTM 功能
 - **配置方式**：使用 JSON 格式配置文件（`env.json`），构建时自动生成配置
-- **构建时配置**：构建脚本（`entry/hvigorfile.ts`）会在构建时读取 `harmonyos/env.json` 并自动生成 `entry/src/main/ets/common/KeyCenterConfig.ets`
+- **构建时配置**：构建脚本（`entry/hvigorfile.ts`）会在构建时读取 `harmonyos/env.json` 并自动生成 `entry/src/main/ets/config/KeyCenterConfig.ets`
 - **字幕渲染模式**：由于 HarmonyOS RTC SDK 能力限制，**仅支持 Text 模式渲染字幕**，不支持 Word 模式（逐词渲染）
+- **代码组织**：采用模块化分包结构，按功能划分目录：
+  - `ability/`：应用能力相关（EntryAbility、EntryBackupAbility）
+  - `api/`：API 封装（AgentStarter、TokenGenerator）
+  - `config/`：配置管理（KeyCenter、KeyCenterConfig）
+  - `pages/`：页面和业务逻辑（AgentChat、AgentChatController）
+  - `pages/components/`：页面组件（TranscriptDataSource）
+  - `utils/`：工具类（MessageParser、PermissionHelper）
 - **Token 续期**：自动处理 RTC token 续期，当 token 即将过期时自动更新
 - **UI 布局**：
-  - 日志区域：显示 Agent 启动相关的状态日志（仅显示 ViewModel 中的状态消息，不显示 IConversationalAIAPIEventHandler 回调的日志）
+  - 日志区域：显示 Agent 启动相关的状态日志
   - 转录区域：AGENT 消息左对齐，USER 消息右对齐，底部显示 Agent 状态
   - 控制按钮：初始显示 "Start Agent"，启动成功后显示 "Mute" 和 "Stop Agent"
 

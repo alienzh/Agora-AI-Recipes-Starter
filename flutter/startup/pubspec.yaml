@@ -1,0 +1,26 @@
+name: agora_flutter_startup
+description: Agora RTC + RTM startup case
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ">=2.17.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.5
+  agora_rtc_engine: ^6.0.0
+  agora_rtm: 2.2.2
+  permission_handler: ^11.3.0
+  http: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/env.properties
+    - assets/env.example.properties

@@ -8,19 +8,10 @@ import {
   RtcEngineConfig,
   ChannelMediaOptions
 } from '@shengwang/rtc-full';
-import { KeyCenter } from '../common/KeyCenter';
+import { KeyCenter } from '../config/KeyCenter';
 import { Context } from '@kit.AbilityKit';
-import {
-  IConversationalAIAPI,
-  IConversationalAIAPIEventHandler,
-  ConversationalAIAPIConfig,
-  Transcript,
-  AgentState,
-  StateChangeEvent,
-  InterruptEvent
-} from '../convoaiApi/IConversationalAIAPI';
-import { createConversationalAIAPI } from '../convoaiApi/ConversationalAIAPIImpl';
-import { TranscriptDataSource } from './common/TranscriptDataSource';
+import { TranscriptDataSource } from './components/TranscriptDataSource';
+import { MessageParser } from '../utils/MessageParser';
 
 /**
  * Connection state enum
@@ -40,7 +31,73 @@ export interface ConversationUiState {
   connectionState: ConnectionState;
 }
 
-// Transcript and AgentState are now imported from IConversationalAIAPI.ets
+/**
+ * Agent State Enum
+ */
+export enum AgentState {
+  IDLE = 'idle',
+  SILENT = 'silent',
+  LISTENING = 'listening',
+  THINKING = 'thinking',
+  SPEAKING = 'speaking',
+  UNKNOWN = 'unknown'
+}
+
+/**
+ * Message type enum for different message types in the conversation
+ */
+enum MessageType {
+  ASSISTANT = 'assistant.transcription',
+  USER = 'user.transcription',
+  INTERRUPT = 'message.interrupt',
+  MESSAGE_STATE = 'message.state',
+  UNKNOWN = 'unknown'
+}
+
+/**
+ * Transcript type enum
+ */
+export enum TranscriptType {
+  AGENT,
+  USER
+}
+
+/**
+ * Transcript status enum
+ */
+export enum TranscriptStatus {
+  IN_PROGRESS,
+  END,
+  INTERRUPTED,
+  UNKNOWN
+}
+
+/**
+ * Transcript data class
+ */
+export interface Transcript {
+  turnId: number;
+  userId: string;
+  text: string;
+  status: TranscriptStatus;
+  type: TranscriptType;
+}
+
+/**
+ * State change event interface
+ */
+interface StateChangeEventInfo {
+  turnId: number;
+  timestamp: number;
+}
+
+/**
+ * Interrupt event interface
+ */
+interface InterruptEventInfo {
+  turnId: number;
+  timestamp: number;
+}
 
 /**
  * Controller for managing agent chat business logic
@@ -96,11 +153,13 @@ export class AgentChatController {
   private unifiedToken: string | null = null;
   private channelName: string = '';
   private rtcJoined: boolean = false;
-  private conversationalAIAPI: IConversationalAIAPI | null = null;
   private rtcEngine: RtcEngineEx | null = null;
   private rtcContext: Context | null = null;
-  private conversationalAIEventHandler: IConversationalAIAPIEventHandler;
   private agentId: string | null = null;
+  private dataStreamId: number = 0;
+  private messageParser: MessageParser = new MessageParser();
+  private lastStateChangeEvent: StateChangeEventInfo | null = null;
+  private lastInterruptEvent: InterruptEventInfo | null = null;
   // Transcript data source (set by AgentChat)
   private transcriptDataSource: TranscriptDataSource | undefined;
 
@@ -108,8 +167,10 @@ export class AgentChatController {
     // Note: Context should be set via initialize() method before using
     // This allows context to be passed from UIAbility or page
 
-    // Create ConversationalAI API event handler
-    this.conversationalAIEventHandler = new ConversationalAIEventHandler(this);
+    // Set message parser error callback
+    this.messageParser.setOnError((message: string) => {
+      console.error(AgentChatController.TAG, message);
+    });
   }
 
 
@@ -125,16 +186,7 @@ export class AgentChatController {
 
     // Init RTC engine
     this.initRtcEngine(context, this.createRtcEventHandler());
-    // Create ConversationalAI API
-    if (this.rtcEngine != null) {
-      const apiConfig = new ConversationalAIAPIConfig(this.rtcEngine, true);
-      this.conversationalAIAPI = createConversationalAIAPI(apiConfig);
-      // Add event handler for ConversationalAI API
-      this.conversationalAIAPI.addHandler(this.conversationalAIEventHandler);
-      console.info(AgentChatController.TAG, 'RTC engine and ConversationalAI API created successfully');
-    } else {
-      console.error(AgentChatController.TAG, `Error creating RTC instances`);
-    }
+    console.info(AgentChatController.TAG, 'RTC engine initialized successfully');
   }
 
   /**
@@ -214,32 +266,42 @@ export class AgentChatController {
       },
 
       onStreamMessage: (uid: number, streamId: number, data: Uint8Array) => {
-        // Forward datastream message to ConversationalAI API
-        if (this.conversationalAIAPI) {
-          this.conversationalAIAPI.setOnStreamMessage(uid, streamId, data);
-        }
+        // Handle datastream message directly
+        this.handleStreamMessage(uid, streamId, data);
       },
       onStreamMessageError: (uid: number, streamId: number, error: number, missed: number, cached: number) => {
-        // Forward datastream error to ConversationalAI API
-        if (this.conversationalAIAPI) {
-          this.conversationalAIAPI.setOnStreamMessageError(uid, streamId, error, missed, cached);
-        }
+        console.error(AgentChatController.TAG, `RTC stream message error: uid=${uid}, streamId=${streamId}, error=${error}, missed=${missed}, cached=${cached}`);
       }
     };
   }
 
   /**
-   * Check if RTC is connected and message subscription is complete
-   * Similar to Kotlin: checkJoinAndLoginComplete()
-   * Note: HarmonyOS uses RTC DataStream instead of RTM
-   * This method may be called multiple times (from onJoinChannelSuccess and subscribeMessage callback),
-   * but startAgent() has guard to prevent duplicate calls
+   * Check if RTC is connected and create DataStream
+   * Similar to React Native: onJoinChannelSuccess creates DataStream
    */
   private checkConnectionComplete(): void {
-    if (this.rtcJoined) {
-      // Automatically start agent after RTC is connected and message subscription is complete
-      // startAgent() has guard (agentStarted check) to prevent duplicate calls
+    if (this.rtcJoined && this.rtcEngine && this.dataStreamId === 0) {
+      // Create DataStream after RTC is connected
+      try {
+        const streamId = this.rtcEngine.createDataStream({
+          syncWithAudio: false,
+          ordered: true
+        });
+        if (streamId > 0) {
+          this.dataStreamId = streamId;
+          console.info(AgentChatController.TAG, `RTC DataStream created, streamId: ${streamId}`);
+          this.addStatusLog(`RTC DataStream created, streamId: ${streamId}`);
+          
+          // Start agent after DataStream is created
       this.startAgent();
+        } else {
+          console.error(AgentChatController.TAG, `Failed to create DataStream, ret: ${streamId}`);
+          this.addStatusLog(`Failed to create DataStream, ret: ${streamId}`);
+        }
+      } catch (error) {
+        console.error(AgentChatController.TAG, `createDataStream error: ${JSON.stringify(error)}`);
+        this.addStatusLog(`createDataStream error`);
+      }
     }
   }
 
@@ -319,25 +381,11 @@ export class AgentChatController {
       return;
     }
 
-    if (this.conversationalAIAPI) {
-      this.conversationalAIAPI.loadAudioSettings()
-    }
+    // Load audio settings before joining channel
+    this.loadAudioSettings();
+    
     // Join RTC channel
     this.joinRtcChannel(token, channelName, AgentChatController.userId);
-
-    // Subscribe to messages for ConversationalAI API (via RTC DataStream)
-    if (this.conversationalAIAPI) {
-      this.conversationalAIAPI.subscribeMessage(channelName, (error) => {
-        if (error) {
-          console.error(AgentChatController.TAG, `Failed to subscribe message: ${error.message}`);
-          this.updateUiState({
-            connectionState: ConnectionState.Error
-          });
-        } else {
-          console.info(AgentChatController.TAG, 'Subscribed to ConversationalAI messages (via RTC DataStream)');
-        }
-      });
-    }
   }
 
   /**
@@ -459,9 +507,9 @@ export class AgentChatController {
     console.info(AgentChatController.TAG, `[Thread] addOrUpdateTranscript called at ${timestamp}`);
 
     // Update internal list for getTranscriptList()
-    const existingIndex = this._transcriptList.findIndex(
-      t => t.turnId === transcript.turnId && t.type === transcript.type
-    );
+    const existingIndex = this._transcriptList.findIndex((t: Transcript): boolean => {
+      return t.turnId === transcript.turnId && t.type === transcript.type;
+    });
     if (existingIndex >= 0) {
       this._transcriptList[existingIndex] = transcript;
       console.info(AgentChatController.TAG,
@@ -507,16 +555,10 @@ export class AgentChatController {
         this.agentId = null;
       }
 
-      // Unsubscribe from ConversationalAI messages
-      if (this.conversationalAIAPI && this.channelName) {
-        this.conversationalAIAPI.unsubscribeMessage(this.channelName, (error) => {
-          if (error) {
-            console.error(AgentChatController.TAG, `Failed to unsubscribe message: ${error.message}`);
-          } else {
-            console.info(AgentChatController.TAG, 'Unsubscribed from ConversationalAI messages');
-          }
-        });
-      }
+      // Reset DataStream
+      this.dataStreamId = 0;
+      this.lastStateChangeEvent = null;
+      this.lastInterruptEvent = null;
 
       this.leaveRtcChannel();
 
@@ -608,14 +650,11 @@ export class AgentChatController {
    * Cleanup resources
    */
   cleanup(): void {
-    // Destroy ConversationalAI API
-    if (this.conversationalAIAPI) {
-      this.conversationalAIAPI.destroy();
-      this.conversationalAIAPI = null;
-    }
-
     this.leaveRtcChannel();
     this.transcriptDataSource = undefined;
+    this.dataStreamId = 0;
+    this.lastStateChangeEvent = null;
+    this.lastInterruptEvent = null;
   }
 
   /**
@@ -636,36 +675,284 @@ export class AgentChatController {
       console.error(AgentChatController.TAG, `leaveChannel error: ${JSON.stringify(error)}`);
     }
   }
+
+  /**
+   * Handle RTC datastream message
+   * Similar to React Native: onStreamMessage handler
+   */
+  private handleStreamMessage(uid: number, streamId: number, data: Uint8Array): void {
+    if (!data || data.length <= 0) {
+      return;
+    }
+
+    try {
+      // Convert Uint8Array to string
+      let messageString = '';
+      for (let i = 0; i < data.length; i++) {
+        messageString += String.fromCharCode(data[i]);
+      }
+
+      // Parse message (may be split into multiple parts)
+      const parsedMessage = this.messageParser.parseStreamMessage(messageString);
+
+      if (parsedMessage) {
+        console.log(`[handleStreamMessage] Message parsed successfully: ${JSON.stringify(parsedMessage)}`);
+        // Handle parsed message on main thread
+        setTimeout(() => {
+          this.handleParsedMessage(uid.toString(), parsedMessage);
+        }, 0);
+      } else {
+        // Message is incomplete (split into multiple parts), this is normal
+        console.log(`[handleStreamMessage] Message parsing returned null (message may be incomplete or split into multiple parts)`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(AgentChatController.TAG, `[handleStreamMessage] error: ${errorMessage}`);
+  }
 }
 
 /**
- * ConversationalAI API event handler class
- * Implements IConversationalAIAPIEventHandler to handle ConversationalAI events
- */
-class ConversationalAIEventHandler implements IConversationalAIAPIEventHandler {
-  private viewModel: AgentChatController;
+   * Handle parsed message
+   * Similar to React Native: handleParsedMessage
+   * Reference: reactnative/src/stores/AgentChatStore.ts:65-177
+   */
+  private handleParsedMessage(publisherId: string, message: Record<string, Object>): void {
+    try {
+      // Get message type from 'object' field
+      const messageTypeStr = message['object'] as string | undefined;
 
-  constructor(viewModel: AgentChatController) {
-    this.viewModel = viewModel;
+      if (!messageTypeStr) {
+        console.log(`[handleParsedMessage] Message without 'object' key: ${JSON.stringify(message)}`);
+        return;
+      }
+
+      // Convert string to MessageType enum
+      let messageType: MessageType;
+      switch (messageTypeStr) {
+        case 'assistant.transcription':
+          messageType = MessageType.ASSISTANT;
+          break;
+        case 'user.transcription':
+          messageType = MessageType.USER;
+          break;
+        case 'message.interrupt':
+          messageType = MessageType.INTERRUPT;
+          break;
+        case 'message.state':
+          messageType = MessageType.MESSAGE_STATE;
+          break;
+        default:
+          messageType = MessageType.UNKNOWN;
+      }
+
+      console.log(`[handleParsedMessage] Received message type: ${messageTypeStr}`);
+
+      // Handle different message types
+      switch (messageType) {
+        case MessageType.ASSISTANT:
+          this.handleAssistantMessage(publisherId, message);
+          break;
+        case MessageType.USER:
+          this.handleUserMessage(publisherId, message);
+          break;
+        case MessageType.INTERRUPT:
+          this.handleInterruptMessage(publisherId, message);
+          break;
+        case MessageType.MESSAGE_STATE:
+          this.handleStateMessage(publisherId, message);
+          break;
+        default:
+          console.log(`[handleParsedMessage] Unknown message type: ${messageTypeStr}, full message: ${JSON.stringify(message)}`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(AgentChatController.TAG, `[handleParsedMessage] error: ${errorMessage}`);
+    }
   }
 
-  onAgentStateChanged(agentUserId: string, event: StateChangeEvent): void {
-    console.info(AgentChatController.TAG, `Agent state changed: ${agentUserId}, state: ${event.state}`);
-    // Use AgentState directly from IConversationalAIAPI, no mapping needed
-    this.viewModel.setAgentState(event.state);
+  /**
+   * Handle assistant transcription message
+   */
+  private handleAssistantMessage(publisherId: string, msg: Record<string, Object>): void {
+    const text = (msg['text'] as string) || '';
+    if (text.length === 0) {
+      console.log(`[handleParsedMessage] assistant.transcription: empty text, ignored`);
+      return;
+    }
+
+    const turnId = (msg['turn_id'] as number) ?? 0;
+    const userId = (msg['user_id'] as string) || '';
+    const turnStatusInt = (msg['turn_status'] as number) ?? 0;
+    
+    // 0: in-progress, 1: end gracefully, 2: interrupted
+    let status: TranscriptStatus;
+    switch (turnStatusInt) {
+      case 0:
+        status = TranscriptStatus.IN_PROGRESS;
+        break;
+      case 1:
+        status = TranscriptStatus.END;
+        break;
+      case 2:
+        status = TranscriptStatus.INTERRUPTED;
+        break;
+      default:
+        status = TranscriptStatus.UNKNOWN;
+    }
+
+    // Discard messages with Unknown status
+    if (status === TranscriptStatus.UNKNOWN) {
+      console.log(`[handleParsedMessage] assistant.transcription: unknown turn_status:${turnStatusInt}`);
+      return;
+    }
+
+    // Check if this turn was interrupted
+    if (this.lastInterruptEvent && this.lastInterruptEvent.turnId === turnId) {
+      console.log(`[handleParsedMessage] assistant.transcription: turn ${turnId} was interrupted, ignored`);
+      return;
+    }
+
+    console.log(`[handleParsedMessage] assistant.transcription: turnId=${turnId}, text="${text}", status=${status}, turnStatus=${turnStatusInt}`);
+
+    const transcript: Transcript = {
+      turnId: turnId,
+      userId: userId,
+      text: text,
+      status: status,
+      type: TranscriptType.AGENT,
+    };
+    this.addOrUpdateTranscript(transcript);
   }
 
-  onAgentInterrupted(agentUserId: string, event: InterruptEvent): void {
-    console.info(AgentChatController.TAG, `Agent interrupted: ${agentUserId}, turnId: ${event.turnId}`);
+  /**
+   * Handle user transcription message
+   */
+  private handleUserMessage(publisherId: string, msg: Record<string, Object>): void {
+    const text = (msg['text'] as string) || '';
+    if (text.length === 0) {
+      console.log(`[handleParsedMessage] user.transcription: empty text, ignored`);
+      return;
+    }
+
+    const turnId = (msg['turn_id'] as number) ?? 0;
+    const userId = (msg['user_id'] as string) || '';
+    const isFinal = (msg['final'] as boolean) || false;
+    const status = isFinal ? TranscriptStatus.END : TranscriptStatus.IN_PROGRESS;
+
+    console.log(`[handleParsedMessage] user.transcription: turnId=${turnId}, text="${text}", status=${status}, isFinal=${isFinal}`);
+
+    const transcript: Transcript = {
+      turnId: turnId,
+      userId: userId,
+      text: text,
+      status: status,
+      type: TranscriptType.USER,
+    };
+    this.addOrUpdateTranscript(transcript);
   }
 
-  onTranscriptUpdated(agentUserId: string, transcript: Transcript): void {
-    // Use Transcript directly from IConversationalAIAPI, no mapping needed
-    this.viewModel.addOrUpdateTranscript(transcript);
+  /**
+   * Handle interrupt message
+   */
+  private handleInterruptMessage(publisherId: string, msg: Record<string, Object>): void {
+    const turnId = (msg['turn_id'] as number) ?? 0;
+    const startMs = (msg['start_ms'] as number) ?? 0;
+
+    const interruptEvent: InterruptEventInfo = {
+      turnId: turnId,
+      timestamp: startMs
+    };
+    this.lastInterruptEvent = interruptEvent;
+
+    console.log(`[handleParsedMessage] message.interrupt: turnId=${turnId}, timestamp=${startMs}`);
+    // TODO: Handle interrupt event, update interrupted transcript status
   }
 
-  onDebugLog(message: string): void {
-    console.info(AgentChatController.TAG, `${message}`);
+  /**
+   * Handle agent state change message
+   */
+  private handleStateMessage(publisherId: string, msg: Record<string, Object>): void {
+    const state = (msg['state'] as string) || '';
+    const turnId = (msg['turn_id'] as number) || 0;
+    const ts = (msg['ts_ms'] as number) || 0;
+
+    // Check if turnId is less than current stateChangeEvent turnId, if so return
+    if (turnId < (this.lastStateChangeEvent?.turnId || 0)) {
+      return;
+    }
+
+    // Check if ts is less than or equal to current stateChangeEvent timestamp, if so return
+    if (ts <= (this.lastStateChangeEvent?.timestamp || 0)) {
+      return;
+    }
+
+    // Update lastStateChangeEvent
+    const stateChangeEvent: StateChangeEventInfo = {
+      turnId: turnId,
+      timestamp: ts
+    };
+    this.lastStateChangeEvent = stateChangeEvent;
+
+    console.log(`[handleParsedMessage] message.state: state=${state}, turnId=${turnId}, timestamp=${ts}`);
+
+    // Convert state string to AgentState enum
+    let agentState: AgentState;
+    switch (state) {
+      case 'idle':
+        agentState = AgentState.IDLE;
+        break;
+      case 'silent':
+        agentState = AgentState.SILENT;
+        break;
+      case 'listening':
+        agentState = AgentState.LISTENING;
+        break;
+      case 'thinking':
+        agentState = AgentState.THINKING;
+        break;
+      case 'speaking':
+        agentState = AgentState.SPEAKING;
+        break;
+      default:
+        agentState = AgentState.UNKNOWN;
+        console.log(`[handleParsedMessage] message.state: unknown state value: ${state}`);
+    }
+
+    this.setAgentState(agentState);
+  }
+
+  /**
+   * Load audio settings for optimal AI conversation performance
+   * Must be called before joinChannel
+   */
+  private loadAudioSettings(): void {
+    if (!this.rtcEngine) {
+      console.warn(AgentChatController.TAG, 'RTC engine not initialized, cannot load audio settings');
+      return;
+    }
+
+    try {
+      // Set audio scenario for AI client
+      this.rtcEngine.setAudioScenario(Constants.AudioScenarioType.CHORUS);
+      
+      // Set audio config parameters
+      this.rtcEngine.setParameters('{"che.audio.aec.split_srate_for_48k":16000}');
+      this.rtcEngine.setParameters('{"che.audio.sf.enabled":true}');
+      this.rtcEngine.setParameters('{"che.audio.sf.stftType":6}');
+      this.rtcEngine.setParameters('{"che.audio.sf.ainlpLowLatencyFlag":1}');
+      this.rtcEngine.setParameters('{"che.audio.sf.ainsLowLatencyFlag":1}');
+      this.rtcEngine.setParameters('{"che.audio.sf.procChainMode":1}');
+      this.rtcEngine.setParameters('{"che.audio.sf.nlpDynamicMode":1}');
+      this.rtcEngine.setParameters('{"che.audio.sf.nlpAlgRoute":1}');
+      this.rtcEngine.setParameters('{"che.audio.sf.ainlpModelPref":10}');
+      this.rtcEngine.setParameters('{"che.audio.sf.nsngAlgRoute":12}');
+      this.rtcEngine.setParameters('{"che.audio.sf.ainsModelPref":10}');
+      this.rtcEngine.setParameters('{"che.audio.sf.nsngPredefAgg":11}');
+      this.rtcEngine.setParameters('{"che.audio.agc.enable":false}');
+
+      console.info(AgentChatController.TAG, `Audio settings loaded, SDK version: ${RtcEngine.getSdkVersion()}`);
+    } catch (error) {
+      console.error(AgentChatController.TAG, `loadAudioSettings error: ${JSON.stringify(error)}`);
   }
 }
-
+}

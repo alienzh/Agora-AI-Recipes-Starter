@@ -261,8 +261,7 @@ class AgentChatViewModel : ViewModel() {
                 ConversationalAIAPIConfig(
                     rtcEngine = rtcEngine!!,
                     rtmClient = rtmClient!!,
-                    enableLog = true,
-                    renderMode = TranscriptRenderMode.Text
+                    enableLog = true
                 )
             )
             conversationalAIAPI?.loadAudioSettings(Constants.AUDIO_SCENARIO_AI_CLIENT)

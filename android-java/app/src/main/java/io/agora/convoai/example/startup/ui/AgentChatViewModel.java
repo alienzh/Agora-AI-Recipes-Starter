@@ -296,7 +296,7 @@ public class AgentChatViewModel extends ViewModel {
                     new ConversationalAIAPIConfig(
                             rtcEngine,
                             rtmClient,
-                            TranscriptRenderMode.Text,
+                            TranscriptRenderMode.Word,
                             true // enableLog
                     )
             );
