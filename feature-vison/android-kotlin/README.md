@@ -41,30 +41,13 @@ private var isCameraOn: Boolean = true
 
 ```kotlin
 // 设置本地视频预览
-fun setupLocalVideo(view: View) {
-    localVideoView = view
-    rtcEngine?.let { engine ->
-        engine.startPreview()
-        val videoCanvas = VideoCanvas(view, VideoCanvas.RENDER_MODE_HIDDEN, 0)
-        engine.setupLocalVideo(videoCanvas)
-    }
-}
+fun setupLocalVideo(view: View)
 
 // 切换摄像头开关
-fun toggleVideo() {
-    val newCameraState = !_uiState.value.isCameraOn
-    _uiState.value = _uiState.value.copy(isCameraOn = newCameraState)
+fun toggleVideo()
 
-    rtcEngine?.let { engine ->
-        if (newCameraState) {
-            engine.startPreview()
-            engine.muteLocalVideoStream(false)
-        } else {
-            engine.stopPreview()
-            engine.muteLocalVideoStream(true)
-        }
-    }
-}
+// 切换本地视频视图大小（展开/收起）
+private fun toggleLocalViewSize()
 ```
 
 ### 连接流程变更

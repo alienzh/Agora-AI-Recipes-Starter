@@ -43,8 +43,6 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
     private var isLocalViewExpanded: Boolean = false
     private val localViewSmallWidth = 90  // dp
     private val localViewSmallHeight = 120  // dp
-    private val localViewExpandedWidth = 180  // dp
-    private val localViewExpandedHeight = 240  // dp
 
     override fun getViewBinding(): ActivityAgentChatBinding {
         return ActivityAgentChatBinding.inflate(layoutInflater)
@@ -73,8 +71,11 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
             setupRecyclerView()
 
             // Setup local video view click listener for expand/collapse
+            // Only allow expand when camera is on
             localVideoContainer.setOnClickListener {
-                toggleLocalViewSize()
+                if (viewModel.uiState.value.isCameraOn) {
+                    toggleLocalViewSize()
+                }
             }
 
             // Start button click listener
@@ -186,22 +187,43 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
 
     /**
      * Update local video view size based on expanded state
+     * When expanded: cover the entire transcript area
+     * When collapsed: small window at top-right corner of transcript area
      */
     private fun updateLocalViewSize() {
-        mBinding?.localVideoContainer?.let { container ->
+        mBinding?.let { binding ->
+            val container = binding.localVideoContainer
+            val params = container.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
             val density = resources.displayMetrics.density
-            val width: Int
-            val height: Int
+
             if (isLocalViewExpanded) {
-                width = (localViewExpandedWidth * density).toInt()
-                height = (localViewExpandedHeight * density).toInt()
+                // Expanded: match cardTranscript size (cover entire transcript area)
+                params.width = 0  // match_constraint
+                params.height = 0  // match_constraint
+                params.topToTop = binding.cardTranscript.id
+                params.bottomToBottom = binding.cardTranscript.id
+                params.startToStart = binding.cardTranscript.id
+                params.endToEnd = binding.cardTranscript.id
+                params.topMargin = 0
+                params.marginEnd = 0
+                params.marginStart = 0
+                params.bottomMargin = 0
+                // Update corner radius for expanded state
+                binding.localVideoContainer.radius = 12f * density
             } else {
-                width = (localViewSmallWidth * density).toInt()
-                height = (localViewSmallHeight * density).toInt()
+                // Collapsed: small window at top-right corner
+                params.width = (localViewSmallWidth * density).toInt()
+                params.height = (localViewSmallHeight * density).toInt()
+                params.topToTop = binding.cardTranscript.id
+                params.bottomToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                params.startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                params.endToEnd = binding.cardTranscript.id
+                val margin = (8 * density).toInt()
+                params.topMargin = margin
+                params.marginEnd = margin
+                // Update corner radius for collapsed state
+                binding.localVideoContainer.radius = 8f * density
             }
-            val params = container.layoutParams
-            params.width = width
-            params.height = height
             container.layoutParams = params
         }
     }
@@ -303,6 +325,12 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     btnVideo.setImageResource(
                         if (state.isCameraOn) R.drawable.ic_video_on else R.drawable.ic_video_off
                     )
+
+                    // Auto collapse video view when camera is turned off
+                    if (!state.isCameraOn && isLocalViewExpanded) {
+                        isLocalViewExpanded = false
+                        updateLocalViewSize()
+                    }
                 }
             }
         }

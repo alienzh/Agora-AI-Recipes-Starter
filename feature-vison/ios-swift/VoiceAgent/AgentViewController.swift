@@ -457,6 +457,11 @@ class AgentViewController: UIViewController {
     }
     
     @objc private func toggleLocalViewSize() {
+        // Only allow expand when camera is on
+        if !isCameraOn && !isLocalViewExpanded {
+            return
+        }
+        
         isLocalViewExpanded.toggle()
         
         localView.snp.remakeConstraints { make in
@@ -508,6 +513,11 @@ class AgentViewController: UIViewController {
         } else {
             rtcEngine?.stopPreview()
             rtcEngine?.muteLocalVideoStream(true)
+            
+            // Auto collapse video view when camera is turned off
+            if isLocalViewExpanded {
+                toggleLocalViewSize()
+            }
         }
         
         addDebugMessage(isCameraOn ? "Camera on" : "Camera off")

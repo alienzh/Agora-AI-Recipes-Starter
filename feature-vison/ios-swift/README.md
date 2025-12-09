@@ -40,27 +40,13 @@ private var isCameraOn: Bool = true
 
 ```swift
 // 设置本地视频预览
-private func setupLocalVideo() {
-    rtcEngine.startPreview()
-    
-    let videoCanvas = AgoraRtcVideoCanvas()
-    videoCanvas.uid = 0  // 0 for local user
-    videoCanvas.view = localView
-    videoCanvas.renderMode = .hidden
-    rtcEngine.setupLocalVideo(videoCanvas)
-}
+private func setupLocalVideo()
 
 // 切换摄像头开关
-@objc private func toggleVideo() {
-    isCameraOn.toggle()
-    if isCameraOn {
-        rtcEngine?.startPreview()
-        rtcEngine?.muteLocalVideoStream(false)
-    } else {
-        rtcEngine?.stopPreview()
-        rtcEngine?.muteLocalVideoStream(true)
-    }
-}
+@objc private func toggleVideo()
+
+// 切换本地视频视图大小（展开/收起）
+@objc private func toggleLocalViewSize()
 ```
 
 ### 连接流程变更
