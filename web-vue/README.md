@@ -1,6 +1,6 @@
-# Web React
+# Web Vue
 
-一个基于 React 和 Vite 的前端项目，实现了完整的 RTM、RTC、ConvoAI 连接和 Agent 启动功能。
+一个基于 Vue 3 和 Vite 的前端项目，实现了完整的 RTM、RTC、ConvoAI 连接和 Agent 启动功能。
 
 ## 开始使用
 
@@ -100,24 +100,37 @@ const appId = env.AG_APP_ID;
 ## 项目结构
 
 ```
-web-react/
+web-vue/
 ├── src/
 │   ├── config/
 │   │   └── env.js              # 环境变量配置
 │   ├── components/
-│   │   ├── MainView.jsx         # 主视图组件（合并了配置和聊天功能）
-│   │   ├── entrance-view.css    # 配置视图样式
-│   │   └── chat-view.css        # 聊天视图样式
+│   │   ├── MainView.vue        # 主视图组件（合并了配置和聊天功能）
+│   │   ├── LogView.vue         # 日志视图组件
+│   │   ├── LogRow.vue          # 日志行组件
+│   │   ├── TranscriptScrollView.vue # 字幕滚动视图组件
+│   │   ├── TranscriptRow.vue  # 字幕行组件
+│   │   ├── ControlBar.vue      # 控制栏组件
+│   │   ├── entrance-view.css   # 配置视图样式
+│   │   └── chat-view.css       # 聊天视图样式
 │   ├── conversational-ai-api/   # ConvoAI API 封装
 │   ├── utils/
 │   │   ├── api.js              # Token 生成 API
 │   │   └── AgentManager.js     # Agent 管理工具
-│   ├── App.jsx                 # 主应用组件（包含日志管理）
+│   ├── App.vue                 # 主应用组件（包含日志管理和两栏布局）
 │   ├── App.css                 # 应用样式（包含两栏布局）
-│   ├── main.jsx                # 入口文件
+│   ├── main.js                 # 入口文件
 │   └── index.css               # 全局样式
 ├── .env.example                # 环境变量示例文件
-├── index.html                  # HTML 模板
+├── index.html                   # HTML 模板
 ├── vite.config.js              # Vite 配置
+├── server.js                    # Express 服务器（用于代理 Agora API）
 └── package.json                # 项目配置
 ```
+
+## 与 web-react 的区别
+
+- **web-vue**: 使用 Vue 3 Composition API 实现，功能与 web-react 相同
+- **web-react**: 使用 React Hooks 实现
+
+两个版本的功能完全一致，只是使用的框架不同。

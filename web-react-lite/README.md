@@ -9,7 +9,7 @@
 ### 安装依赖
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ### 开发模式
@@ -41,34 +41,13 @@ npm run preview
 
 2. 点击"连接对话式AI引擎"按钮开始连接
 
-3. 配置会自动保存到浏览器的 localStorage，下次打开页面时会自动填充
-
-4. 连接成功后会自动进入聊天页面
-
-5. 右侧会显示详细的连接状态日志，包括：
-   - RTM Client 初始化状态
-   - RTC Engine 初始化状态
-   - Token 生成状态
-   - 频道加入状态
-   - 各种事件回调（onJoinChannelSuccess、onUserJoined、onError 等）
-
 **注意**: `web-react-lite` 版本只启动前端开发服务器，不包含后端 API 代理服务器。Agent 的启动和停止应由后端服务处理。
-
-## 配置说明
-
-`web-react-lite` 版本使用页面输入的方式配置 Agora 参数，无需配置 `.env` 文件。
 
 ### 配置项说明
 
 - **App ID**: Agora App ID，用于初始化 RTM 和 RTC 引擎（必填）
 - **App Certificate**: Agora App Certificate，用于生成用户 Token（选填）
 - **频道名称**: 用于加入的频道名称（必填）
-
-### 配置存储
-
-- 配置会自动保存到浏览器的 localStorage
-- 下次打开页面时会自动填充已保存的配置
-- 可以随时修改配置，新配置会覆盖旧配置
 
 **注意**: Agent 的启动和停止应由后端服务处理，前端不参与
 
