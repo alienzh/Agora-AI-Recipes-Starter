@@ -47,6 +47,9 @@ private func setupLocalVideo()
 
 // 切换本地视频视图大小（展开/收起）
 @objc private func toggleLocalViewSize()
+
+// 构建 Vision LLM 配置
+private func buildVisionLLMConfig() -> [String: Any]
 ```
 
 ### 连接流程变更
@@ -69,8 +72,22 @@ let videoToggleButton = UIButton(type: .system)
 
 ---
 
-## 2. Pipeline 新增的配置
+## 2. LLM 配置要求
 
-未知
-TODO：支持Vison功能的条件
+Vision 功能需要配置支持多模态的 LLM，在 `startAgent` 时传入 `llm` 参数：
+
+```swift
+"llm": [
+    "url": "https://...",           // LLM API 地址（必须支持多模态/视觉）
+    "api_key": "sk-xxx",            // API 密钥
+    "input_modalities": ["text", "image"],  // 必须包含 "image"
+    "params": [
+        "model": "qwen3-vl-flash"   // 支持视觉的模型名称
+    ]
+]
+```
+
+**支持的模型示例**：
+- 阿里云：`qwen3-vl-flash`、`qwen-vl-max`
+- OpenAI：`gpt-4o`、`gpt-4o-mini`
 

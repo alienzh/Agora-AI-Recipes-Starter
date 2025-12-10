@@ -48,6 +48,9 @@ fun toggleVideo()
 
 // 切换本地视频视图大小（展开/收起）
 private fun toggleLocalViewSize()
+
+// 构建 Vision LLM 配置（在 AgentStarter 中）
+private fun buildVisionLLMConfig(): Map<String, Any>
 ```
 
 ### 连接流程变更
@@ -80,7 +83,21 @@ val channelOptions = ChannelMediaOptions().apply {
 
 ---
 
-## 2. Pipeline 新增的配置
+## 2. LLM 配置要求
 
-未知
-TODO：支持Vison功能的条件
+Vision 功能需要配置支持多模态的 LLM，在 `startAgent` 时传入 `llm` 参数：
+
+```kotlin
+"llm" to mapOf(
+    "url" to "https://...",           // LLM API 地址（必须支持多模态/视觉）
+    "api_key" to "sk-xxx",            // API 密钥
+    "input_modalities" to listOf("text", "image"),  // 必须包含 "image"
+    "params" to mapOf(
+        "model" to "qwen3-vl-flash"   // 支持视觉的模型名称
+    )
+)
+```
+
+**支持的模型示例**：
+- 阿里云：`qwen3-vl-flash`、`qwen-vl-max`
+- OpenAI：`gpt-4o`、`gpt-4o-mini`

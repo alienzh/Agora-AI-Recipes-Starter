@@ -362,6 +362,38 @@ class AgentViewController: UIViewController {
     }
     
     // MARK: - Agent Management
+    
+    /// Build LLM configuration for Vision feature
+    /// - Returns: LLM configuration dictionary
+    ///
+    /// Required parameters for Vision:
+    /// - url: LLM API endpoint URL (must support multimodal/vision)
+    /// - api_key: API key for authentication
+    /// - input_modalities: Must include "image" for vision feature, e.g. ["text", "image"]
+    /// - params.model: Model name that supports vision, e.g. "qwen-vl-max", "gpt-4o"
+    private func buildVisionLLMConfig() -> [String: Any] {
+        // TODO: Replace with your actual LLM configuration
+        let url = "<your_llm_api_url>"
+        let apiKey = "<your_api_key>"
+        let model = "<your_vision_model>"
+        
+        // Check if LLM is configured
+        if url.hasPrefix("<") || apiKey.hasPrefix("<") || model.hasPrefix("<") {
+            print("⚠️ [Vision] LLM not configured! Please update buildVisionLLMConfig() with your actual LLM settings.")
+            print("⚠️ [Vision] Vision feature will NOT work without proper LLM configuration.")
+            addDebugMessage("⚠️ LLM 未配置，Vision 功能无法使用")
+        }
+        
+        return [
+            "url": url,
+            "api_key": apiKey,
+            "input_modalities": ["text", "image"],
+            "params": [
+                "model": model
+            ]
+        ]
+    }
+    
     private func startAgent() async throws {
         addDebugMessage("Agent Start 调用中...")
         
@@ -373,7 +405,8 @@ class AgentViewController: UIViewController {
                     "channel": channel,
                     "agent_rtc_uid": "\(agentUid)",
                     "remote_rtc_uids": ["*"],
-                    "token": agentToken
+                    "token": agentToken,
+                    "llm": buildVisionLLMConfig()
                 ]
             ]
             AgentManager.startAgent(parameter: parameter) { agentId, error in
