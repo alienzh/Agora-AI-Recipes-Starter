@@ -90,6 +90,39 @@ object AgentStarter {
     }
 
     /**
+     * Build LLM configuration for Vision feature
+     *
+     * Required parameters for Vision:
+     * - url: LLM API endpoint URL (must support multimodal/vision)
+     * - api_key: API key for authentication
+     * - input_modalities: Must include "image" for vision feature, e.g. ["text", "image"]
+     * - params.model: Model name that supports vision, e.g. "qwen-vl-max", "gpt-4o"
+     *
+     * @return LLM configuration map
+     */
+    private fun buildVisionLLMConfig(): Map<String, Any> {
+        // TODO: Replace with your actual LLM configuration
+        val url = "<your_llm_api_url>"
+        val apiKey = "<your_api_key>"
+        val model = "<your_vision_model>"
+
+        // Check if LLM is configured
+        if (url.startsWith("<") || apiKey.startsWith("<") || model.startsWith("<")) {
+            android.util.Log.w("Vision", "⚠️ LLM not configured! Please update buildVisionLLMConfig() with your actual LLM settings.")
+            android.util.Log.w("Vision", "⚠️ Vision feature will NOT work without proper LLM configuration.")
+        }
+
+        return mapOf(
+            "url" to url,
+            "api_key" to apiKey,
+            "input_modalities" to listOf("text", "image"),
+            "params" to mapOf(
+                "model" to model
+            )
+        )
+    }
+
+    /**
      * Build JSON payload for Agora API
      */
     private fun buildJsonPayload(
@@ -107,7 +140,8 @@ object AgentStarter {
                 "channel" to channel,
                 "agent_rtc_uid" to agentRtcUid,
                 "remote_rtc_uids" to remoteRtcUids,
-                "token" to token
+                "token" to token,
+                "llm" to buildVisionLLMConfig()
             )
         )
         return mapToJsonObjectWithFilter(payloadMap)
