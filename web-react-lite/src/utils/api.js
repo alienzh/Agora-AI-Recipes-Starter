@@ -5,8 +5,8 @@
  * @param {number} expire - 过期时间（秒），默认 86400（24小时）
  * @param {number[]} types - Token 类型数组
  * @param {string} appId - Agora App ID
- * @param {string} appCertificate - Agora App Certificate
- * @returns {Promise<string|null>} 返回 token 或 null
+ * @param {string} appCertificate - Agora App Certificate（选填，为空时返回 null 表示不使用 token）
+ * @returns {Promise<string|null>} 返回 token（如果 appCertificate 为空则返回 null）
  */
 export async function generateToken(channelName, uid, expire = 86400, types = [1], appId, appCertificate) {
   // 检查配置是否已填写
@@ -14,8 +14,9 @@ export async function generateToken(channelName, uid, expire = 86400, types = [1
     throw new Error('App ID 未配置')
   }
   
-  if (!appCertificate) {
-    throw new Error('App Certificate 未配置')
+  // 如果 appCertificate 为空，返回 null 表示不使用 token
+  if (!appCertificate || appCertificate.trim() === '') {
+    return null
   }
   
   const params = {

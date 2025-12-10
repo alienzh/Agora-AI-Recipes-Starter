@@ -240,16 +240,26 @@ function MainView({ addLog, clearLogs }) {
         // 步骤 2: 生成用户 token
         safeAddLog('获取 Token 调用中...', 'info')
         const userToken = await generateToken(channel, String(uid), 86400, [1, 2], appId, appCertificate)
-        if (!userToken) {
+        // userToken 可以是 null（不使用 token），这是有效的
+        if (userToken === undefined) {
           throw new Error('获取 token 失败，请重试')
         }
-        setToken(userToken)
-        safeAddLog('获取 Token 调用成功', 'success')
+        setToken(userToken || '')
+        if (userToken === null) {
+          safeAddLog('不使用 Token（App Certificate 未配置）', 'info')
+        } else {
+          safeAddLog('获取 Token 调用成功', 'success')
+        }
 
         // 步骤 3: RTM 登录
         safeAddLog('RTM Login 调用中...', 'info')
         try {
-          await rtmClientRef.current.login({ token: userToken })
+          // 如果 userToken 是 null，不传 token 参数
+          if (userToken === null) {
+            await rtmClientRef.current.login()
+          } else {
+            await rtmClientRef.current.login({ token: userToken })
+          }
           safeAddLog('RTM Login 调用成功', 'success')
         } catch (error) {
           if (error.code === -10017 || error.message?.includes('Same subscribe, join or login request')) {
@@ -271,7 +281,7 @@ function MainView({ addLog, clearLogs }) {
           })
         }
 
-        // 加入频道
+        // 加入频道（如果 userToken 是 null，传递 null 给 join 方法）
         const userId = typeof uid === 'number' ? uid : parseInt(uid, 10)
         await rtcClientRef.current.join(appId, channel, userToken, userId)
         safeAddLog('joinChannel 调用成功', 'success')
