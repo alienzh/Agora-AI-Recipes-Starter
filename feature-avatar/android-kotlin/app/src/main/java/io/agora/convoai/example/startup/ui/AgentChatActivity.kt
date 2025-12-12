@@ -1,12 +1,11 @@
 package io.agora.convoai.example.startup.ui
 
 import android.view.LayoutInflater
-import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -26,7 +25,6 @@ import kotlinx.coroutines.launch
 import kotlin.text.ifEmpty
 import androidx.core.graphics.toColorInt
 import io.agora.convoai.example.startup.tools.PermissionHelp
-import io.agora.rtc2.RtcEngine
 
 /**
  * Activity for agent chat interface
@@ -44,7 +42,8 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
 
     // Avatar video display state
     private var isAvatarExpanded = false
-    private var avatarSurfaceView: SurfaceView? = null
+    private val avatarViewSmallWidth = 120  // dp
+    private val avatarViewSmallHeight = 160  // dp
 
     override fun getViewBinding(): ActivityAgentChatBinding {
         return ActivityAgentChatBinding.inflate(layoutInflater)
@@ -104,14 +103,13 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 viewModel.hangup()
             }
 
-            // Avatar small card click listener - expand to full screen
-            cardAvatarSmall.setOnClickListener {
-                toggleAvatarSize()
-            }
-
-            // Avatar full card click listener - shrink to small
-            cardAvatarFull.setOnClickListener {
-                toggleAvatarSize()
+            // Avatar video container click listener - expand/collapse
+            avatarVideoContainer.setOnClickListener {
+                val state = viewModel.uiState.value
+                val isConnected = state.connectionState == AgentChatViewModel.ConnectionState.Connected
+                if (isConnected) {
+                    toggleAvatarSize()
+                }
             }
         }
     }
@@ -213,6 +211,7 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     // Update button visibility based on connection state
                     val isConnected = state.connectionState == AgentChatViewModel.ConnectionState.Connected
                     val isConnecting = state.connectionState == AgentChatViewModel.ConnectionState.Connecting
+                    val isIdle = state.connectionState == AgentChatViewModel.ConnectionState.Idle
 
                     // Show/hide buttons
                     llStart.visibility = if (isConnected) View.GONE else View.VISIBLE
@@ -230,6 +229,12 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     btnMute.setImageResource(
                         if (state.isMuted) R.drawable.ic_mic_off else R.drawable.ic_mic
                     )
+
+                    // Auto collapse avatar view when agent stops
+                    if (isIdle && isAvatarExpanded) {
+                        isAvatarExpanded = false
+                        updateAvatarViewSize()
+                    }
                 }
             }
         }
@@ -298,29 +303,13 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
      */
     private fun setupAvatarVideo() {
         mBinding?.apply {
-            // Create SurfaceView for avatar video
-            avatarSurfaceView = SurfaceView(this@AgentChatActivity).apply {
-                setZOrderMediaOverlay(true)
-            }
+            // Setup remote video rendering using the SurfaceView in layout
+            viewModel.setupRemoteVideo(avatarVideoView)
 
-            // Add to small container initially
-            avatarContainerSmall.removeAllViews()
-            avatarContainerSmall.addView(
-                avatarSurfaceView,
-                FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-            )
-
-            // Setup remote video rendering
-            avatarSurfaceView?.let { surface ->
-                viewModel.setupRemoteVideo(surface)
-            }
-
-            // Show small avatar card
-            cardAvatarSmall.visibility = View.VISIBLE
+            // Show avatar video container
+            avatarVideoContainer.visibility = View.VISIBLE
             isAvatarExpanded = false
+            updateAvatarViewSize()
         }
     }
 
@@ -329,54 +318,60 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
      */
     private fun hideAvatarVideo() {
         mBinding?.apply {
-            cardAvatarSmall.visibility = View.GONE
-            cardAvatarFull.visibility = View.GONE
-            avatarContainerSmall.removeAllViews()
-            avatarContainerFull.removeAllViews()
-            avatarSurfaceView = null
+            avatarVideoContainer.visibility = View.GONE
             isAvatarExpanded = false
+            updateAvatarViewSize()
         }
     }
 
     /**
-     * Toggle avatar video size between small and full screen
+     * Toggle avatar video size between small and expanded
      */
     private fun toggleAvatarSize() {
-        mBinding?.apply {
-            val surfaceView = avatarSurfaceView ?: return
+        isAvatarExpanded = !isAvatarExpanded
+        updateAvatarViewSize()
+    }
+
+    /**
+     * Update avatar video view size based on expanded state
+     * When expanded: cover the entire transcript area
+     * When collapsed: small window at top-right corner of transcript area
+     */
+    private fun updateAvatarViewSize() {
+        mBinding?.let { binding ->
+            val container = binding.avatarVideoContainer
+            val params = container.layoutParams as ConstraintLayout.LayoutParams
+            val density = resources.displayMetrics.density
 
             if (isAvatarExpanded) {
-                // Shrink to small
-                avatarContainerFull.removeView(surfaceView)
-                avatarContainerSmall.addView(
-                    surfaceView,
-                    FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                    )
-                )
-                cardAvatarFull.visibility = View.GONE
-                cardAvatarSmall.visibility = View.VISIBLE
-                // Show other UI elements
-                cardLog.visibility = View.VISIBLE
-                cardTranscript.visibility = View.VISIBLE
+                // Expanded: match cardTranscript size (cover entire transcript area)
+                params.width = 0  // match_constraint
+                params.height = 0  // match_constraint
+                params.topToTop = binding.cardTranscript.id
+                params.bottomToBottom = binding.cardTranscript.id
+                params.startToStart = binding.cardTranscript.id
+                params.endToEnd = binding.cardTranscript.id
+                params.topMargin = 0
+                params.marginEnd = 0
+                params.marginStart = 0
+                params.bottomMargin = 0
+                // Update corner radius for expanded state
+                binding.avatarVideoContainer.radius = 12f * density
             } else {
-                // Expand to full screen
-                avatarContainerSmall.removeView(surfaceView)
-                avatarContainerFull.addView(
-                    surfaceView,
-                    FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                    )
-                )
-                cardAvatarSmall.visibility = View.GONE
-                cardAvatarFull.visibility = View.VISIBLE
-                // Hide other UI elements
-                cardLog.visibility = View.GONE
-                cardTranscript.visibility = View.GONE
+                // Collapsed: small window at top-right corner
+                params.width = (avatarViewSmallWidth * density).toInt()
+                params.height = (avatarViewSmallHeight * density).toInt()
+                params.topToTop = binding.cardTranscript.id
+                params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                params.startToStart = ConstraintLayout.LayoutParams.UNSET
+                params.endToEnd = binding.cardTranscript.id
+                val margin = (8 * density).toInt()
+                params.topMargin = margin
+                params.marginEnd = margin
+                // Update corner radius for collapsed state
+                binding.avatarVideoContainer.radius = 8f * density
             }
-            isAvatarExpanded = !isAvatarExpanded
+            container.layoutParams = params
         }
     }
 

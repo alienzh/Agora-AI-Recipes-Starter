@@ -8,52 +8,6 @@
     android:padding="16dp"
     tools:context=".ui.AgentChatActivity">
 
-    <!-- Avatar Video Container (Small) - Top Right -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardAvatarSmall"
-        android:layout_width="120dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="#1A1A2E"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible">
-
-        <FrameLayout
-            android:id="@+id/avatarContainerSmall"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Avatar Video Container (Full Screen) - Hidden by default -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardAvatarFull"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="#1A1A2E"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="8dp"
-        app:layout_constraintBottom_toTopOf="@id/llStart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="96dp"
-        tools:visibility="gone">
-
-        <FrameLayout
-            android:id="@+id/avatarContainerFull"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </com.google.android.material.card.MaterialCardView>
-
     <!-- Log Section -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardLog"
@@ -63,10 +17,9 @@
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
-        app:layout_constraintEnd_toStartOf="@id/cardAvatarSmall"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -95,7 +48,6 @@
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardLog">
@@ -230,5 +182,27 @@
             app:elevation="8dp"
             app:rippleColor="#33FFFFFF" />
     </LinearLayout>
+
+    <!-- Avatar Video Container (positioned over transcript area, clickable to expand) -->
+    <!-- Placed at end of layout to ensure it's on top (higher z-order) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/avatarVideoContainer"
+        android:layout_width="120dp"
+        android:layout_height="160dp"
+        android:layout_margin="8dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#1A1A2E"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="@id/cardTranscript"
+        app:layout_constraintTop_toTopOf="@id/cardTranscript"
+        tools:visibility="visible">
+
+        <SurfaceView
+            android:id="@+id/avatarVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
