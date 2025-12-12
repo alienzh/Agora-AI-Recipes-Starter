@@ -281,6 +281,7 @@ class AgentChatViewModel : ViewModel() {
                 ConversationalAIAPIConfig(
                     rtcEngine = rtcEngine!!,
                     rtmClient = rtmClient!!,
+                    renderMode = TranscriptRenderMode.Text,
                     enableLog = true
                 )
             )
