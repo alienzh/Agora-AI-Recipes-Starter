@@ -53,6 +53,9 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
         super.initData()
         viewModel = ViewModelProvider(this)[AgentChatViewModel::class.java]
         mPermissionHelp = PermissionHelp(this)
+        
+        // Load saved UIDs and fill input fields
+        loadSavedUIDs()
 
         // Observe UI state changes
         observeUiState()
@@ -74,21 +77,39 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
             // Setup RecyclerView for transcript list
             setupRecyclerView()
 
-            // Start button click listener
-            btnStart.setOnClickListener {
-                // Generate random channel name each time joining channel
-                val channelName = AgentChatViewModel.generateRandomChannelName()
+            // Setup ChannelInputView callback
+            channelInputView.onJoinChannelListener = object : OnJoinChannelListener {
+                override fun onJoinChannel(data: ChannelInputData) {
+                    // Generate random channel name each time joining channel
+                    val channelName = data.channelName.ifEmpty { 
+                        AgentChatViewModel.generateRandomChannelName() 
+                    }
+                    
+                    // Validate UIDs
+                    if (data.userId == null || data.userId <= 0) {
+                        viewModel.addStatusLog("ERROR: 用户UID不能为空")
+                        return
+                    }
+                    if (data.agentUid == null || data.agentUid <= 0) {
+                        viewModel.addStatusLog("ERROR: Agent UID不能为空")
+                        return
+                    }
+                    if (data.avatarUid == null || data.avatarUid <= 0) {
+                        viewModel.addStatusLog("ERROR: Avatar UID不能为空")
+                        return
+                    }
 
-                // Check microphone permission before joining channel
-                checkMicrophonePermission { granted ->
-                    if (granted) {
-                        viewModel.joinChannelAndLogin(channelName)
-                    } else {
-                        Toast.makeText(
-                            this@AgentChatActivity,
-                            "Microphone permission is required to join channel",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    // Check microphone permission before joining channel
+                    checkMicrophonePermission { granted ->
+                        if (granted) {
+                            viewModel.joinChannelAndLogin(channelName, data.userId, data.agentUid, data.avatarUid)
+                        } else {
+                            Toast.makeText(
+                                this@AgentChatActivity,
+                                "Microphone permission is required to join channel",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }
@@ -213,17 +234,11 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     val isConnecting = state.connectionState == AgentChatViewModel.ConnectionState.Connecting
                     val isIdle = state.connectionState == AgentChatViewModel.ConnectionState.Idle
 
-                    // Show/hide buttons
-                    llStart.visibility = if (isConnected) View.GONE else View.VISIBLE
+                    // Show/hide views based on connection state
+                    scrollView.visibility = if (isConnected) View.GONE else View.VISIBLE
+                    cardTranscript.visibility = if (isConnected) View.VISIBLE else View.GONE
                     llControls.visibility = if (isConnected) View.VISIBLE else View.GONE
-                    // Update button loading state
-                    if (isConnecting) {
-                        btnStart.text = "Starting..."
-                        btnStart.isEnabled = false
-                    } else {
-                        btnStart.text = "Start Agent"
-                        btnStart.isEnabled = true
-                    }
+                    // Button state is managed by ChannelInputView
 
                     // Update mute button UI
                     btnMute.setImageResource(
@@ -355,8 +370,7 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 params.marginEnd = 0
                 params.marginStart = 0
                 params.bottomMargin = 0
-                // Update corner radius for expanded state
-                binding.avatarVideoContainer.radius = 12f * density
+                // Corner radius is handled by drawable background
             } else {
                 // Collapsed: small window at top-right corner
                 params.width = (avatarViewSmallWidth * density).toInt()
@@ -368,13 +382,24 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 val margin = (8 * density).toInt()
                 params.topMargin = margin
                 params.marginEnd = margin
-                // Update corner radius for collapsed state
-                binding.avatarVideoContainer.radius = 8f * density
+                // Corner radius is handled by drawable background
             }
             container.layoutParams = params
         }
     }
 
+    /**
+     * Load saved channel name and UIDs and fill input fields
+     */
+    private fun loadSavedUIDs() {
+        val (savedChannelName, uids) = viewModel.loadSavedChannelNameAndUIDs()
+        val (savedUserId, savedAgentUid, savedAvatarUid) = uids
+        mBinding?.channelInputView?.apply {
+            loadSavedChannelName(savedChannelName)
+            loadSavedUIDs(savedUserId, savedAgentUid, savedAvatarUid)
+        }
+    }
+    
     /**
      * Scroll RecyclerView to the bottom to show latest transcript
      */

@@ -12,7 +12,7 @@ import AgoraRtmKit
 
 class AgentViewController: UIViewController {
     // MARK: - UI Components
-    private let configBackgroundView = ConfigBackgroundView()
+    private let channelInputView = ChannelInputView()
     private let chatBackgroundView = ChatBackgroundView()
     private let debugInfoTextView = UITextView()
     
@@ -24,7 +24,7 @@ class AgentViewController: UIViewController {
     private var isRemoteViewExpanded: Bool = false  // Default collapsed
     
     // MARK: - State
-    private let uid = Int.random(in: 1000...9999999)
+    private var uid: Int = 0
     private var channel: String = ""
     private var transcripts: [Transcript] = []
     private var isMicMuted: Bool = false
@@ -35,14 +35,17 @@ class AgentViewController: UIViewController {
     
     // MARK: - Agora Components
     private var token: String = ""
-    private var agentToken: String = ""
-    private var avatarToken: String = ""
-    private var agentId: String = ""
     private var rtcEngine: AgoraRtcEngineKit?
     private var rtmEngine: AgoraRtmClientKit?
     private var convoAIAPI: ConversationalAIAPI?
-    private let agentUid = Int.random(in: 10000000...99999999)
-    private let avatarUid = Int.random(in: 10000000...99999999)
+    private var agentUid: Int = 0
+    private var avatarUid: Int = 0
+    
+    // MARK: - UserDefaults Keys
+    private let kSavedChannelName = "saved_channel_name"
+    private let kSavedUid = "saved_uid"
+    private let kSavedAgentUid = "saved_agent_uid"
+    private let kSavedAvatarUid = "saved_avatar_uid"
     
     // MARK: - Toast
     private var loadingToast: UIView?
@@ -75,6 +78,38 @@ class AgentViewController: UIViewController {
         setupUI()
         setupConstraints()
         initializeEngines()
+        loadSavedUIDs()
+    }
+    
+    // MARK: - Load/Save Channel Name and UIDs
+    private func loadSavedUIDs() {
+        let savedChannelName = UserDefaults.standard.string(forKey: kSavedChannelName)
+        let savedUid = UserDefaults.standard.integer(forKey: kSavedUid)
+        let savedAgentUid = UserDefaults.standard.integer(forKey: kSavedAgentUid)
+        let savedAvatarUid = UserDefaults.standard.integer(forKey: kSavedAvatarUid)
+        
+        channelInputView.loadSavedChannelName(savedChannelName)
+        
+        let userId = savedUid > 0 ? savedUid : nil
+        let agentUid = savedAgentUid > 0 ? savedAgentUid : nil
+        let avatarUid = savedAvatarUid > 0 ? savedAvatarUid : nil
+        
+        channelInputView.loadSavedUIDs(userId: userId, agentUid: agentUid, avatarUid: avatarUid)
+    }
+    
+    private func saveChannelNameAndUIDs() {
+        if !channel.isEmpty {
+            UserDefaults.standard.set(channel, forKey: kSavedChannelName)
+        }
+        if uid > 0 {
+            UserDefaults.standard.set(uid, forKey: kSavedUid)
+        }
+        if agentUid > 0 {
+            UserDefaults.standard.set(agentUid, forKey: kSavedAgentUid)
+        }
+        if avatarUid > 0 {
+            UserDefaults.standard.set(avatarUid, forKey: kSavedAvatarUid)
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -101,10 +136,11 @@ class AgentViewController: UIViewController {
         debugInfoTextView.text = "等待连接...\n"
         view.addSubview(debugInfoTextView)
         
-        // Config Background View
-        view.addSubview(configBackgroundView)
-        configBackgroundView.channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-        configBackgroundView.startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
+        // Channel Input View
+        view.addSubview(channelInputView)
+        channelInputView.onJoinChannelTapped = { [weak self] inputData in
+            self?.handleJoinChannel(inputData: inputData)
+        }
         
         // Chat Background View
         chatBackgroundView.isHidden = true
@@ -134,8 +170,8 @@ class AgentViewController: UIViewController {
             make.height.equalTo(120)
         }
         
-        // Config Background View (below debug view)
-        configBackgroundView.snp.makeConstraints { make in
+        // Channel Input View (below debug view)
+        channelInputView.snp.makeConstraints { make in
             make.top.equalTo(debugInfoTextView.snp.bottom).offset(20)
             make.left.right.bottom.equalToSuperview()
         }
@@ -239,15 +275,6 @@ class AgentViewController: UIViewController {
                 // 4. 订阅 ConvoAI 消息
                 try await subscribeConvoAIMessage()
                 
-                // 5. 生成agentToken
-                try await generateAgentToken()
-                
-                // 6. 生成avatarToken
-                try await generateAvatarToken()
-                
-                // 7. 启动agent
-                try await startAgent()
-                
                 await MainActor.run {
                     isLoading = false
                     hideLoadingToast()
@@ -278,32 +305,6 @@ class AgentViewController: UIViewController {
                 }
                 self.token = token
                 self.addDebugMessage("获取 Token 调用成功")
-                continuation.resume()
-            }
-        }
-    }
-    
-    private func generateAgentToken() async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            NetworkManager.shared.generateToken(channelName: channel, uid: "\(agentUid)", types: [.rtc, .rtm]) { token in
-                guard let token = token else {
-                    continuation.resume(throwing: NSError(domain: "generateAgentToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 token 失败，请重试"]))
-                    return
-                }
-                self.agentToken = token
-                continuation.resume()
-            }
-        }
-    }
-    
-    private func generateAvatarToken() async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            NetworkManager.shared.generateToken(channelName: channel, uid: "\(avatarUid)", types: [.rtc]) { token in
-                guard let token = token else {
-                    continuation.resume(throwing: NSError(domain: "generateAvatarToken", code: -1, userInfo: [NSLocalizedDescriptionKey: "获取 avatar token 失败，请重试"]))
-                    return
-                }
-                self.avatarToken = token
                 continuation.resume()
             }
         }
@@ -377,55 +378,15 @@ class AgentViewController: UIViewController {
         }
     }
     
-    // MARK: - Agent Management
-    private func startAgent() async throws {
-        addDebugMessage("Agent Start 调用中...")
-        
-        return try await withCheckedThrowingContinuation { continuation in
-            let parameter: [String: Any] = [
-                "name": channel,
-                "pipeline_id": KeyCenter.AG_PIPELINE_ID,
-                "properties": [
-                    "channel": channel,
-                    "agent_rtc_uid": "\(agentUid)",
-                    "remote_rtc_uids": ["\(uid)"],
-                    "token": agentToken,
-                    "avatar": [
-                        "params": [
-                            "agora_token": avatarToken,
-                            "agora_uid": "\(avatarUid)"
-                        ]
-                    ]
-                ]
-            ]
-            AgentManager.startAgent(parameter: parameter) { agentId, error in
-                if let error = error {
-                    self.addDebugMessage("Agent Start 调用失败: \(error.localizedDescription)")
-                    continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
-                    return
-                }
-                
-                if let agentId = agentId {
-                    self.agentId = agentId
-                    self.addDebugMessage("Agent Start 调用成功 (agentId: \(agentId))")
-                    continuation.resume()
-                } else {
-                    self.addDebugMessage("Agent Start 调用失败: 未返回 agentId")
-                    continuation.resume(throwing: NSError(domain: "startAgent", code: -1, userInfo: [NSLocalizedDescriptionKey: "请求失败"]))
-                }
-            }
-        }
-    }
-    
     // MARK: - View Management
     private func switchToChatView() {
-        configBackgroundView.isHidden = true
+        channelInputView.isHidden = true
         chatBackgroundView.isHidden = false
     }
     
     private func switchToConfigView() {
         chatBackgroundView.isHidden = true
-        configBackgroundView.isHidden = false
+        channelInputView.isHidden = false
     }
     
     private func resetConnectionState() {
@@ -443,19 +404,10 @@ class AgentViewController: UIViewController {
         isMicMuted = false
         currentAgentState = .unknown
         chatBackgroundView.updateStatusView(state: .unknown)
-        agentId = ""
         token = ""
-        agentToken = ""
-        avatarToken = ""
     }
     
     // MARK: - UI Updates
-    private func updateStartButtonState() {
-        let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let isValid = !channelName.isEmpty
-        configBackgroundView.updateButtonState(isEnabled: isValid)
-    }
-    
     private func updateAgentStatusView() {
         chatBackgroundView.updateStatusView(state: currentAgentState)
     }
@@ -498,15 +450,36 @@ class AgentViewController: UIViewController {
     }
     
     // MARK: - Actions
-    @objc private func textFieldDidChange() {
-        updateStartButtonState()
-    }
-    
-    @objc private func startButtonTapped() {
-        let channelName = configBackgroundView.channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        guard !channelName.isEmpty else { return }
+    private func handleJoinChannel(inputData: ChannelInputData) {
+        guard !inputData.channelName.isEmpty else {
+            addDebugMessage("ERROR: 频道名称不能为空")
+            return
+        }
         
-        self.channel = channelName
+        guard let userId = inputData.userId, userId > 0 else {
+            addDebugMessage("ERROR: 用户UID不能为空")
+            return
+        }
+        
+        guard let agentUid = inputData.agentUid, agentUid > 0 else {
+            addDebugMessage("ERROR: Agent UID不能为空")
+            return
+        }
+        
+        guard let avatarUid = inputData.avatarUid, avatarUid > 0 else {
+            addDebugMessage("ERROR: Avatar UID不能为空")
+            return
+        }
+        
+        // Set channel name and UIDs
+        self.channel = inputData.channelName
+        self.uid = userId
+        self.agentUid = agentUid
+        self.avatarUid = avatarUid
+        
+        // Save channel name and UIDs for next time
+        saveChannelNameAndUIDs()
+        
         startConnection()
     }
     
@@ -517,7 +490,6 @@ class AgentViewController: UIViewController {
     }
     
     @objc private func endCall() {
-        AgentManager.stopAgent(agentId: agentId, completion: nil)
         resetConnectionState()
     }
     

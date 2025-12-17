@@ -52,6 +52,9 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
         super.initData()
         viewModel = ViewModelProvider(this)[AgentChatViewModel::class.java]
         mPermissionHelp = PermissionHelp(this)
+        
+        // Load saved UIDs and fill input fields
+        loadSavedUIDs()
 
         // Observe UI state changes
         observeUiState()
@@ -80,23 +83,37 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 }
             }
 
-            // Start button click listener
-            btnStart.setOnClickListener {
-                // Generate random channel name each time joining channel
-                val channelName = AgentChatViewModel.generateRandomChannelName()
+            // Setup ChannelInputView callback
+            channelInputView.onJoinChannelListener = object : OnJoinChannelListener {
+                override fun onJoinChannel(data: ChannelInputData) {
+                    // Generate random channel name each time joining channel
+                    val channelName = data.channelName.ifEmpty { 
+                        AgentChatViewModel.generateRandomChannelName() 
+                    }
+                    
+                    // Validate UIDs
+                    if (data.userId == null || data.userId <= 0) {
+                        viewModel.addStatusLog("ERROR: 用户UID不能为空")
+                        return
+                    }
+                    if (data.agentUid == null || data.agentUid <= 0) {
+                        viewModel.addStatusLog("ERROR: Agent UID不能为空")
+                        return
+                    }
 
-                // Check camera and microphone permissions before joining channel (for vision feature)
-                checkCameraAndMicPermission { granted ->
-                    if (granted) {
-                        // Setup local video preview
-                        viewModel.setupLocalVideo(localVideoView)
-                        viewModel.joinChannelAndLogin(channelName)
-                    } else {
-                        Toast.makeText(
-                            this@AgentChatActivity,
-                            "Camera and microphone permissions are required for vision AI",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    // Check camera and microphone permissions before joining channel (for vision feature)
+                    checkCameraAndMicPermission { granted ->
+                        if (granted) {
+                            // Setup local video preview
+                            viewModel.setupLocalVideo(localVideoView)
+                            viewModel.joinChannelAndLogin(channelName, data.userId, data.agentUid)
+                        } else {
+                            Toast.makeText(
+                                this@AgentChatActivity,
+                                "Camera and microphone permissions are required for vision AI",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }
@@ -210,8 +227,7 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 params.marginEnd = 0
                 params.marginStart = 0
                 params.bottomMargin = 0
-                // Update corner radius for expanded state
-                binding.localVideoContainer.radius = 12f * density
+                // Corner radius is handled by drawable background
             } else {
                 // Collapsed: small window at top-right corner
                 params.width = (localViewSmallWidth * density).toInt()
@@ -223,8 +239,7 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 val margin = (8 * density).toInt()
                 params.topMargin = margin
                 params.marginEnd = margin
-                // Update corner radius for collapsed state
-                binding.localVideoContainer.radius = 8f * density
+                // Corner radius is handled by drawable background
             }
             container.layoutParams = params
         }
@@ -303,20 +318,14 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     val isConnecting = state.connectionState == AgentChatViewModel.ConnectionState.Connecting
                     val isIdle = state.connectionState == AgentChatViewModel.ConnectionState.Idle
 
-                    // Show/hide buttons
-                    llStart.visibility = if (isConnected) View.GONE else View.VISIBLE
+                    // Show/hide views based on connection state
+                    scrollView.visibility = if (isConnected) View.GONE else View.VISIBLE
+                    cardTranscript.visibility = if (isConnected) View.VISIBLE else View.GONE
                     llControls.visibility = if (isConnected) View.VISIBLE else View.GONE
 
                     // Local video container stays visible even when camera is off (shows black screen)
 
-                    // Update button loading state
-                    if (isConnecting) {
-                        btnStart.text = "Starting..."
-                        btnStart.isEnabled = false
-                    } else {
-                        btnStart.text = "Start Agent"
-                        btnStart.isEnabled = true
-                    }
+                    // Button state is managed by ChannelInputView
 
                     // Update mute button UI
                     btnMute.setImageResource(
@@ -381,6 +390,18 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
         }
     }
 
+    /**
+     * Load saved channel name and UIDs and fill input fields
+     */
+    private fun loadSavedUIDs() {
+        val (savedChannelName, uids) = viewModel.loadSavedChannelNameAndUIDs()
+        val (savedUserId, savedAgentUid) = uids
+        mBinding?.channelInputView?.apply {
+            loadSavedChannelName(savedChannelName)
+            loadSavedUIDs(savedUserId, savedAgentUid)
+        }
+    }
+    
     /**
      * Scroll RecyclerView to the bottom to show latest transcript
      */

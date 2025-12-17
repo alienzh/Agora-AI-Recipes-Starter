@@ -6,8 +6,8 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.agora.convoai.example.startup.AgentApp
+import io.agora.convoai.example.startup.AgentApp
 import io.agora.convoai.example.startup.KeyCenter
-import io.agora.convoai.example.startup.api.AgentStarter
 import io.agora.convoai.example.startup.api.TokenGenerator
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
@@ -52,8 +52,6 @@ class AgentChatViewModel : ViewModel() {
 
     companion object {
         private const val TAG = "ConversationViewModel"
-        const val userId = 1001086
-        const val agentUid = 1009527
 
         /**
          * Generate a random channel name
@@ -62,6 +60,18 @@ class AgentChatViewModel : ViewModel() {
             return "channel_kotlin_${(1000..9999).random()}"
         }
     }
+
+    // UIDs - can be set from UI input fields
+    private var userId: Int = 0
+    private var agentUid: Int = 0
+    
+    // SharedPreferences keys
+    private val prefs by lazy {
+        AgentApp.instance().getSharedPreferences("uid_prefs", android.content.Context.MODE_PRIVATE)
+    }
+    private val kSavedChannelName = "saved_channel_name"
+    private val kSavedUserId = "saved_user_id"
+    private val kSavedAgentUid = "saved_agent_uid"
 
     /**
      * Connection state enum
@@ -105,8 +115,6 @@ class AgentChatViewModel : ViewModel() {
     private var rtcJoined = false
     private var rtmLoggedIn = false
 
-    // Agent management
-    private var agentId: String? = null
 
     // Local video view reference for vision feature
     private var localVideoView: View? = null
@@ -457,70 +465,17 @@ class AgentChatViewModel : ViewModel() {
     }
 
     /**
-     * Check if both RTC and RTM are connected, then start agent
+     * Check if both RTC and RTM are connected, then update connection state
      */
     private fun checkJoinAndLoginComplete() {
         if (rtcJoined && rtmLoggedIn) {
-            startAgent()
+            _uiState.value = _uiState.value.copy(
+                connectionState = ConnectionState.Connected
+            )
+            addStatusLog("RTC and RTM connected successfully")
         }
     }
 
-    /**
-     * Start agent (called automatically after RTC and RTM are connected)
-     */
-    fun startAgent() {
-        viewModelScope.launch {
-            if (agentId != null) {
-                Log.d(TAG, "Agent already started, agentId: $agentId")
-                return@launch
-            }
-
-            // Generate token for agent (always required)
-            val tokenResult = TokenGenerator.generateTokensAsync(
-                channelName = channelName,
-                uid = agentUid.toString()
-            )
-
-            val agentToken = tokenResult.fold(
-                onSuccess = { token ->
-                    addStatusLog("Generate agent token successfully")
-                    token
-                },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        connectionState = ConnectionState.Error
-                    )
-                    addStatusLog("Generate agent token failed")
-                    Log.e(TAG, "Failed to generate agent token: ${exception.message}", exception)
-                    return@launch
-                }
-            )
-
-
-            val startAgentResult = AgentStarter.startAgentAsync(
-                channelName = channelName,
-                agentRtcUid = agentUid.toString(),
-                token = agentToken
-            )
-            startAgentResult.fold(
-                onSuccess = { agentId ->
-                    this@AgentChatViewModel.agentId = agentId
-                    _uiState.value = _uiState.value.copy(
-                        connectionState = ConnectionState.Connected
-                    )
-                    addStatusLog("Agent start successfully")
-                    Log.d(TAG, "Agent started successfully, agentId: $agentId")
-                },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        connectionState = ConnectionState.Error
-                    )
-                    addStatusLog("Agent start failed")
-                    Log.e(TAG, "Failed to start agent: ${exception.message}", exception)
-                }
-            )
-        }
-    }
 
     /**
      * Generate unified token for RTC and RTM
@@ -554,8 +509,37 @@ class AgentChatViewModel : ViewModel() {
     /**
      * Join RTC channel and login RTM
      * @param channelName Channel name to join
+     * @param userId User UID (required)
+     * @param agentUid Agent UID (required)
      */
-    fun joinChannelAndLogin(channelName: String) {
+    fun joinChannelAndLogin(
+        channelName: String,
+        userId: Int?,
+        agentUid: Int?
+    ) {
+        // Validate UIDs
+        if (userId == null || userId <= 0) {
+            addStatusLog("ERROR: 用户UID不能为空")
+            _uiState.value = _uiState.value.copy(
+                connectionState = ConnectionState.Error
+            )
+            return
+        }
+        if (agentUid == null || agentUid <= 0) {
+            addStatusLog("ERROR: Agent UID不能为空")
+            _uiState.value = _uiState.value.copy(
+                connectionState = ConnectionState.Error
+            )
+            return
+        }
+        
+        // Set UIDs
+        this.userId = userId
+        this.agentUid = agentUid
+        
+        // Save channel name and UIDs for next time
+        saveChannelNameAndUIDs()
+        
         viewModelScope.launch {
             this@AgentChatViewModel.channelName = channelName
             rtcJoined = false
@@ -569,7 +553,7 @@ class AgentChatViewModel : ViewModel() {
             val token = unifiedToken ?: generateUserToken() ?: return@launch
 
             // Join RTC channel with the unified token
-            joinRtcChannel(token, channelName, userId)
+            joinRtcChannel(token, channelName, this@AgentChatViewModel.userId)
 
             // Login RTM with the same unified token
             loginRtm(token) { exception ->
@@ -662,10 +646,40 @@ class AgentChatViewModel : ViewModel() {
     }
 
     /**
+     * Load saved channel name and UIDs from SharedPreferences
+     */
+    fun loadSavedChannelNameAndUIDs(): Pair<String?, Pair<Int?, Int?>> {
+        val savedChannelName = prefs.getString(kSavedChannelName, null)?.takeIf { it.isNotEmpty() }
+        val savedUserId = if (prefs.getInt(kSavedUserId, 0) > 0) prefs.getInt(kSavedUserId, 0) else null
+        val savedAgentUid = if (prefs.getInt(kSavedAgentUid, 0) > 0) prefs.getInt(kSavedAgentUid, 0) else null
+        return Pair(savedChannelName, Pair(savedUserId, savedAgentUid))
+    }
+    
+    /**
+     * Load saved UIDs from SharedPreferences (for backward compatibility)
+     */
+    fun loadSavedUIDs(): Pair<Int?, Int?> {
+        val (_, uids) = loadSavedChannelNameAndUIDs()
+        return uids
+    }
+    
+    /**
+     * Save channel name and UIDs to SharedPreferences
+     */
+    private fun saveChannelNameAndUIDs() {
+        prefs.edit().apply {
+            channelName.takeIf { it.isNotEmpty() }?.let { putString(kSavedChannelName, it) }
+            putInt(kSavedUserId, userId)
+            putInt(kSavedAgentUid, agentUid)
+            apply()
+        }
+    }
+    
+    /**
      * Add a status message to debug log list
      * This is used to track ViewModel state changes that are shown via SnackbarHelper
      */
-    private fun addStatusLog(message: String) {
+    fun addStatusLog(message: String) {
         if (message.isEmpty()) return
         viewModelScope.launch {
             val currentLogs = _debugLogList.value.toMutableList()
@@ -688,23 +702,6 @@ class AgentChatViewModel : ViewModel() {
                     if (errorInfo != null) {
                         Log.e(TAG, "Unsubscribe message error: ${errorInfo}")
                     }
-                }
-
-                // Stop agent if it was started
-                if (agentId != null) {
-                    val stopResult = AgentStarter.stopAgentAsync(
-                        agentId = agentId!!
-                    )
-                    stopResult.fold(
-                        onSuccess = {
-                            Log.d(TAG, "Agent stopped successfully")
-                            addStatusLog("Agent stopped successfully")
-                        },
-                        onFailure = { exception ->
-                            Log.e(TAG, "Failed to stop agent: ${exception.message}", exception)
-                        }
-                    )
-                    agentId = null
                 }
 
                 // Stop video preview and cleanup local video
