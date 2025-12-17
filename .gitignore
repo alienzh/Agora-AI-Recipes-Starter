@@ -111,8 +111,6 @@ Thumbs.db
 
 # Environment files (may contain sensitive data)
 **/env.properties
-**/env.example.properties
-
 # ============================================
 # HarmonyOS
 # ============================================
@@ -180,7 +178,6 @@ Thumbs.db
 **/env.json
 **/env.properties
 **/env.example.json
-**/env.example.properties
 **/.env
 **/.env.local
 **/.env.*.local
