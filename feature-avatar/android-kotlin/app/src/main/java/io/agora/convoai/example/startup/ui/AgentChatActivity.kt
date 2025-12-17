@@ -3,6 +3,8 @@ package io.agora.convoai.example.startup.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -54,9 +56,6 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
         viewModel = ViewModelProvider(this)[AgentChatViewModel::class.java]
         mPermissionHelp = PermissionHelp(this)
         
-        // Load saved UIDs and fill input fields
-        loadSavedUIDs()
-
         // Observe UI state changes
         observeUiState()
 
@@ -124,8 +123,8 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 viewModel.hangup()
             }
 
-            // Avatar video container click listener - expand/collapse
-            avatarVideoContainer.setOnClickListener {
+            // Avatar video view click listener - expand/collapse
+            avatarVideoView.setOnClickListener {
                 val state = viewModel.uiState.value
                 val isConnected = state.connectionState == AgentChatViewModel.ConnectionState.Connected
                 if (isConnected) {
@@ -235,9 +234,8 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     val isIdle = state.connectionState == AgentChatViewModel.ConnectionState.Idle
 
                     // Show/hide views based on connection state
-                    scrollView.visibility = if (isConnected) View.GONE else View.VISIBLE
-                    cardTranscript.visibility = if (isConnected) View.VISIBLE else View.GONE
-                    llControls.visibility = if (isConnected) View.VISIBLE else View.GONE
+                    // Only channelInputView is hidden when connected, all other views stay visible
+                    channelInputView.visibility = if (isConnected) View.GONE else View.VISIBLE
                     // Button state is managed by ChannelInputView
 
                     // Update mute button UI
@@ -321,19 +319,18 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
             // Setup remote video rendering using the SurfaceView in layout
             viewModel.setupRemoteVideo(avatarVideoView)
 
-            // Show avatar video container
-            avatarVideoContainer.visibility = View.VISIBLE
+            // Avatar video view stays visible, just update size
             isAvatarExpanded = false
             updateAvatarViewSize()
         }
     }
 
     /**
-     * Hide avatar video when disconnected
+     * Reset avatar video state when disconnected
      */
     private fun hideAvatarVideo() {
         mBinding?.apply {
-            avatarVideoContainer.visibility = View.GONE
+            // Avatar video view stays visible, just reset expanded state
             isAvatarExpanded = false
             updateAvatarViewSize()
         }
@@ -354,51 +351,38 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
      */
     private fun updateAvatarViewSize() {
         mBinding?.let { binding ->
-            val container = binding.avatarVideoContainer
-            val params = container.layoutParams as ConstraintLayout.LayoutParams
-            val density = resources.displayMetrics.density
-
-            if (isAvatarExpanded) {
-                // Expanded: match cardTranscript size (cover entire transcript area)
-                params.width = 0  // match_constraint
-                params.height = 0  // match_constraint
-                params.topToTop = binding.cardTranscript.id
-                params.bottomToBottom = binding.cardTranscript.id
-                params.startToStart = binding.cardTranscript.id
-                params.endToEnd = binding.cardTranscript.id
-                params.topMargin = 0
-                params.marginEnd = 0
-                params.marginStart = 0
-                params.bottomMargin = 0
-                // Corner radius is handled by drawable background
-            } else {
-                // Collapsed: small window at top-right corner
-                params.width = (avatarViewSmallWidth * density).toInt()
-                params.height = (avatarViewSmallHeight * density).toInt()
-                params.topToTop = binding.cardTranscript.id
-                params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
-                params.startToStart = ConstraintLayout.LayoutParams.UNSET
-                params.endToEnd = binding.cardTranscript.id
-                val margin = (8 * density).toInt()
-                params.topMargin = margin
-                params.marginEnd = margin
-                // Corner radius is handled by drawable background
+            // Get visual container through avatarVideoView's parent
+            val container = binding.avatarVideoView.parent as? android.widget.FrameLayout
+            container?.let {
+                val containerParams = it.layoutParams as LinearLayout.LayoutParams
+                val density = resources.displayMetrics.density
+                
+                // Container always keeps weight=1 to fill remaining space
+                containerParams.weight = 1f
+                containerParams.width = LinearLayout.LayoutParams.MATCH_PARENT
+                containerParams.height = 0  // Use weight, so height should be 0dp
+                
+                // Update avatarVideoView size within container
+                val avatarParams = binding.avatarVideoView.layoutParams as FrameLayout.LayoutParams
+                
+                if (isAvatarExpanded) {
+                    // Expanded: avatarVideoView covers entire container
+                    avatarParams.width = FrameLayout.LayoutParams.MATCH_PARENT
+                    avatarParams.height = FrameLayout.LayoutParams.MATCH_PARENT
+                    avatarParams.gravity = android.view.Gravity.NO_GRAVITY
+                } else {
+                    // Collapsed: avatarVideoView is small window at top-right corner
+                    avatarParams.width = (avatarViewSmallWidth * density).toInt()
+                    avatarParams.height = (avatarViewSmallHeight * density).toInt()
+                    avatarParams.gravity = android.view.Gravity.TOP or android.view.Gravity.END
+                }
+                
+                it.layoutParams = containerParams
+                binding.avatarVideoView.layoutParams = avatarParams
             }
-            container.layoutParams = params
         }
     }
 
-    /**
-     * Load saved channel name and UIDs and fill input fields
-     */
-    private fun loadSavedUIDs() {
-        val (savedChannelName, uids) = viewModel.loadSavedChannelNameAndUIDs()
-        val (savedUserId, savedAgentUid, savedAvatarUid) = uids
-        mBinding?.channelInputView?.apply {
-            loadSavedChannelName(savedChannelName)
-            loadSavedUIDs(savedUserId, savedAgentUid, savedAvatarUid)
-        }
-    }
     
     /**
      * Scroll RecyclerView to the bottom to show latest transcript

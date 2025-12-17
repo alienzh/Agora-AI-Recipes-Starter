@@ -2,88 +2,67 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="频道名称"
-            app:boxStrokeColor="@android:color/white"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <EditText
+        android:id="@+id/etChannelName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:hint="频道名称"
+        android:textSize="14sp"
+        android:minHeight="32dp"
+        android:padding="6dp"
+        android:background="#FFFFFF"
+        android:textColorHint="#999999" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etChannelName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <EditText
+        android:id="@+id/etUserId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="用户UID"
+        android:inputType="number"
+        android:digits="0123456789"
+        android:textSize="14sp"
+        android:minHeight="36dp"
+        android:padding="8dp"
+        android:background="#FFFFFF"
+        android:textColorHint="#999999" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="用户UID"
-            app:boxStrokeColor="@android:color/white"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <EditText
+        android:id="@+id/etAgentUid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Agent UID"
+        android:inputType="number"
+        android:digits="0123456789"
+        android:textSize="14sp"
+        android:minHeight="36dp"
+        android:padding="8dp"
+        android:background="#FFFFFF"
+        android:textColorHint="#999999" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etUserId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:digits="0123456789"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <EditText
+        android:id="@+id/etAvatarUid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Avatar UID"
+        android:inputType="number"
+        android:digits="0123456789"
+        android:textSize="14sp"
+        android:minHeight="36dp"
+        android:padding="8dp"
+        android:background="#FFFFFF"
+        android:textColorHint="#999999" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Agent UID"
-            app:boxStrokeColor="@android:color/white"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAgentUid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:digits="0123456789"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="Avatar UID"
-            app:boxStrokeColor="@android:color/white"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAvatarUid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:digits="0123456789"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnJoinChannel"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:background="@drawable/selector_gradient_button"
-            android:letterSpacing="0.02"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:text="加入频道"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:backgroundTint="@null"
-            app:cornerRadius="16dp"
-            app:elevation="8dp"
-            app:rippleColor="#33FFFFFF" />
+    <Button
+        android:id="@+id/btnJoinChannel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="加入频道"
+        android:textSize="14sp"
+        android:minHeight="36dp"
+        android:padding="6dp" />
 </merge>
 

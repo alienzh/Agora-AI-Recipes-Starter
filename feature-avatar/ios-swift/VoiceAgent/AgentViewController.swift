@@ -78,39 +78,8 @@ class AgentViewController: UIViewController {
         setupUI()
         setupConstraints()
         initializeEngines()
-        loadSavedUIDs()
     }
     
-    // MARK: - Load/Save Channel Name and UIDs
-    private func loadSavedUIDs() {
-        let savedChannelName = UserDefaults.standard.string(forKey: kSavedChannelName)
-        let savedUid = UserDefaults.standard.integer(forKey: kSavedUid)
-        let savedAgentUid = UserDefaults.standard.integer(forKey: kSavedAgentUid)
-        let savedAvatarUid = UserDefaults.standard.integer(forKey: kSavedAvatarUid)
-        
-        channelInputView.loadSavedChannelName(savedChannelName)
-        
-        let userId = savedUid > 0 ? savedUid : nil
-        let agentUid = savedAgentUid > 0 ? savedAgentUid : nil
-        let avatarUid = savedAvatarUid > 0 ? savedAvatarUid : nil
-        
-        channelInputView.loadSavedUIDs(userId: userId, agentUid: agentUid, avatarUid: avatarUid)
-    }
-    
-    private func saveChannelNameAndUIDs() {
-        if !channel.isEmpty {
-            UserDefaults.standard.set(channel, forKey: kSavedChannelName)
-        }
-        if uid > 0 {
-            UserDefaults.standard.set(uid, forKey: kSavedUid)
-        }
-        if agentUid > 0 {
-            UserDefaults.standard.set(agentUid, forKey: kSavedAgentUid)
-        }
-        if avatarUid > 0 {
-            UserDefaults.standard.set(avatarUid, forKey: kSavedAvatarUid)
-        }
-    }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
@@ -478,7 +447,6 @@ class AgentViewController: UIViewController {
         self.avatarUid = avatarUid
         
         // Save channel name and UIDs for next time
-        saveChannelNameAndUIDs()
         
         startConnection()
     }

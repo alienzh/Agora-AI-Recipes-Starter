@@ -571,9 +571,6 @@ class AgentChatViewModel : ViewModel() {
         this.agentUid = agentUid
         this.avatarUid = avatarUid
         
-        // Save channel name and UIDs for next time
-        saveChannelNameAndUIDs()
-        
         viewModelScope.launch {
             this@AgentChatViewModel.channelName = channelName
             rtcJoined = false

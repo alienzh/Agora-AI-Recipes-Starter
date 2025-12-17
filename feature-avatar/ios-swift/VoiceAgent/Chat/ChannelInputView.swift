@@ -27,10 +27,6 @@ class ChannelInputView: UIView {
     private let avatarUidTextField = UITextField()
     private let startButton = UIButton(type: .system)
     
-    // MARK: - Scroll View
-    private let scrollView = UIScrollView()
-    private let contentView = UIView()
-    
     // MARK: - Callback
     var onJoinChannelTapped: ChannelInputCallback?
     
@@ -49,89 +45,87 @@ class ChannelInputView: UIView {
     private func setupUI() {
         backgroundColor = .systemBackground
         
-        // Setup scroll view
-        addSubview(scrollView)
-        scrollView.addSubview(contentView)
-        
         // Channel name
         channelNameTextField.placeholder = "输入频道名称"
         channelNameTextField.borderStyle = .roundedRect
         channelNameTextField.keyboardType = .default
+        channelNameTextField.backgroundColor = .white
         channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-        contentView.addSubview(channelNameTextField)
+        addSubview(channelNameTextField)
         
         // User UID
         uidTextField.placeholder = "用户UID"
         uidTextField.borderStyle = .roundedRect
         uidTextField.keyboardType = .numberPad
-        contentView.addSubview(uidTextField)
+        uidTextField.backgroundColor = .white
+        addSubview(uidTextField)
         
         // Agent UID
         agentUidTextField.placeholder = "Agent UID"
         agentUidTextField.borderStyle = .roundedRect
         agentUidTextField.keyboardType = .numberPad
-        contentView.addSubview(agentUidTextField)
+        agentUidTextField.backgroundColor = .white
+        addSubview(agentUidTextField)
         
         // Avatar UID
         avatarUidTextField.placeholder = "Avatar UID"
         avatarUidTextField.borderStyle = .roundedRect
         avatarUidTextField.keyboardType = .numberPad
-        contentView.addSubview(avatarUidTextField)
+        avatarUidTextField.backgroundColor = .white
+        addSubview(avatarUidTextField)
         
         startButton.setTitle("加入频道", for: .normal)
         startButton.setTitleColor(.white, for: .normal)
         startButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
-        startButton.backgroundColor = .systemBlue.withAlphaComponent(0.4)
-        startButton.layer.cornerRadius = 25
+        startButton.backgroundColor = .systemBlue
+        startButton.layer.cornerRadius = 8
         startButton.isEnabled = false
         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
-        contentView.addSubview(startButton)
+        addSubview(startButton)
+        
+        // Set default values
+        channelNameTextField.text = "channel_avatar_001"
+        uidTextField.text = "1001"
+        agentUidTextField.text = "2001"
+        avatarUidTextField.text = "3001"
+        updateButtonState(isEnabled: true)
     }
     
     private func setupConstraints() {
-        scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        contentView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-            make.width.equalToSuperview()
-        }
-        
         channelNameTextField.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(40)
-            make.width.equalTo(280)
-            make.height.equalTo(44)
+            make.top.equalToSuperview().offset(12)
+            make.width.equalTo(240)
+            make.height.equalTo(32)
         }
         
         uidTextField.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(channelNameTextField.snp.bottom).offset(16)
-            make.width.equalTo(280)
-            make.height.equalTo(44)
+            make.top.equalTo(channelNameTextField.snp.bottom).offset(6)
+            make.width.equalTo(240)
+            make.height.equalTo(32)
         }
         
         agentUidTextField.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(uidTextField.snp.bottom).offset(16)
-            make.width.equalTo(280)
-            make.height.equalTo(44)
+            make.top.equalTo(uidTextField.snp.bottom).offset(6)
+            make.width.equalTo(240)
+            make.height.equalTo(32)
         }
         
         avatarUidTextField.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(agentUidTextField.snp.bottom).offset(16)
-            make.width.equalTo(280)
-            make.height.equalTo(44)
+            make.top.equalTo(agentUidTextField.snp.bottom).offset(6)
+            make.width.equalTo(240)
+            make.height.equalTo(32)
         }
         
         startButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(avatarUidTextField.snp.bottom).offset(30)
-            make.width.equalTo(280)
-            make.height.equalTo(50)
-            make.bottom.equalToSuperview().offset(-40)
+            make.top.equalTo(avatarUidTextField.snp.bottom).offset(12)
+            make.width.equalTo(240)
+            make.height.equalTo(36)
+            make.bottom.equalToSuperview().offset(-12)
         }
     }
     

@@ -40,13 +40,9 @@ class ChannelInputView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-        gravity = android.view.Gravity.CENTER
-        setPadding(
-            resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 4,
-            resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 4,
-            resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 4,
-            resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 4
-        )
+        gravity = android.view.Gravity.TOP
+        val padding = (12 * resources.displayMetrics.density).toInt()
+        setPadding(padding, padding, padding, padding)
         
         // Setup text change listener for channel name to enable/disable button
         binding.etChannelName.addTextChangedListener {
@@ -58,38 +54,14 @@ class ChannelInputView @JvmOverloads constructor(
             handleJoinChannel()
         }
         
+        // Set default values
+        binding.etChannelName.setText("channel_avatar_001")
+        binding.etUserId.setText("1001")
+        binding.etAgentUid.setText("2001")
+        binding.etAvatarUid.setText("3001")
+        
         // Initially disable button
         updateButtonState()
-    }
-
-    /**
-     * Load saved channel name and fill input field
-     */
-    fun loadSavedChannelName(channelName: String?) {
-        channelName?.takeIf { it.isNotEmpty() }?.let {
-            binding.etChannelName.setText(it)
-        }
-    }
-    
-    /**
-     * Load saved UIDs and fill input fields
-     */
-    fun loadSavedUIDs(userId: Int?, agentUid: Int?, avatarUid: Int?) {
-        userId?.let {
-            if (it > 0) {
-                binding.etUserId.setText(it.toString())
-            }
-        }
-        agentUid?.let {
-            if (it > 0) {
-                binding.etAgentUid.setText(it.toString())
-            }
-        }
-        avatarUid?.let {
-            if (it > 0) {
-                binding.etAvatarUid.setText(it.toString())
-            }
-        }
     }
 
     /**

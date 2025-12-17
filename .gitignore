@@ -177,7 +177,6 @@ Thumbs.db
 # Environment configuration files
 **/env.json
 **/env.properties
-**/env.example.json
 **/.env
 **/.env.local
 **/.env.*.local
