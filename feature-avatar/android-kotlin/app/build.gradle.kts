@@ -15,10 +15,7 @@ if (envPropertiesFile.exists()) {
 
 // Validate required Agora configuration properties
 val requiredProperties = listOf(
-    "agora.appId",
-    "agora.restKey",
-    "agora.restSecret",
-    "agora.pipelineId"
+    "agora.appId"
 )
 
 val missingProperties = mutableListOf<String>()
@@ -62,9 +59,6 @@ android {
         // Load Agora configuration from env.properties
         buildConfigField("String", "AGORA_APP_ID", "\"${envProperties.getProperty("agora.appId", "")}\"")
         buildConfigField("String", "AGORA_APP_CERTIFICATE", "\"${envProperties.getProperty("agora.appCertificate", "")}\"")
-        buildConfigField("String", "REST_KEY", "\"${envProperties.getProperty("agora.restKey", "")}\"")
-        buildConfigField("String", "REST_SECRET", "\"${envProperties.getProperty("agora.restSecret", "")}\"")
-        buildConfigField("String", "PIPELINE_ID", "\"${envProperties.getProperty("agora.pipelineId", "")}\"")
     }
 
     buildTypes {
