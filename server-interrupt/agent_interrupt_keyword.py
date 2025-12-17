@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Agora Agent Starter Script (Avatar)
-命令行脚本，用于启动和停止 Agora 对话式 AI Agent（数字人版本）
+Agora Agent Starter Script (Keyword Interrupt)
+命令行脚本，用于启动和停止 Agora 对话式 AI Agent（关键词打断版本）
 所有配置从本地环境变量加载（.env.local 文件）
 """
 import argparse
@@ -24,9 +24,9 @@ except ImportError:
 
 class AgoraStarterServer:
     """
-    Agora Agent Starter Server 实现类（数字人版本）
+    Agora Agent Starter Server 实现类（关键词打断版本）
     用于管理 Agora 对话式 AI Agent 的启动、停止和 Token 生成
-    支持数字人（Avatar）功能
+    支持关键词打断功能
     """
     
     # API 端点配置
@@ -83,11 +83,10 @@ class AgoraStarterServer:
         agent_rtc_uid: str,
         token: str,
         remote_rtc_uids: List[str],
-        avatar_rtc_uid: Optional[str] = None,
-        avatar_rtc_token: Optional[str] = None
+        interrupt_keywords: List[str]
     ) -> Dict[str, Any]:
         """
-        构建启动 Agent 的 JSON 请求体（数字人版本）
+        构建启动 Agent 的 JSON 请求体（关键词打断版本）
         参考 Android 代码中的 buildJsonPayload() 方法
         
         参数:
@@ -96,8 +95,7 @@ class AgoraStarterServer:
             agent_rtc_uid: Agent 的 RTC UID
             token: Token 字符串
             remote_rtc_uids: 远程 RTC UIDs 列表
-            avatar_rtc_uid: Avatar 的 RTC UID（可选，用于数字人功能）
-            avatar_rtc_token: Avatar 的 RTC Token（可选，用于数字人功能）
+            interrupt_keywords: 打断关键词列表
             
         返回:
             表示 JSON 请求体的字典
@@ -106,17 +104,12 @@ class AgoraStarterServer:
             "channel": channel,
             "agent_rtc_uid": agent_rtc_uid,
             "remote_rtc_uids": remote_rtc_uids,  # ["*"] 表示所有用户
-            "token": token
-        }
-        
-        # 添加 Avatar 配置（如果提供了 avatar_rtc_uid 和 avatar_rtc_token）
-        if avatar_rtc_uid and avatar_rtc_token:
-            properties["avatar"] = {
-                "params": {
-                    "agora_uid": avatar_rtc_uid,
-                    "agora_token": avatar_rtc_token
-                }
+            "token": token,
+            "turn_detection": {
+                "interrupt_mode": "keywords",
+                "interrupt_keywords": interrupt_keywords
             }
+        }
         
         payload = {
             "name": name,
@@ -132,11 +125,10 @@ class AgoraStarterServer:
         agent_rtc_uid: str,
         token: str,
         remote_rtc_uids: List[str],
-        avatar_rtc_uid: Optional[str] = None,
-        avatar_rtc_token: Optional[str] = None
+        interrupt_keywords: List[str]
     ) -> str:
         """
-        执行启动 Agent 的 HTTP 请求（数字人版本）
+        执行启动 Agent 的 HTTP 请求（关键词打断版本）
         参考 Android 代码中的 executeJoinRequest() 方法
         
         参数:
@@ -145,8 +137,7 @@ class AgoraStarterServer:
             agent_rtc_uid: Agent 的 RTC UID
             token: Token 字符串
             remote_rtc_uids: 远程 RTC UIDs 列表
-            avatar_rtc_uid: Avatar 的 RTC UID（可选）
-            avatar_rtc_token: Avatar 的 RTC Token（可选）
+            interrupt_keywords: 打断关键词列表
             
         返回:
             响应文本（JSON 格式）
@@ -156,10 +147,18 @@ class AgoraStarterServer:
         """
         # 构建 API URL：POST /api/conversational-ai-agent/v2/projects/{project_id}/join/
         url = f"{self.API_BASE_URL}/{self.app_id}/join/"
-        payload = self._build_json_payload(
-            name, channel, agent_rtc_uid, token, remote_rtc_uids,
-            avatar_rtc_uid, avatar_rtc_token
-        )
+        payload = self._build_json_payload(name, channel, agent_rtc_uid, token, remote_rtc_uids, interrupt_keywords)
+        
+        # Print curl command for debugging
+        credentials = f"{self.rest_key}:{self.rest_secret}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        payload_json = json.dumps(payload, ensure_ascii=False)
+        curl_cmd = f"""curl -X POST '{url}' \\
+  -H 'Authorization: Basic {encoded_credentials}' \\
+  -H 'Content-Type: application/json; charset=utf-8' \\
+  -d '{payload_json}'"""
+        print(f"[DEBUG] Curl command:")
+        print(curl_cmd)
         
         try:
             response = self.session.post(url, json=payload, timeout=self.DEFAULT_TIMEOUT)
@@ -263,11 +262,10 @@ class AgoraStarterServer:
         token: str,
         channel: Optional[str] = None,
         remote_rtc_uids: Optional[List[str]] = None,
-        avatar_rtc_uid: Optional[str] = None,
-        avatar_rtc_token: Optional[str] = None
+        interrupt_keywords: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
-        启动一个 Agent（数字人版本）
+        启动一个 Agent（关键词打断版本）
         参考 Android 代码中的 startAgentAsync() 方法
         
         参数:
@@ -276,8 +274,7 @@ class AgoraStarterServer:
             token: Token 字符串
             channel: 频道名称（可选，如果不提供则使用实例默认值）
             remote_rtc_uids: 远程 RTC UIDs 列表（可选，默认为 ["*"] 表示所有用户）
-            avatar_rtc_uid: Avatar 的 RTC UID（可选，用于数字人功能）
-            avatar_rtc_token: Avatar 的 RTC Token（可选，用于数字人功能）
+            interrupt_keywords: 打断关键词列表（必需）
             
         返回:
             Agora API 返回的完整响应（包含 agent_id, create_ts, status）
@@ -287,10 +284,13 @@ class AgoraStarterServer:
         # 使用传入的远程 UIDs 或默认值 ["*"]
         remote_rtc_uids = remote_rtc_uids or ["*"]
         
+        # 验证打断关键词列表
+        if not interrupt_keywords or len(interrupt_keywords) == 0:
+            raise ValueError("interrupt_keywords 不能为空，必须提供至少一个打断关键词")
+        
         # 执行启动请求
         response_text = self._execute_join_request(
-            name, channel, agent_rtc_uid, token, remote_rtc_uids,
-            avatar_rtc_uid, avatar_rtc_token
+            name, channel, agent_rtc_uid, token, remote_rtc_uids, interrupt_keywords
         )
         
         # 解析 JSON 响应并返回完整数据
@@ -459,8 +459,27 @@ def load_config():
         "APP_ID": os.getenv("AGORA_APP_ID", ""),
         "APP_CERT": os.getenv("AGORA_APP_CERT", ""),
         "CHANNEL_NAME": os.getenv("AGORA_CHANNEL_NAME", ""),
-        "CURRENT_RTC_UID": os.getenv("AGORA_CURRENT_RTC_UID", "")
+        "INTERRUPT_KEYWORDS": os.getenv("AGORA_INTERRUPT_KEYWORDS", "")
     }
+
+
+def parse_interrupt_keywords(keywords_str: str) -> List[str]:
+    """
+    解析打断关键词字符串
+    支持逗号分隔的字符串，例如："停止,暂停,结束"
+    
+    参数:
+        keywords_str: 关键词字符串（逗号分隔）
+        
+    返回:
+        关键词列表
+    """
+    if not keywords_str or not keywords_str.strip():
+        return []
+    
+    # 按逗号分割，去除空白字符
+    keywords = [kw.strip() for kw in keywords_str.split(",") if kw.strip()]
+    return keywords
 
 
 def validate_config(config: Dict[str, str]):
@@ -480,8 +499,8 @@ def validate_config(config: Dict[str, str]):
         missing.append("AGORA_APP_ID")
     if not config.get("CHANNEL_NAME"):
         missing.append("AGORA_CHANNEL_NAME")
-    if not config.get("CURRENT_RTC_UID"):
-        missing.append("AGORA_CURRENT_RTC_UID")
+    if not config.get("INTERRUPT_KEYWORDS"):
+        missing.append("AGORA_INTERRUPT_KEYWORDS")
     
     if missing:
         error_msg = f"配置缺失：{', '.join(missing)} 必须在 .env.local 文件或环境变量中设置"
@@ -490,16 +509,15 @@ def validate_config(config: Dict[str, str]):
 
 def cmd_start_agent(config: Dict[str, str]):
     """
-    启动 Agent 的命令行函数（数字人版本）
-    默认启用数字人功能
+    启动 Agent 的命令行函数（关键词打断版本）
+    默认启用关键词打断功能
     
     参数:
         config: 配置字典
     """
     try:
-        # 固定的 RTC UID（客户端写死使用这两个 UID）
+        # 固定的 RTC UID
         agent_rtc_uid = "1009527"
-        avatar_rtc_uid = "1009528"
         
         # 验证基本配置
         validate_config(config)
@@ -510,7 +528,16 @@ def cmd_start_agent(config: Dict[str, str]):
         basic_key = config["BASIC_KEY"].strip()
         basic_secret = config["BASIC_SECRET"].strip()
         pipeline_id = config["PIPELINE_ID"].strip()
-        current_rtc_uid = config["CURRENT_RTC_UID"].strip()
+        interrupt_keywords_str = config["INTERRUPT_KEYWORDS"].strip()
+        
+        # 解析打断关键词
+        interrupt_keywords = parse_interrupt_keywords(interrupt_keywords_str)
+        if not interrupt_keywords:
+            raise ValueError("AGORA_INTERRUPT_KEYWORDS 不能为空，必须提供至少一个打断关键词")
+        
+        # 验证关键词数量（最多 128 个）
+        if len(interrupt_keywords) > 128:
+            raise ValueError(f"打断关键词数量不能超过 128 个，当前有 {len(interrupt_keywords)} 个")
         
         # 默认 token 类型：RTC 和 RTM
         token_types = [1, 2]  # 1=RTC, 2=RTM
@@ -534,15 +561,6 @@ def cmd_start_agent(config: Dict[str, str]):
         )
         print(f"[INFO] Agent Token 生成成功")
         
-        # 生成 Avatar Token（数字人功能默认启用）
-        print(f"[INFO] 正在生成 Avatar Token (app_id={app_id}, channel={channel_name}, uid={avatar_rtc_uid})...")
-        avatar_token = token_server.generate_token(
-            channel_name=channel_name,
-            uid=avatar_rtc_uid,
-            token_types=token_types
-        )
-        print(f"[INFO] Avatar Token 生成成功")
-        
         # 创建用于启动 Agent 的 AgoraStarterServer 实例
         server = AgoraStarterServer(
             app_id=app_id,
@@ -553,23 +571,17 @@ def cmd_start_agent(config: Dict[str, str]):
             app_cert=app_cert if app_cert else None
         )
         
-        # 启动 Agent（数字人模式）
-        # 注意：启用 Avatar 时，不能使用 ["*"] 订阅所有用户，必须指定具体的 UID
-        remote_rtc_uids = [current_rtc_uid]
-        
-        print(f"[INFO] 正在启动 Agent（数字人模式）(app_id={app_id}, channel={channel_name})...")
+        # 启动 Agent（关键词打断模式）
+        print(f"[INFO] 正在启动 Agent（关键词打断模式）(app_id={app_id}, channel={channel_name})...")
         print(f"[INFO] Agent RTC UID: {agent_rtc_uid}")
-        print(f"[INFO] Avatar RTC UID: {avatar_rtc_uid}")
-        print(f"[INFO] Current RTC UID (客户端使用): {current_rtc_uid}")
+        print(f"[INFO] 打断关键词: {', '.join(interrupt_keywords)}")
         
         agent_data = server.start_agent(
             name=channel_name,
             agent_rtc_uid=agent_rtc_uid,
             token=agent_token,
             channel=channel_name,
-            remote_rtc_uids=remote_rtc_uids,
-            avatar_rtc_uid=avatar_rtc_uid,
-            avatar_rtc_token=avatar_token
+            interrupt_keywords=interrupt_keywords
         )
         
         agent_id = agent_data.get("agent_id", "")
@@ -583,9 +595,9 @@ def cmd_start_agent(config: Dict[str, str]):
         print(f"[INFO] Agent ID: {agent_id}")
         print(f"[INFO] Channel: {channel_name}")
         print(f"[INFO] Agent RTC UID: {agent_rtc_uid}")
-        print(f"[INFO] Avatar RTC UID: {avatar_rtc_uid}")
-        print(f"[INFO] Current RTC UID (客户端使用此 UID 加入频道): {current_rtc_uid}")
-        print(f"\n💡 现在可以打开应用，使用 UID {current_rtc_uid} 加入频道 {channel_name} 来体验对话式 AI（数字人）")
+        print(f"[INFO] 打断模式: keywords")
+        print(f"[INFO] 打断关键词: {', '.join(interrupt_keywords)}")
+        print(f"\n💡 现在可以打开应用，加入频道 {channel_name} 来体验对话式 AI（关键词打断）")
         
         return 0
         
@@ -617,7 +629,7 @@ def cmd_stop_agent(config: Dict[str, str], agent_id: Optional[str] = None):
             if not agent_id:
                 print("[ERROR] 未找到 agent_id。", file=sys.stderr)
                 print("[ERROR] 请提供 --agent-id 参数，或确保之前已成功启动过 Agent。", file=sys.stderr)
-                print("[ERROR] 使用方式: python agent_start_avatar.py stop --agent-id <agent_id>", file=sys.stderr)
+                print("[ERROR] 使用方式: python agent_start_interrupt.py stop --agent-id <agent_id>", file=sys.stderr)
                 return 1
             print(f"[INFO] 使用上一次的 Agent ID: {agent_id}")
         
@@ -650,12 +662,12 @@ def cmd_stop_agent(config: Dict[str, str], agent_id: Optional[str] = None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Agora Agent Starter Script (Avatar) - 启动和停止 Agora 对话式 AI Agent（数字人版本）'
+        description='Agora Agent Starter Script (Keyword Interrupt) - 启动和停止 Agora 对话式 AI Agent（关键词打断版本）'
     )
     subparsers = parser.add_subparsers(dest='command', help='可用命令')
     
     # start 命令
-    start_parser = subparsers.add_parser('start', help='启动 Agent（数字人模式，默认启用）')
+    start_parser = subparsers.add_parser('start', help='启动 Agent（关键词打断模式，默认启用）')
     
     # stop 命令
     stop_parser = subparsers.add_parser('stop', help='停止 Agent')

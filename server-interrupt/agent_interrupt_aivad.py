@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Agora Agent Starter Script (Avatar)
-命令行脚本，用于启动和停止 Agora 对话式 AI Agent（数字人版本）
+Agora Agent Starter Script (AIVAD)
+命令行脚本，用于启动和停止 Agora 对话式 AI Agent（AIVAD 版本）
 所有配置从本地环境变量加载（.env.local 文件）
 """
 import argparse
@@ -24,9 +24,9 @@ except ImportError:
 
 class AgoraStarterServer:
     """
-    Agora Agent Starter Server 实现类（数字人版本）
+    Agora Agent Starter Server 实现类（AIVAD 版本）
     用于管理 Agora 对话式 AI Agent 的启动、停止和 Token 生成
-    支持数字人（Avatar）功能
+    支持 AIVAD 功能
     """
     
     # API 端点配置
@@ -82,12 +82,10 @@ class AgoraStarterServer:
         channel: str,
         agent_rtc_uid: str,
         token: str,
-        remote_rtc_uids: List[str],
-        avatar_rtc_uid: Optional[str] = None,
-        avatar_rtc_token: Optional[str] = None
+        remote_rtc_uids: List[str]
     ) -> Dict[str, Any]:
         """
-        构建启动 Agent 的 JSON 请求体（数字人版本）
+        构建启动 Agent 的 JSON 请求体（AIVAD 版本）
         参考 Android 代码中的 buildJsonPayload() 方法
         
         参数:
@@ -96,8 +94,6 @@ class AgoraStarterServer:
             agent_rtc_uid: Agent 的 RTC UID
             token: Token 字符串
             remote_rtc_uids: 远程 RTC UIDs 列表
-            avatar_rtc_uid: Avatar 的 RTC UID（可选，用于数字人功能）
-            avatar_rtc_token: Avatar 的 RTC Token（可选，用于数字人功能）
             
         返回:
             表示 JSON 请求体的字典
@@ -106,17 +102,11 @@ class AgoraStarterServer:
             "channel": channel,
             "agent_rtc_uid": agent_rtc_uid,
             "remote_rtc_uids": remote_rtc_uids,  # ["*"] 表示所有用户
-            "token": token
-        }
-        
-        # 添加 Avatar 配置（如果提供了 avatar_rtc_uid 和 avatar_rtc_token）
-        if avatar_rtc_uid and avatar_rtc_token:
-            properties["avatar"] = {
-                "params": {
-                    "agora_uid": avatar_rtc_uid,
-                    "agora_token": avatar_rtc_token
-                }
+            "token": token,
+            "advanced_features": {
+                "enable_aivad": True
             }
+        }
         
         payload = {
             "name": name,
@@ -131,12 +121,10 @@ class AgoraStarterServer:
         channel: str,
         agent_rtc_uid: str,
         token: str,
-        remote_rtc_uids: List[str],
-        avatar_rtc_uid: Optional[str] = None,
-        avatar_rtc_token: Optional[str] = None
+        remote_rtc_uids: List[str]
     ) -> str:
         """
-        执行启动 Agent 的 HTTP 请求（数字人版本）
+        执行启动 Agent 的 HTTP 请求（AIVAD 版本）
         参考 Android 代码中的 executeJoinRequest() 方法
         
         参数:
@@ -145,8 +133,6 @@ class AgoraStarterServer:
             agent_rtc_uid: Agent 的 RTC UID
             token: Token 字符串
             remote_rtc_uids: 远程 RTC UIDs 列表
-            avatar_rtc_uid: Avatar 的 RTC UID（可选）
-            avatar_rtc_token: Avatar 的 RTC Token（可选）
             
         返回:
             响应文本（JSON 格式）
@@ -156,10 +142,7 @@ class AgoraStarterServer:
         """
         # 构建 API URL：POST /api/conversational-ai-agent/v2/projects/{project_id}/join/
         url = f"{self.API_BASE_URL}/{self.app_id}/join/"
-        payload = self._build_json_payload(
-            name, channel, agent_rtc_uid, token, remote_rtc_uids,
-            avatar_rtc_uid, avatar_rtc_token
-        )
+        payload = self._build_json_payload(name, channel, agent_rtc_uid, token, remote_rtc_uids)
         
         try:
             response = self.session.post(url, json=payload, timeout=self.DEFAULT_TIMEOUT)
@@ -262,12 +245,10 @@ class AgoraStarterServer:
         agent_rtc_uid: str,
         token: str,
         channel: Optional[str] = None,
-        remote_rtc_uids: Optional[List[str]] = None,
-        avatar_rtc_uid: Optional[str] = None,
-        avatar_rtc_token: Optional[str] = None
+        remote_rtc_uids: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
-        启动一个 Agent（数字人版本）
+        启动一个 Agent（AIVAD 版本）
         参考 Android 代码中的 startAgentAsync() 方法
         
         参数:
@@ -276,8 +257,6 @@ class AgoraStarterServer:
             token: Token 字符串
             channel: 频道名称（可选，如果不提供则使用实例默认值）
             remote_rtc_uids: 远程 RTC UIDs 列表（可选，默认为 ["*"] 表示所有用户）
-            avatar_rtc_uid: Avatar 的 RTC UID（可选，用于数字人功能）
-            avatar_rtc_token: Avatar 的 RTC Token（可选，用于数字人功能）
             
         返回:
             Agora API 返回的完整响应（包含 agent_id, create_ts, status）
@@ -289,8 +268,7 @@ class AgoraStarterServer:
         
         # 执行启动请求
         response_text = self._execute_join_request(
-            name, channel, agent_rtc_uid, token, remote_rtc_uids,
-            avatar_rtc_uid, avatar_rtc_token
+            name, channel, agent_rtc_uid, token, remote_rtc_uids
         )
         
         # 解析 JSON 响应并返回完整数据
@@ -458,18 +436,18 @@ def load_config():
         "PIPELINE_ID": os.getenv("AGORA_PIPELINE_ID", ""),
         "APP_ID": os.getenv("AGORA_APP_ID", ""),
         "APP_CERT": os.getenv("AGORA_APP_CERT", ""),
-        "CHANNEL_NAME": os.getenv("AGORA_CHANNEL_NAME", ""),
-        "CURRENT_RTC_UID": os.getenv("AGORA_CURRENT_RTC_UID", "")
+        "CHANNEL_NAME": os.getenv("AGORA_CHANNEL_NAME", "")
     }
 
 
-def validate_config(config: Dict[str, str]):
+def validate_config(config: Dict[str, str], dotenv_available: bool = True):
     """
     验证配置是否可用
     如果缺少必需的配置，抛出 ValueError
     
     参数:
         config: 配置字典
+        dotenv_available: python-dotenv 是否可用
     """
     missing = []
     if not config.get("BASIC_KEY") or not config.get("BASIC_SECRET"):
@@ -480,29 +458,35 @@ def validate_config(config: Dict[str, str]):
         missing.append("AGORA_APP_ID")
     if not config.get("CHANNEL_NAME"):
         missing.append("AGORA_CHANNEL_NAME")
-    if not config.get("CURRENT_RTC_UID"):
-        missing.append("AGORA_CURRENT_RTC_UID")
     
     if missing:
-        error_msg = f"配置缺失：{', '.join(missing)} 必须在 .env.local 文件或环境变量中设置"
+        error_msg = f"配置缺失：{', '.join(missing)} "
+        if not dotenv_available:
+            error_msg += "\n\n提示：检测到 python-dotenv 未安装，无法加载 .env.local 文件。\n"
+            error_msg += "请先安装依赖包：\n"
+            error_msg += "  pip install -r requirements.txt\n"
+            error_msg += "  或: pip install python-dotenv\n"
+            error_msg += "\n然后创建 .env.local 文件（参考 .env.example）并填入配置。"
+        else:
+            error_msg += "必须在 .env.local 文件或环境变量中设置"
         raise ValueError(error_msg)
 
 
-def cmd_start_agent(config: Dict[str, str]):
+def cmd_start_agent(config: Dict[str, str], dotenv_available: bool = True):
     """
-    启动 Agent 的命令行函数（数字人版本）
-    默认启用数字人功能
+    启动 Agent 的命令行函数（AIVAD 版本）
+    默认启用 AIVAD 功能
     
     参数:
         config: 配置字典
+        dotenv_available: python-dotenv 是否可用
     """
     try:
-        # 固定的 RTC UID（客户端写死使用这两个 UID）
+        # 固定的 RTC UID
         agent_rtc_uid = "1009527"
-        avatar_rtc_uid = "1009528"
         
         # 验证基本配置
-        validate_config(config)
+        validate_config(config, dotenv_available)
         
         app_id = config["APP_ID"].strip()
         app_cert = config.get("APP_CERT", "").strip()
@@ -510,7 +494,6 @@ def cmd_start_agent(config: Dict[str, str]):
         basic_key = config["BASIC_KEY"].strip()
         basic_secret = config["BASIC_SECRET"].strip()
         pipeline_id = config["PIPELINE_ID"].strip()
-        current_rtc_uid = config["CURRENT_RTC_UID"].strip()
         
         # 默认 token 类型：RTC 和 RTM
         token_types = [1, 2]  # 1=RTC, 2=RTM
@@ -534,15 +517,6 @@ def cmd_start_agent(config: Dict[str, str]):
         )
         print(f"[INFO] Agent Token 生成成功")
         
-        # 生成 Avatar Token（数字人功能默认启用）
-        print(f"[INFO] 正在生成 Avatar Token (app_id={app_id}, channel={channel_name}, uid={avatar_rtc_uid})...")
-        avatar_token = token_server.generate_token(
-            channel_name=channel_name,
-            uid=avatar_rtc_uid,
-            token_types=token_types
-        )
-        print(f"[INFO] Avatar Token 生成成功")
-        
         # 创建用于启动 Agent 的 AgoraStarterServer 实例
         server = AgoraStarterServer(
             app_id=app_id,
@@ -553,23 +527,16 @@ def cmd_start_agent(config: Dict[str, str]):
             app_cert=app_cert if app_cert else None
         )
         
-        # 启动 Agent（数字人模式）
-        # 注意：启用 Avatar 时，不能使用 ["*"] 订阅所有用户，必须指定具体的 UID
-        remote_rtc_uids = [current_rtc_uid]
-        
-        print(f"[INFO] 正在启动 Agent（数字人模式）(app_id={app_id}, channel={channel_name})...")
+        # 启动 Agent（AIVAD 模式）
+        print(f"[INFO] 正在启动 Agent（AIVAD 模式）(app_id={app_id}, channel={channel_name})...")
         print(f"[INFO] Agent RTC UID: {agent_rtc_uid}")
-        print(f"[INFO] Avatar RTC UID: {avatar_rtc_uid}")
-        print(f"[INFO] Current RTC UID (客户端使用): {current_rtc_uid}")
+        print(f"[INFO] AIVAD 功能: 已启用")
         
         agent_data = server.start_agent(
             name=channel_name,
             agent_rtc_uid=agent_rtc_uid,
             token=agent_token,
-            channel=channel_name,
-            remote_rtc_uids=remote_rtc_uids,
-            avatar_rtc_uid=avatar_rtc_uid,
-            avatar_rtc_token=avatar_token
+            channel=channel_name
         )
         
         agent_id = agent_data.get("agent_id", "")
@@ -583,9 +550,8 @@ def cmd_start_agent(config: Dict[str, str]):
         print(f"[INFO] Agent ID: {agent_id}")
         print(f"[INFO] Channel: {channel_name}")
         print(f"[INFO] Agent RTC UID: {agent_rtc_uid}")
-        print(f"[INFO] Avatar RTC UID: {avatar_rtc_uid}")
-        print(f"[INFO] Current RTC UID (客户端使用此 UID 加入频道): {current_rtc_uid}")
-        print(f"\n💡 现在可以打开应用，使用 UID {current_rtc_uid} 加入频道 {channel_name} 来体验对话式 AI（数字人）")
+        print(f"[INFO] AIVAD 功能: 已启用")
+        print(f"\n💡 现在可以打开应用，加入频道 {channel_name} 来体验对话式 AI（AIVAD）")
         
         return 0
         
@@ -617,7 +583,7 @@ def cmd_stop_agent(config: Dict[str, str], agent_id: Optional[str] = None):
             if not agent_id:
                 print("[ERROR] 未找到 agent_id。", file=sys.stderr)
                 print("[ERROR] 请提供 --agent-id 参数，或确保之前已成功启动过 Agent。", file=sys.stderr)
-                print("[ERROR] 使用方式: python agent_start_avatar.py stop --agent-id <agent_id>", file=sys.stderr)
+                print("[ERROR] 使用方式: python agent_start_aivad.py stop --agent-id <agent_id>", file=sys.stderr)
                 return 1
             print(f"[INFO] 使用上一次的 Agent ID: {agent_id}")
         
@@ -650,12 +616,12 @@ def cmd_stop_agent(config: Dict[str, str], agent_id: Optional[str] = None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Agora Agent Starter Script (Avatar) - 启动和停止 Agora 对话式 AI Agent（数字人版本）'
+        description='Agora Agent Starter Script (AIVAD) - 启动和停止 Agora 对话式 AI Agent（AIVAD 版本）'
     )
     subparsers = parser.add_subparsers(dest='command', help='可用命令')
     
     # start 命令
-    start_parser = subparsers.add_parser('start', help='启动 Agent（数字人模式，默认启用）')
+    start_parser = subparsers.add_parser('start', help='启动 Agent（AIVAD 模式，默认启用）')
     
     # stop 命令
     stop_parser = subparsers.add_parser('stop', help='停止 Agent')
@@ -692,7 +658,7 @@ if __name__ == '__main__':
     
     # 执行命令
     if args.command == 'start':
-        sys.exit(cmd_start_agent(config))
+        sys.exit(cmd_start_agent(config, dotenv_available))
     elif args.command == 'stop':
         sys.exit(cmd_stop_agent(config, args.agent_id))
 
