@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("io.agora.agent.example.startup.kotlin", appContext.packageName)
+        assertEquals("io.agora.agent.example.vison", appContext.packageName)
     }
 }

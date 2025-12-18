@@ -1,11 +1,9 @@
 package io.agora.convoai.example.startup.ui
 
 import android.util.Log
-import android.view.SurfaceView
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.agora.convoai.example.startup.AgentApp
 import io.agora.convoai.example.startup.AgentApp
 import io.agora.convoai.example.startup.KeyCenter
 import io.agora.convoai.example.startup.api.TokenGenerator
@@ -38,7 +36,6 @@ import io.agora.convoai.convoaiApi.Metric
 import io.agora.convoai.convoaiApi.ModuleError
 import io.agora.convoai.convoaiApi.StateChangeEvent
 import io.agora.convoai.convoaiApi.Transcript
-import io.agora.convoai.convoaiApi.TranscriptRenderMode
 import io.agora.convoai.convoaiApi.VoiceprintStateChangeEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
