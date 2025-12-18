@@ -2,57 +2,96 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Channel Name -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="频道名称"
+        android:textSize="12sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="4dp" />
+
     <EditText
         android:id="@+id/etChannelName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:hint="频道名称"
-        android:textSize="14sp"
+        android:layout_marginBottom="10dp"
+        android:hint="请输入频道名称"
+        android:textSize="13sp"
         android:minHeight="32dp"
         android:padding="6dp"
         android:background="#FFFFFF"
         android:textColorHint="#999999" />
 
+    <!-- Local User UID (Read-only) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="本地用户 UID"
+        android:textSize="11sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="3dp" />
+
     <EditText
         android:id="@+id/etUserId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:hint="用户UID"
-        android:inputType="number"
-        android:digits="0123456789"
-        android:textSize="14sp"
-        android:minHeight="36dp"
-        android:padding="8dp"
-        android:background="#FFFFFF"
-        android:textColorHint="#999999" />
+        android:layout_marginBottom="10dp"
+        android:hint="本地用户UID"
+        android:inputType="none"
+        android:textSize="13sp"
+        android:minHeight="32dp"
+        android:padding="6dp"
+        android:background="#F5F5F5"
+        android:textColor="#333333"
+        android:textColorHint="#999999"
+        android:focusable="false"
+        android:clickable="false"
+        android:cursorVisible="false" />
+
+    <!-- Agent UID (Editable) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Agent UID"
+        android:textSize="11sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="3dp" />
 
     <EditText
         android:id="@+id/etAgentUid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:hint="Agent UID"
+        android:layout_marginBottom="10dp"
+        android:hint="请输入 Agent UID"
         android:inputType="number"
         android:digits="0123456789"
-        android:textSize="14sp"
-        android:minHeight="36dp"
-        android:padding="8dp"
+        android:textSize="13sp"
+        android:minHeight="32dp"
+        android:padding="6dp"
         android:background="#FFFFFF"
         android:textColorHint="#999999" />
+
+    <!-- Avatar UID (Editable) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Avatar UID"
+        android:textSize="11sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="3dp" />
 
     <EditText
         android:id="@+id/etAvatarUid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:hint="Avatar UID"
+        android:layout_marginBottom="10dp"
+        android:hint="请输入 Avatar UID"
         android:inputType="number"
         android:digits="0123456789"
-        android:textSize="14sp"
-        android:minHeight="36dp"
-        android:padding="8dp"
+        android:textSize="13sp"
+        android:minHeight="32dp"
+        android:padding="6dp"
         android:background="#FFFFFF"
         android:textColorHint="#999999" />
 
@@ -61,8 +100,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="加入频道"
-        android:textSize="14sp"
-        android:minHeight="36dp"
-        android:padding="6dp" />
+        android:textSize="13sp"
+        android:minHeight="40dp"
+        android:layout_marginTop="4dp" />
 </merge>
 

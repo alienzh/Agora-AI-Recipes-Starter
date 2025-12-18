@@ -76,6 +76,14 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
             // Setup RecyclerView for transcript list
             setupRecyclerView()
 
+            // Set default values for ChannelInputView from ViewModel (single source of truth)
+            channelInputView.setDefaultValues(
+                channelName = AgentChatViewModel.DEFAULT_CHANNEL_NAME,
+                userId = AgentChatViewModel.DEFAULT_USER_UID,
+                agentUid = AgentChatViewModel.DEFAULT_AGENT_UID,
+                avatarUid = AgentChatViewModel.DEFAULT_AVATAR_UID
+            )
+
             // Setup ChannelInputView callback
             channelInputView.onJoinChannelListener = object : OnJoinChannelListener {
                 override fun onJoinChannel(data: ChannelInputData) {

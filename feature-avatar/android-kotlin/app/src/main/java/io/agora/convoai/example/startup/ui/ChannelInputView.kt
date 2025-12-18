@@ -54,13 +54,33 @@ class ChannelInputView @JvmOverloads constructor(
             handleJoinChannel()
         }
         
-        // Set default values
-        binding.etChannelName.setText("channel_avatar_001")
-        binding.etUserId.setText("1001")
-        binding.etAgentUid.setText("2001")
-        binding.etAvatarUid.setText("3001")
+        // Note: Default values will be set via setDefaultValues() method
+        // from Activity/Fragment after reading from ViewModel
         
         // Initially disable button
+        updateButtonState()
+    }
+
+    /**
+     * Set default values for input fields
+     * Should be called from Activity/Fragment with values from ViewModel
+     * 
+     * Note: Only userId is read-only to ensure consistency with RTM client 
+     * initialization and token generation. agentUid and avatarUid are editable
+     * to allow connecting to different agents and avatars.
+     */
+    fun setDefaultValues(
+        channelName: String,
+        userId: Int,
+        agentUid: Int,
+        avatarUid: Int
+    ) {
+        binding.etChannelName.setText(channelName)
+        // Set userId (read-only)
+        binding.etUserId.setText(userId.toString())
+        // Set default values for editable fields
+        binding.etAgentUid.setText(agentUid.toString())
+        binding.etAvatarUid.setText(avatarUid.toString())
         updateButtonState()
     }
 
@@ -74,12 +94,15 @@ class ChannelInputView @JvmOverloads constructor(
 
     /**
      * Handle join channel button click
+     * Note: userId is read-only, agentUid and avatarUid are editable
      */
     private fun handleJoinChannel() {
         val channelName = binding.etChannelName.text?.toString()?.trim() ?: ""
-        val userIdText = binding.etUserId.text?.toString()?.trim()
-        val agentUidText = binding.etAgentUid.text?.toString()?.trim()
-        val avatarUidText = binding.etAvatarUid.text?.toString()?.trim()
+        
+        // Read UID values
+        val userIdText = binding.etUserId.text?.toString()?.trim()  // Read-only
+        val agentUidText = binding.etAgentUid.text?.toString()?.trim()  // Editable
+        val avatarUidText = binding.etAvatarUid.text?.toString()?.trim()  // Editable
 
         val userId = userIdText?.toIntOrNull()
         val agentUid = agentUidText?.toIntOrNull()

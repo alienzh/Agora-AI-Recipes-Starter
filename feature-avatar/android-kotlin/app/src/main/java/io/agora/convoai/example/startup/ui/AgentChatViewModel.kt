@@ -52,6 +52,12 @@ class AgentChatViewModel : ViewModel() {
     companion object {
         private const val TAG = "ConversationViewModel"
 
+        // Default UID values - single source of truth
+        const val DEFAULT_USER_UID = 1001
+        const val DEFAULT_AGENT_UID = 2001
+        const val DEFAULT_AVATAR_UID = 3001
+        const val DEFAULT_CHANNEL_NAME = "channel_avatar_001"
+
         /**
          * Generate a random channel name
          */
@@ -60,10 +66,10 @@ class AgentChatViewModel : ViewModel() {
         }
     }
 
-    // UIDs - can be set from UI input fields
-    private var userId: Int = 0
-    private var agentUid: Int = 0
-    private var avatarUid: Int = 0
+    // UIDs - initialized with default values
+    private var userId: Int = DEFAULT_USER_UID
+    private var agentUid: Int = DEFAULT_AGENT_UID
+    private var avatarUid: Int = DEFAULT_AVATAR_UID
     
     // SharedPreferences keys
     private val prefs by lazy {
@@ -504,12 +510,13 @@ class AgentChatViewModel : ViewModel() {
     /**
      * Generate unified token for RTC and RTM
      *
+     * @param channelName Channel name for token generation
      * @return Token string on success, null on failure
      */
-    private suspend fun generateUserToken(): String? {
+    private suspend fun generateUserToken(channelName: String): String? {
         // Get unified token for both RTC and RTM
         val tokenResult = TokenGenerator.generateTokensAsync(
-            channelName = "",
+            channelName = channelName,
             uid = userId.toString(),
         )
 
@@ -581,7 +588,7 @@ class AgentChatViewModel : ViewModel() {
             )
 
             // Get token if not available, otherwise use existing token
-            val token = unifiedToken ?: generateUserToken() ?: return@launch
+            val token = unifiedToken ?: generateUserToken(channelName) ?: return@launch
 
             // Join RTC channel with the unified token
             joinRtcChannel(token, channelName, this@AgentChatViewModel.userId)
