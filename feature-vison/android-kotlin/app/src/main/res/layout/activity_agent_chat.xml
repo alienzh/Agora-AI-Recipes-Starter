@@ -178,7 +178,7 @@
     <!-- Start Section (shown when not connected) -->
     <io.agora.convoai.example.startup.ui.ChannelInputView
         android:id="@+id/channelInputView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#F5F5F5"
         app:layout_constraintBottom_toBottomOf="parent"

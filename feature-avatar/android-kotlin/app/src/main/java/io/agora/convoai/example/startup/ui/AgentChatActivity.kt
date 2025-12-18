@@ -242,7 +242,7 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     val isIdle = state.connectionState == AgentChatViewModel.ConnectionState.Idle
 
                     // Show/hide views based on connection state
-                    // Only channelInputView is hidden when connected, all other views stay visible
+                    // Only channelInputView is hidden when connected
                     channelInputView.visibility = if (isConnected) View.GONE else View.VISIBLE
                     // Button state is managed by ChannelInputView
 

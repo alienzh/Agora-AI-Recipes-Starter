@@ -11,6 +11,12 @@ import AgoraRtcKit
 import AgoraRtmKit
 
 class AgentViewController: UIViewController {
+    // MARK: - Default UID values - single source of truth
+    static let DEFAULT_USER_UID: Int = 1001
+    static let DEFAULT_AGENT_UID: Int = 2001
+    static let DEFAULT_AVATAR_UID: Int = 3001
+    static let DEFAULT_CHANNEL_NAME: String = "channel_avatar_001"
+    
     // MARK: - UI Components
     private let channelInputView = ChannelInputView()
     private let chatBackgroundView = ChatBackgroundView()
@@ -24,7 +30,7 @@ class AgentViewController: UIViewController {
     private var isRemoteViewExpanded: Bool = false  // Default collapsed
     
     // MARK: - State
-    private var uid: Int = 0
+    private var uid: Int = DEFAULT_USER_UID
     private var channel: String = ""
     private var transcripts: [Transcript] = []
     private var isMicMuted: Bool = false
@@ -38,8 +44,8 @@ class AgentViewController: UIViewController {
     private var rtcEngine: AgoraRtcEngineKit?
     private var rtmEngine: AgoraRtmClientKit?
     private var convoAIAPI: ConversationalAIAPI?
-    private var agentUid: Int = 0
-    private var avatarUid: Int = 0
+    private var agentUid: Int = DEFAULT_AGENT_UID
+    private var avatarUid: Int = DEFAULT_AVATAR_UID
     
     // MARK: - UserDefaults Keys
     private let kSavedChannelName = "saved_channel_name"
@@ -75,22 +81,20 @@ class AgentViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Hide navigation bar for better space utilization
+        navigationController?.setNavigationBarHidden(true, animated: false)
         setupUI()
         setupConstraints()
         initializeEngines()
     }
     
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        view.endEditing(true)
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - UI Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        
-        title = "VoiceAgent"
-        navigationController?.navigationBar.prefersLargeTitles = false
         
         // Debug Info TextView (always visible)
         debugInfoTextView.isEditable = false
@@ -107,6 +111,15 @@ class AgentViewController: UIViewController {
         
         // Channel Input View
         view.addSubview(channelInputView)
+        
+        // Set default values from ViewController constants (single source of truth)
+        channelInputView.setDefaultValues(
+            channelName: AgentViewController.DEFAULT_CHANNEL_NAME,
+            userId: AgentViewController.DEFAULT_USER_UID,
+            agentUid: AgentViewController.DEFAULT_AGENT_UID,
+            avatarUid: AgentViewController.DEFAULT_AVATAR_UID
+        )
+        
         channelInputView.onJoinChannelTapped = { [weak self] inputData in
             self?.handleJoinChannel(inputData: inputData)
         }
@@ -133,16 +146,18 @@ class AgentViewController: UIViewController {
     
     private func setupConstraints() {
         // Debug Info TextView (always visible at top)
+        // No navigation bar, so we can use less top spacing
         debugInfoTextView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(8)
             make.left.right.equalToSuperview().inset(20)
             make.height.equalTo(120)
         }
         
-        // Channel Input View (below debug view)
+        // Channel Input View (below debug view, layout from top to bottom)
+        // Only constrain top, let it size based on content, this leaves space for keyboard
         channelInputView.snp.makeConstraints { make in
-            make.top.equalTo(debugInfoTextView.snp.bottom).offset(20)
-            make.left.right.bottom.equalToSuperview()
+            make.top.equalTo(debugInfoTextView.snp.bottom).offset(8)
+            make.left.right.equalToSuperview()
         }
         
         // Chat Background View (below debug view)
@@ -168,6 +183,8 @@ class AgentViewController: UIViewController {
     }
     
     private func initializeRTM() {
+        // RTM client is initialized with DEFAULT_USER_UID
+        // Since userId is read-only, no need to recreate RTM client
         let rtmConfig = AgoraRtmClientConfig(appId: KeyCenter.AG_APP_ID, userId: "\(uid)")
         rtmConfig.areaCode = [.CN, .NA]
         rtmConfig.presenceTimeout = 30
@@ -177,8 +194,8 @@ class AgentViewController: UIViewController {
         do {
             let rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: self)
             self.rtmEngine = rtmClient
-            print("[Engine Init] RTM initialized successfully")
-            addDebugMessage("RTM Client 初始化成功")
+            print("[Engine Init] RTM initialized successfully, userId: \(uid)")
+            addDebugMessage("RTM Client 初始化成功，userId: \(uid)")
         } catch {
             print("[Engine Init] RTM initialization failed: \(error)")
             addDebugMessage("RTM Client 初始化失败")
@@ -442,7 +459,7 @@ class AgentViewController: UIViewController {
         
         // Set channel name and UIDs
         self.channel = inputData.channelName
-        self.uid = userId
+        // Note: uid is read-only (DEFAULT_USER_UID), always consistent with RTM client initialization
         self.agentUid = agentUid
         self.avatarUid = avatarUid
         
