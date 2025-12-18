@@ -4,18 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient"
+    android:background="#F5F5F5"
     android:padding="16dp"
     tools:context=".ui.AgentChatActivity">
 
     <!-- Log Section -->
-    <View
+    <FrameLayout
         android:id="@+id/cardLog"
         android:layout_width="0dp"
         android:layout_height="120dp"
         android:layout_marginBottom="12dp"
-        android:background="@drawable/bg_rounded_white"
-        android:elevation="4dp"
+        android:background="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -34,46 +33,65 @@
                 android:textColor="#666666"
                 android:textSize="12sp" />
         </ScrollView>
-    </View>
+    </FrameLayout>
 
-    <!-- Transcript List and Agent Status  -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cardTranscript"
+    <!-- Main Content Container -->
+    <LinearLayout
+        android:id="@+id/llMainContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="96dp"
-        android:background="@drawable/bg_rounded_white"
-        android:elevation="4dp"
+        android:orientation="vertical"
+        android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardLog">
 
-        <!-- Transcript List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvTranscript"
-            android:layout_width="0dp"
+        <!-- Visual Container (transcript + local video) -->
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:clipToPadding="false"
-            android:paddingVertical="12dp"
-            android:scrollbars="vertical"
-            app:layout_constraintBottom_toTopOf="@id/llAgentStatus"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight="1"
+            android:background="#1A1A2E">
+
+            <!-- Transcript List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTranscript"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingVertical="12dp"
+                android:scrollbars="vertical" />
+
+            <!-- Local Video Container (small window at top-right) -->
+            <FrameLayout
+                android:id="@+id/localVideoContainer"
+                android:layout_width="90dp"
+                android:layout_height="120dp"
+                android:layout_margin="8dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_rounded_black"
+                android:elevation="8dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <SurfaceView
+                    android:id="@+id/localVideoView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+        </FrameLayout>
 
         <!-- Agent Status Section -->
         <LinearLayout
             android:id="@+id/llAgentStatus"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_weight="0"
+            android:gravity="bottom"
             android:orientation="horizontal"
-            android:padding="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -92,110 +110,80 @@
                 android:textSize="14sp"
                 tools:text="Speaking" />
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Start Section (shown when not connected) -->
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardLog">
-
-        <io.agora.convoai.example.startup.ui.ChannelInputView
-            android:id="@+id/channelInputView"
+        <!-- Control Buttons -->
+        <LinearLayout
+            android:id="@+id/llControls"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            tools:visibility="visible">
 
-    <!-- Control Buttons (shown when connected) -->
-    <LinearLayout
-        android:id="@+id/llControls"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="visible">
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btnMute"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_button_mute_selector"
+                android:contentDescription="Mute/Unmute"
+                android:padding="12dp"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/ic_mic"
+                app:tint="@android:color/white" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/btnMute"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@drawable/bg_button_mute_selector"
-            android:contentDescription="Mute/Unmute"
-            android:padding="12dp"
-            android:scaleType="centerInside"
-            app:srcCompat="@drawable/ic_mic"
-            app:tint="@android:color/white" />
+            <View
+                android:id="@+id/spacer1"
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
 
-        <View
-            android:id="@+id/spacer1"
-            android:layout_width="16dp"
-            android:layout_height="match_parent" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStop"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_weight="2"
+                android:background="@drawable/selector_button_hangup"
+                android:letterSpacing="0.02"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:text="退出频道"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:backgroundTint="@null"
+                app:cornerRadius="16dp"
+                app:elevation="8dp"
+                app:rippleColor="#33FFFFFF" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnStop"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="2"
-            android:background="@drawable/selector_button_hangup"
-            android:letterSpacing="0.02"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:text="退出频道"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:backgroundTint="@null"
-            app:cornerRadius="16dp"
-            app:elevation="8dp"
-            app:rippleColor="#33FFFFFF" />
+            <View
+                android:id="@+id/spacer2"
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
 
-        <View
-            android:id="@+id/spacer2"
-            android:layout_width="16dp"
-            android:layout_height="match_parent" />
-
-        <!-- Video Toggle Button for Vision Feature -->
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/btnVideo"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@drawable/bg_button_mute_selector"
-            android:contentDescription="Video On/Off"
-            android:padding="12dp"
-            android:scaleType="centerInside"
-            app:srcCompat="@drawable/ic_video_on"
-            app:tint="@android:color/white" />
+            <!-- Video Toggle Button for Vision Feature -->
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btnVideo"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_button_mute_selector"
+                android:contentDescription="Video On/Off"
+                android:padding="12dp"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/ic_video_on"
+                app:tint="@android:color/white" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Local Video Preview Container (positioned over transcript area, clickable to expand) -->
-    <!-- Placed at end of layout to ensure it's on top (higher z-order) -->
-    <FrameLayout
-        android:id="@+id/localVideoContainer"
-        android:layout_width="90dp"
-        android:layout_height="120dp"
-        android:layout_margin="8dp"
-        android:visibility="visible"
-        android:background="@drawable/bg_rounded_black"
-        android:elevation="8dp"
-        app:layout_constraintEnd_toEndOf="@id/cardTranscript"
-        app:layout_constraintTop_toTopOf="@id/cardTranscript">
-
-        <SurfaceView
-            android:id="@+id/localVideoView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </FrameLayout>
+    <!-- Start Section (shown when not connected) -->
+    <io.agora.convoai.example.startup.ui.ChannelInputView
+        android:id="@+id/channelInputView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#F5F5F5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardLog" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

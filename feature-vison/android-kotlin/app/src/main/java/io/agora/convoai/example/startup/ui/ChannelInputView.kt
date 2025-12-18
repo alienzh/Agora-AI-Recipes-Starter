@@ -39,8 +39,8 @@ class ChannelInputView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-        gravity = android.view.Gravity.CENTER
-        val padding = (16 * resources.displayMetrics.density).toInt()
+        gravity = android.view.Gravity.TOP
+        val padding = (12 * resources.displayMetrics.density).toInt()
         setPadding(padding, padding, padding, padding)
         
         // Setup text change listener for channel name to enable/disable button
@@ -53,7 +53,30 @@ class ChannelInputView @JvmOverloads constructor(
             handleJoinChannel()
         }
         
+        // Note: Default values will be set via setDefaultValues() method
+        // from Activity/Fragment after reading from ViewModel
+        
         // Initially disable button
+        updateButtonState()
+    }
+
+    /**
+     * Set default values for input fields
+     * Should be called from Activity/Fragment with values from ViewModel
+     * 
+     * Note: Only userId is read-only to ensure consistency with RTM client 
+     * initialization and token generation. agentUid is editable.
+     */
+    fun setDefaultValues(
+        channelName: String,
+        userId: Int,
+        agentUid: Int
+    ) {
+        binding.etChannelName.setText(channelName)
+        // Set userId (read-only)
+        binding.etUserId.setText(userId.toString())
+        // Set default value for editable field
+        binding.etAgentUid.setText(agentUid.toString())
         updateButtonState()
     }
 
@@ -92,11 +115,12 @@ class ChannelInputView @JvmOverloads constructor(
 
     /**
      * Handle join channel button click
+     * Note: userId is read-only, agentUid is editable
      */
     private fun handleJoinChannel() {
         val channelName = binding.etChannelName.text?.toString()?.trim() ?: ""
-        val userIdText = binding.etUserId.text?.toString()?.trim()
-        val agentUidText = binding.etAgentUid.text?.toString()?.trim()
+        val userIdText = binding.etUserId.text?.toString()?.trim()  // Read-only
+        val agentUidText = binding.etAgentUid.text?.toString()?.trim()  // Editable
 
         val userId = userIdText?.toIntOrNull()
         val agentUid = agentUidText?.toIntOrNull()

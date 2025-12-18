@@ -48,7 +48,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.agora.agent.example.startup.kotlin"
+        applicationId = "io.agora.agent.example.avatar"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

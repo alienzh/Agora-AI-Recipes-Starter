@@ -83,6 +83,13 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                 }
             }
 
+            // Set default values for ChannelInputView from ViewModel (single source of truth)
+            channelInputView.setDefaultValues(
+                channelName = AgentChatViewModel.DEFAULT_CHANNEL_NAME,
+                userId = AgentChatViewModel.DEFAULT_USER_UID,
+                agentUid = AgentChatViewModel.DEFAULT_AGENT_UID
+            )
+
             // Setup ChannelInputView callback
             channelInputView.onJoinChannelListener = object : OnJoinChannelListener {
                 override fun onJoinChannel(data: ChannelInputData) {
@@ -206,41 +213,30 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
 
     /**
      * Update local video view size based on expanded state
-     * When expanded: cover the entire transcript area
-     * When collapsed: small window at top-right corner of transcript area
+     * When expanded: cover the entire visual container
+     * When collapsed: small window at top-right corner
      */
     private fun updateLocalViewSize() {
         mBinding?.let { binding ->
             val container = binding.localVideoContainer
-            val params = container.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+            val params = container.layoutParams as FrameLayout.LayoutParams
             val density = resources.displayMetrics.density
 
             if (isLocalViewExpanded) {
-                // Expanded: match cardTranscript size (cover entire transcript area)
-                params.width = 0  // match_constraint
-                params.height = 0  // match_constraint
-                params.topToTop = binding.cardTranscript.id
-                params.bottomToBottom = binding.cardTranscript.id
-                params.startToStart = binding.cardTranscript.id
-                params.endToEnd = binding.cardTranscript.id
-                params.topMargin = 0
-                params.marginEnd = 0
-                params.marginStart = 0
-                params.bottomMargin = 0
-                // Corner radius is handled by drawable background
+                // Expanded: localVideoContainer covers entire visual area
+                params.width = FrameLayout.LayoutParams.MATCH_PARENT
+                params.height = FrameLayout.LayoutParams.MATCH_PARENT
+                params.gravity = android.view.Gravity.NO_GRAVITY
+                params.setMargins(0, 0, 0, 0)
             } else {
                 // Collapsed: small window at top-right corner
                 params.width = (localViewSmallWidth * density).toInt()
                 params.height = (localViewSmallHeight * density).toInt()
-                params.topToTop = binding.cardTranscript.id
-                params.bottomToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-                params.startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-                params.endToEnd = binding.cardTranscript.id
+                params.gravity = android.view.Gravity.TOP or android.view.Gravity.END
                 val margin = (8 * density).toInt()
-                params.topMargin = margin
-                params.marginEnd = margin
-                // Corner radius is handled by drawable background
+                params.setMargins(margin, margin, margin, margin)
             }
+            
             container.layoutParams = params
         }
     }
@@ -319,9 +315,9 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     val isIdle = state.connectionState == AgentChatViewModel.ConnectionState.Idle
 
                     // Show/hide views based on connection state
-                    scrollView.visibility = if (isConnected) View.GONE else View.VISIBLE
-                    cardTranscript.visibility = if (isConnected) View.VISIBLE else View.GONE
-                    llControls.visibility = if (isConnected) View.VISIBLE else View.GONE
+                    // Only channelInputView is hidden when connected, all other views stay visible
+                    channelInputView.visibility = if (isConnected) View.GONE else View.VISIBLE
+                    llMainContent.visibility = if (isConnected) View.VISIBLE else View.GONE
 
                     // Local video container stays visible even when camera is off (shows black screen)
 

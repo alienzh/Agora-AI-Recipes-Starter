@@ -53,6 +53,11 @@ class AgentChatViewModel : ViewModel() {
     companion object {
         private const val TAG = "ConversationViewModel"
 
+        // Default UID values - single source of truth
+        const val DEFAULT_USER_UID = 1001
+        const val DEFAULT_AGENT_UID = 2001
+        const val DEFAULT_CHANNEL_NAME = "channel_vision_001"
+
         /**
          * Generate a random channel name
          */
@@ -61,9 +66,9 @@ class AgentChatViewModel : ViewModel() {
         }
     }
 
-    // UIDs - can be set from UI input fields
-    private var userId: Int = 0
-    private var agentUid: Int = 0
+    // UIDs - initialized with default values
+    private var userId: Int = DEFAULT_USER_UID
+    private var agentUid: Int = DEFAULT_AGENT_UID
     
     // SharedPreferences keys
     private val prefs by lazy {
