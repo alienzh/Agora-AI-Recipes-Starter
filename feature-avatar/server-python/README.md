@@ -35,10 +35,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-依赖包：
-- `requests>=2.31.0` - HTTP 请求库
-- `python-dotenv>=1.0.0` - 用于加载 `.env.local` 文件
-
 ## 配置
 
 1. 复制示例配置文件：
@@ -65,10 +61,6 @@ AGORA_PIPELINE_ID=your_pipeline_id_here
 
 # 频道名称（Agent 将加入的频道）
 AGORA_CHANNEL_NAME=your_channel_name_here
-
-# Current RTC UID（客户端需要使用此 UID 加入频道）
-# 启用 Avatar 时，remote_rtc_uids 只能订阅指定的 UID，不能使用 ["*"]
-AGORA_CURRENT_RTC_UID=your_current_rtc_uid_here
 ```
 
 ## Pipeline 配置
@@ -87,7 +79,10 @@ AGORA_CURRENT_RTC_UID=your_current_rtc_uid_here
 
 ### 启动 Agent（数字人模式）
 
-直接运行命令启动 Agent，将使用固定配置（Agent RTC UID: `1009527`，Avatar RTC UID: `1009528`）：
+直接运行命令启动 Agent，将使用固定配置：
+- Current RTC UID: `1001`（客户端使用此 UID 加入频道）
+- Agent RTC UID: `2001`
+- Avatar RTC UID: `3001`
 
 ```bash
 python agent_start_avatar.py start
@@ -98,12 +93,12 @@ python agent_start_avatar.py start
 脚本执行 `startAgent` 时的完整流程如下：
 
 1. **生成 Agent RTC UID 和 Token**
-   - Agent RTC UID 固定值：`1009527`（客户端写死使用此 UID）
+   - Agent RTC UID 固定值：`2001`
    - 调用 Token 生成服务，生成 Agent 的 RTC/RTM Token
    - API: `POST https://service.apprtc.cn/toolbox/v2/token/generate`
 
 2. **生成数字人 RTC UID 和 Token**
-   - 数字人 RTC UID 固定值：`1009528`（客户端写死使用此 UID）
+   - 数字人 RTC UID 固定值：`3001`
    - 调用 Token 生成服务，生成数字人的 RTC/RTM Token
    - API: `POST https://service.apprtc.cn/toolbox/v2/token/generate`
 
@@ -112,7 +107,7 @@ python agent_start_avatar.py start
    - 发送 POST 请求到 Agora REST API
    - API: `POST https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects/{app_id}/join/`
    - 请求头包含 Basic Auth 认证信息
-   - **重要**：启用 Avatar 时，`remote_rtc_uids` 不能使用 `["*"]`，必须指定具体的 UID（`AGORA_CURRENT_RTC_UID`）
+   - **重要**：启用 Avatar 时，`remote_rtc_uids` 不能使用 `["*"]`，必须指定具体的 UID（固定为 `1001`）
    - 请求体示例：
      ```json
      {
@@ -120,12 +115,12 @@ python agent_start_avatar.py start
        "pipeline_id": "<pipeline_id>",
        "properties": {
          "channel": "<channel_name>",
-         "agent_rtc_uid": "1009527",
-         "remote_rtc_uids": ["<current_rtc_uid>"],
+         "agent_rtc_uid": "2001",
+         "remote_rtc_uids": ["1001"],
          "token": "<agent_token>",
          "avatar": {
            "params": {
-             "agora_uid": "<avatar_rtc_uid>",
+             "agora_uid": "3001",
              "agora_token": "<avatar_rtc_token>"
            }
          }
@@ -140,9 +135,9 @@ python agent_start_avatar.py start
 启动成功后，脚本会输出：
 - Agent ID
 - Channel 名称
-- Agent RTC UID
-- Avatar RTC UID
-- Current RTC UID（客户端需要使用此 UID 加入频道）
+- Agent RTC UID: `2001`
+- Avatar RTC UID: `3001`
+- Current RTC UID: `1001`（客户端需要使用此 UID 加入频道）
 
 ### 停止 Agent
 
@@ -179,8 +174,9 @@ python agent_start_avatar.py stop --agent-id 1NT29X10YHxxxxxWJOXLYHNYB
 }
 ```
 
-- `agent_rtc_uid` 固定值：`1009527`（客户端写死使用此 UID）
-- `avatar_rtc_uid` 固定值：`1009528`（客户端写死使用此 UID）
+- `current_rtc_uid` 固定值：`1001`（客户端使用此 UID 加入频道）
+- `agent_rtc_uid` 固定值：`2001`
+- `avatar_rtc_uid` 固定值：`3001`
 - `avatar_rtc_token` 由服务端自动生成，无需手动配置
 
 Agent 将以数字人模式运行，支持数字人相关的功能。
@@ -191,8 +187,8 @@ Agent 将以数字人模式运行，支持数字人相关的功能。
 
 **重要提示**：
 - 移动端应用中使用的频道名称必须与 `.env.local` 中的 `AGORA_CHANNEL_NAME` 一致
-- 移动端应用必须使用 `.env.local` 中配置的 `AGORA_CURRENT_RTC_UID` 作为客户端的 RTC UID 加入频道
-- 启用 Avatar 时，Agent 只能订阅指定的 `current_rtc_uid`，不能使用 `["*"]` 订阅所有用户
+- 移动端应用必须使用固定值 `1001` 作为客户端的 RTC UID 加入频道
+- 启用 Avatar 时，Agent 只能订阅指定的 `current_rtc_uid`（固定为 `1001`），不能使用 `["*"]` 订阅所有用户
 
 ## 许可证
 
