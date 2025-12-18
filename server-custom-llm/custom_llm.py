@@ -1,5 +1,4 @@
 import base64
-import os
 import json
 from openai import AsyncOpenAI
 import traceback
@@ -9,15 +8,11 @@ import aiofiles
 import uuid
 from typing import List, Union, Dict, Optional
 from pydantic import BaseModel, HttpUrl
-from dotenv import load_dotenv
 
 from fastapi.responses import StreamingResponse
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 import asyncio
 import random
-
-# Load environment variables from .env file
-load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,39 +23,62 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Get LLM configuration from .env file or environment variables
-# Supports any OpenAI-compatible API (OpenAI, Azure OpenAI, Anthropic Claude, etc.)
-LLM_API_KEY = os.getenv("LLM_API_KEY")
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", None)  # Optional: for custom API endpoints
+# LLM API base URL configuration
+# Modify this URL to point to your LLM provider's endpoint
+# Default: OpenAI API endpoint
+LLM_BASE_URL = "https://api.chatanywhere.tech"  # Change this to your LLM provider's endpoint if needed
 
-if not LLM_API_KEY:
-    raise ValueError(
-        "LLM_API_KEY is not set. "
-        "Please set it in .env file or as an environment variable before running the server."
+
+def extract_api_key_from_header(authorization: Optional[str] = None) -> str:
+    """
+    Extracts API key from Authorization header.
+    
+    Args:
+        authorization: Authorization header value (e.g., "Bearer sk-...")
+    
+    Returns:
+        str: API key
+    
+    Raises:
+        HTTPException: If no API key is found
+    """
+    if not authorization:
+        raise HTTPException(
+            status_code=401,
+            detail="API key is required. Provide it via Authorization header (Bearer <key>)."
+        )
+    
+    # Handle "Bearer <token>" format
+    if authorization.startswith("Bearer "):
+        api_key = authorization[7:].strip()
+        if api_key:
+            return api_key
+    
+    # Handle direct token (without Bearer prefix)
+    if authorization.strip():
+        return authorization.strip()
+    
+    # Invalid format
+    raise HTTPException(
+        status_code=401,
+        detail="Invalid Authorization header format. Use 'Bearer <your-api-key>' format."
     )
 
 
-def get_openai_client() -> AsyncOpenAI:
+def get_openai_client(api_key: str) -> AsyncOpenAI:
     """
     Creates and returns an AsyncOpenAI client instance compatible with various LLM providers.
     
-    Supports:
-    - OpenAI (default): https://api.openai.com/v1
-    - Azure OpenAI: Set LLM_BASE_URL to your Azure endpoint
-    - Anthropic Claude: Set LLM_BASE_URL to compatible endpoint
-    - Other OpenAI-compatible APIs: Set LLM_BASE_URL accordingly
+    Args:
+        api_key: API key for the LLM provider (from Authorization header)
     
     Returns:
         AsyncOpenAI: Configured OpenAI-compatible client instance
+    
+    Note:
+        Modify LLM_BASE_URL constant above to change the API endpoint.
     """
-    client_kwargs = {"api_key": LLM_API_KEY}
-    
-    # Use custom base URL if provided (for Azure OpenAI, Anthropic, or other compatible APIs)
-    if LLM_BASE_URL:
-        client_kwargs["base_url"] = LLM_BASE_URL
-        logger.info(f"Using custom LLM endpoint: {LLM_BASE_URL}")
-    
-    return AsyncOpenAI(**client_kwargs)
+    return AsyncOpenAI(api_key=api_key, base_url=LLM_BASE_URL)
 
 
 class TextContent(BaseModel):
@@ -138,9 +156,15 @@ class ChatCompletionRequest(BaseModel):
 
 
 @app.post("/chat/completions")
-async def create_chat_completion(request: ChatCompletionRequest):
+async def create_chat_completion(
+    request: ChatCompletionRequest,
+    authorization: Optional[str] = Header(None, alias="Authorization")
+):
     try:
         logger.info(f"Received request: {request.model_dump_json()}")
+        
+        # Extract API key from Authorization header or environment variable
+        api_key = extract_api_key_from_header(authorization)
         
         if not request.stream:
             raise HTTPException(
@@ -149,7 +173,7 @@ async def create_chat_completion(request: ChatCompletionRequest):
 
         async def generate():
             try:
-                client = get_openai_client()
+                client = get_openai_client(api_key)
                 response = await client.chat.completions.create(
                     model=request.model,
                     messages=request.messages,  # Directly use request messages
@@ -235,9 +259,16 @@ waiting_messages = [
 
 
 @app.post("/rag/chat/completions")
-async def create_rag_chat_completion(request: ChatCompletionRequest):
+async def create_rag_chat_completion(
+    request: ChatCompletionRequest,
+    authorization: Optional[str] = Header(None, alias="Authorization")
+):
     try:
         logger.info(f"Received RAG request: {request.model_dump_json()}")
+        
+        # Extract API key from Authorization header or environment variable
+        api_key = extract_api_key_from_header(authorization)
+        
         if not request.stream:
             raise HTTPException(
                 status_code=400, detail="chat completions require streaming"
@@ -268,7 +299,7 @@ async def create_rag_chat_completion(request: ChatCompletionRequest):
                 refacted_messages = refact_messages(retrieved_context, request.messages)
 
                 # Request LLM completion
-                client = get_openai_client()
+                client = get_openai_client(api_key)
                 response = await client.chat.completions.create(
                     model=request.model,
                     messages=refacted_messages,
@@ -350,9 +381,16 @@ async def read_pcm_file(
 
 
 @app.post("/audio/chat/completions")
-async def create_audio_chat_completion(request: ChatCompletionRequest):
+async def create_audio_chat_completion(
+    request: ChatCompletionRequest,
+    authorization: Optional[str] = Header(None, alias="Authorization")
+):
     try:
         logger.info(f"Received audio request: {request.model_dump_json()}")
+        
+        # Extract API key from Authorization header or environment variable
+        # Note: Audio endpoint doesn't use LLM API, but we validate for consistency
+        api_key = extract_api_key_from_header(authorization)
 
         if not request.stream:
             raise HTTPException(

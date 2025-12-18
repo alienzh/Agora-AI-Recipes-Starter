@@ -17,29 +17,19 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 配置环境变量
+### 配置 LLM API 端点（可选）
 
-复制示例环境文件并设置您的 API Key：
+如果需要使用非 OpenAI 的 LLM 服务，可以修改 `custom_llm.py` 文件中的 `LLM_BASE_URL` 常量：
 
-```bash
-cp .env.example .env
-```
-
-编辑 `.env` 文件，配置您的 LLM API：
-
-```bash
-# 必需的：LLM 提供商的 API Key
-LLM_API_KEY=your-api-key-here
-
-# 可选的：自定义 API 端点（默认为 OpenAI: https://api.openai.com/v1）
-# 如果使用其他兼容 OpenAI API 的服务，请设置此变量
-LLM_BASE_URL=https://api.openai.com/v1
+```python
+# 在 custom_llm.py 文件中（第 30 行左右）
+LLM_BASE_URL = "https://api.openai.com/v1"  # 修改为您的 LLM 提供商端点
 ```
 
 **重要提示**：
 - 服务器需要兼容 OpenAI Chat Completions API 格式的 LLM 服务
-- 如果使用 OpenAI，只需设置 `LLM_API_KEY`，`LLM_BASE_URL` 使用默认值
-- 如果使用其他兼容 OpenAI API 的服务（如 Azure OpenAI、OpenRouter 等），需要同时设置 `LLM_BASE_URL` 指向相应的端点
+- API Key 必须通过请求的 `Authorization` header 提供（格式：`Bearer <your-api-key>`）
+- 默认使用 OpenAI API 端点，如需使用其他服务，请修改代码中的 `LLM_BASE_URL` 常量
 
 ### 安装依赖
 
@@ -68,7 +58,10 @@ curl -X POST http://localhost:8000/chat/completions \
   -d '{"messages": [{"role": "user", "content": "Hello, how are you?"}], "stream": true, "model": "gpt-4o-mini"}'
 ```
 
-**注意**：将 `your-api-key-here` 替换为您的实际 `LLM_API_KEY` 值。
+**注意**：
+- 将 `your-api-key-here` 替换为您的实际 LLM API Key
+- API Key 必须通过 `Authorization` header 传递（格式：`Bearer <your-api-key>`）
+- 如需使用其他 LLM 服务，请修改 `custom_llm.py` 中的 `LLM_BASE_URL` 常量
 
 ## 🔄 架构和流程图
 
