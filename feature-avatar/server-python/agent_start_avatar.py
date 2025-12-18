@@ -458,8 +458,7 @@ def load_config():
         "PIPELINE_ID": os.getenv("AGORA_PIPELINE_ID", ""),
         "APP_ID": os.getenv("AGORA_APP_ID", ""),
         "APP_CERT": os.getenv("AGORA_APP_CERT", ""),
-        "CHANNEL_NAME": os.getenv("AGORA_CHANNEL_NAME", ""),
-        "CURRENT_RTC_UID": os.getenv("AGORA_CURRENT_RTC_UID", "")
+        "CHANNEL_NAME": os.getenv("AGORA_CHANNEL_NAME", "")
     }
 
 
@@ -480,8 +479,6 @@ def validate_config(config: Dict[str, str]):
         missing.append("AGORA_APP_ID")
     if not config.get("CHANNEL_NAME"):
         missing.append("AGORA_CHANNEL_NAME")
-    if not config.get("CURRENT_RTC_UID"):
-        missing.append("AGORA_CURRENT_RTC_UID")
     
     if missing:
         error_msg = f"配置缺失：{', '.join(missing)} 必须在 .env.local 文件或环境变量中设置"
@@ -497,9 +494,13 @@ def cmd_start_agent(config: Dict[str, str]):
         config: 配置字典
     """
     try:
-        # 固定的 RTC UID（客户端写死使用这两个 UID）
-        agent_rtc_uid = "1009527"
-        avatar_rtc_uid = "1009528"
+        # Fixed RTC UIDs (hardcoded values used by client)
+        # current_rtc_uid: Client uses this UID to join the channel
+        # agent_rtc_uid: Agent RTC UID
+        # avatar_rtc_uid: Avatar RTC UID
+        current_rtc_uid = "1001"
+        agent_rtc_uid = "2001"
+        avatar_rtc_uid = "3001"
         
         # 验证基本配置
         validate_config(config)
@@ -510,7 +511,6 @@ def cmd_start_agent(config: Dict[str, str]):
         basic_key = config["BASIC_KEY"].strip()
         basic_secret = config["BASIC_SECRET"].strip()
         pipeline_id = config["PIPELINE_ID"].strip()
-        current_rtc_uid = config["CURRENT_RTC_UID"].strip()
         
         # 默认 token 类型：RTC 和 RTM
         token_types = [1, 2]  # 1=RTC, 2=RTM

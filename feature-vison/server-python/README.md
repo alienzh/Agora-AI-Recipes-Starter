@@ -36,10 +36,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-依赖包：
-- `requests>=2.31.0` - HTTP 请求库
-- `python-dotenv>=1.0.0` - 用于加载 `.env.local` 文件
-
 ## 配置
 
 1. 复制示例配置文件：
