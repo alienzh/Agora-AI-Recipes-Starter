@@ -51,7 +51,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.agora.agent.example.custommessage.kotlin"
+        applicationId = "io.agora.agent.example.custommessage"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

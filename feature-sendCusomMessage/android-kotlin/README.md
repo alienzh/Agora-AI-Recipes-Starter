@@ -55,35 +55,6 @@ fun sendTextMessage(message: String?) {
 }
 ```
 
-### UI 交互逻辑
-
-```kotlin
-// Send message from input field
-private fun sendMessage() {
-    mBinding?.etMessage?.let { editText ->
-        val message = editText.text?.toString()
-        if (!message.isNullOrBlank()) {
-            viewModel.sendTextMessage(message)
-            editText.text?.clear()
-            // Hide keyboard after sending
-            hideKeyboard(editText)
-        }
-    }
-}
-
-// Listen for keyboard enter key and send button
-etMessage.setOnEditorActionListener { _, actionId, event ->
-    if (actionId == EditorInfo.IME_ACTION_SEND ||
-        (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)
-    ) {
-        sendMessage()
-        true
-    } else {
-        false
-    }
-}
-```
-
 ---
 
 ## 2. API 调用说明
@@ -130,7 +101,6 @@ feature-sendCusomMessage/android-kotlin/
 **主要修改说明**：
 - `AgentChatViewModel.kt`：新增 `sendTextMessage()` 方法，调用 Conversational AI API 发送文本消息
 - `AgentChatActivity.kt`：新增输入框 UI 交互逻辑，包括键盘处理、发送按钮监听等
-- `activity_agent_chat.xml`：新增底部输入框容器和文本输入组件
 
 ---
 
