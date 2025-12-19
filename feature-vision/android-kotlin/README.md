@@ -1,103 +1,26 @@
-# Android Kotlin Vision Agent Starter
+# Android Kotlin Vision Demo
 
-本示例展示如何在 Conversational AI 中集成 **视觉理解 Vision** 功能，实现 AI 对本地摄像头画面的实时理解和分析。
+本示例是配合服务端视觉理解功能的**移动端效果演示 Demo**。
 
-> **工程启动指引**：请先参考 [android-kotlin 工程 README](../../android-kotlin/README.md) 完成基础配置和环境搭建。
+## 启动指引
 
-## 权限要求
+### 1. 运行移动端 Demo
 
-Vision 功能需要**摄像头权限**，在 `AndroidManifest.xml` 中配置：
+请先参考 [android-kotlin 工程 README](../../android-kotlin/README.md) 完成基础配置和环境搭建。
 
-```xml
-<uses-permission android:name="android.permission.CAMERA" />
+### 2. 启动服务端 Vision Agent
 
-<uses-feature android:name="android.hardware.camera" android:required="false" />
-<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-```
+在运行移动端 Demo 之前，必须先启动服务端 Vision Agent 脚本
+
+详细的服务端配置和使用方法，请参考 [服务端 README](../server-python/README.md)。
 
 ## Demo 效果
 
-- 默认状态：右上角小窗口显示本地摄像头画面
+- 默认状态：右上角小窗口显示本地摄像头画面（后置摄像头）
 - 点击放大窗口，再次点击收起成小窗
 - 点击视频开关按钮（挂断按钮右侧）可开关摄像头和视频流
 - AI 可以实时理解摄像头拍摄的内容并进行对话
 
----
+## 注意事项
 
-## 1. 代码新增的调用
-
-相比基础版本，Vision 示例新增了以下主要代码：
-
-### 新增属性
-
-```kotlin
-// 本地视频视图
-private var localVideoView: View? = null
-private var isLocalViewExpanded: Boolean = false
-private var isCameraOn: Boolean = true
-```
-
-### 新增方法
-
-```kotlin
-// 设置本地视频预览
-fun setupLocalVideo(view: View)
-
-// 切换摄像头开关
-fun toggleVideo()
-
-// 切换本地视频视图大小（展开/收起）
-private fun toggleLocalViewSize()
-
-// 构建 Vision LLM 配置（在 AgentStarter 中）
-private fun buildVisionLLMConfig(): Map<String, Any>
-```
-
-### 连接流程变更
-
-```kotlin
-// joinRtcChannel 中启用摄像头发布
-val channelOptions = ChannelMediaOptions().apply {
-    publishCameraTrack = true   // 开启摄像头视频流
-    autoSubscribeVideo = false  // 无需订阅远端视频
-}
-```
-
-### UI 新增组件
-
-在 `activity_agent_chat.xml` 中新增了视频开关按钮：
-
-```xml
-<!-- 本地视频预览窗口 -->
-<com.google.android.material.card.MaterialCardView
-    android:id="@+id/localVideoContainer"
-    ...>
-    <SurfaceView android:id="@+id/localVideoView" />
-</com.google.android.material.card.MaterialCardView>
-
-<!-- 视频开关按钮，放置在挂断按钮右侧 -->
-<androidx.appcompat.widget.AppCompatImageButton
-    android:id="@+id/btnVideo"
-    app:srcCompat="@drawable/ic_video_on" />
-```
-
----
-
-## 2. LLM 配置要求
-
-Vision 功能需要配置支持多模态的 LLM，在 `startAgent` 时传入 `llm` 参数：
-
-```kotlin
-"llm" to mapOf(
-    "url" to "https://...",           // LLM API 地址（必须支持多模态/视觉）
-    "api_key" to "sk-xxx",            // API 密钥
-    "input_modalities" to listOf("text", "image"),  // 必须包含 "image"
-    "params" to mapOf(
-        "model" to "qwen3-vl-flash"   // 支持视觉的模型名称
-    )
-)
-```
-
-**支持的模型示例**：
-- 阿里云：`qwen3-vl-flash`、`qwen-vl-max`
-- OpenAI：`gpt-4o`、`gpt-4o-mini`
+- 本 Demo 仅用于展示效果，服务端 Vision Agent 需要单独启动
