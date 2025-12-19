@@ -485,7 +485,7 @@ def cmd_start_agent(config: Dict[str, str], dotenv_available: bool = True):
     """
     try:
         # 固定的 RTC UID
-        agent_rtc_uid = "1009527"
+        agent_rtc_uid = "2001"
         
         # 验证基本配置
         validate_config(config, dotenv_available)
