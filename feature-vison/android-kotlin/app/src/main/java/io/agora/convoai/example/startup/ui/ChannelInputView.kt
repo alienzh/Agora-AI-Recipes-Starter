@@ -11,9 +11,7 @@ import io.agora.convoai.example.startup.databinding.ViewChannelInputBinding
  * Data class for channel input
  */
 data class ChannelInputData(
-    val channelName: String,
-    val userId: Int?,
-    val agentUid: Int?
+    val channelName: String
 )
 
 /**
@@ -61,22 +59,11 @@ class ChannelInputView @JvmOverloads constructor(
     }
 
     /**
-     * Set default values for input fields
-     * Should be called from Activity/Fragment with values from ViewModel
-     * 
-     * Note: Only userId is read-only to ensure consistency with RTM client 
-     * initialization and token generation. agentUid is editable.
+     * Set default channel name
+     * Should be called from Activity/Fragment with value from ViewModel
      */
-    fun setDefaultValues(
-        channelName: String,
-        userId: Int,
-        agentUid: Int
-    ) {
+    fun setDefaultValues(channelName: String) {
         binding.etChannelName.setText(channelName)
-        // Set userId (read-only)
-        binding.etUserId.setText(userId.toString())
-        // Set default value for editable field
-        binding.etAgentUid.setText(agentUid.toString())
         updateButtonState()
     }
 
@@ -86,22 +73,6 @@ class ChannelInputView @JvmOverloads constructor(
     fun loadSavedChannelName(channelName: String?) {
         channelName?.takeIf { it.isNotEmpty() }?.let {
             binding.etChannelName.setText(it)
-        }
-    }
-    
-    /**
-     * Load saved UIDs and fill input fields
-     */
-    fun loadSavedUIDs(userId: Int?, agentUid: Int?) {
-        userId?.let {
-            if (it > 0) {
-                binding.etUserId.setText(it.toString())
-            }
-        }
-        agentUid?.let {
-            if (it > 0) {
-                binding.etAgentUid.setText(it.toString())
-            }
         }
     }
 
@@ -115,21 +86,11 @@ class ChannelInputView @JvmOverloads constructor(
 
     /**
      * Handle join channel button click
-     * Note: userId is read-only, agentUid is editable
      */
     private fun handleJoinChannel() {
         val channelName = binding.etChannelName.text?.toString()?.trim() ?: ""
-        val userIdText = binding.etUserId.text?.toString()?.trim()  // Read-only
-        val agentUidText = binding.etAgentUid.text?.toString()?.trim()  // Editable
 
-        val userId = userIdText?.toIntOrNull()
-        val agentUid = agentUidText?.toIntOrNull()
-
-        val inputData = ChannelInputData(
-            channelName = channelName,
-            userId = userId,
-            agentUid = agentUid
-        )
+        val inputData = ChannelInputData(channelName = channelName)
 
         onJoinChannelListener?.onJoinChannel(inputData)
     }

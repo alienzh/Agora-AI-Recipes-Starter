@@ -89,9 +89,10 @@ class AgentViewController: UIViewController {
     
     // MARK: - UI Setup
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white
         
         // Debug Info TextView (always visible)
+        // Debug Info TextView
         debugInfoTextView.isEditable = false
         debugInfoTextView.isSelectable = true
         debugInfoTextView.font = .systemFont(ofSize: 11)
@@ -104,55 +105,43 @@ class AgentViewController: UIViewController {
         debugInfoTextView.text = "等待连接...\n"
         view.addSubview(debugInfoTextView)
         
-        // Channel Input View
-        view.addSubview(channelInputView)
-        
-        // Set default values from ViewController constants (single source of truth)
-        channelInputView.setDefaultValues(
-            channelName: AgentViewController.DEFAULT_CHANNEL_NAME,
-            userId: AgentViewController.DEFAULT_USER_UID,
-            agentUid: AgentViewController.DEFAULT_AGENT_UID
-        )
-        
-        channelInputView.onJoinChannelTapped = { [weak self] inputData in
-            self?.handleJoinChannel(inputData: inputData)
-        }
-        
         // Chat Background View
-        chatBackgroundView.isHidden = true
-        view.addSubview(chatBackgroundView)
         chatBackgroundView.tableView.delegate = self
         chatBackgroundView.tableView.dataSource = self
+        chatBackgroundView.tableView.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
         chatBackgroundView.micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
         chatBackgroundView.endCallButton.addTarget(self, action: #selector(endCall), for: .touchUpInside)
         chatBackgroundView.videoToggleButton.addTarget(self, action: #selector(toggleVideo), for: .touchUpInside)
+        view.addSubview(chatBackgroundView)
+        
+        // Channel Input View (added after chatBackgroundView to be on top)
+        channelInputView.setDefaultValues(
+            channelName: AgentViewController.DEFAULT_CHANNEL_NAME
+        )
+        channelInputView.onJoinChannelTapped = { [weak self] inputData in
+            self?.handleJoinChannel(inputData: inputData)
+        }
+        view.addSubview(channelInputView)
         
         // Local Video View (added to chatBackgroundView, expandable/collapsible)
         localView.backgroundColor = .black
-        localView.layer.cornerRadius = localViewSmallCornerRadius  // Default collapsed
+        localView.layer.cornerRadius = localViewSmallCornerRadius
         localView.clipsToBounds = true
         localView.isUserInteractionEnabled = true
-        chatBackgroundView.addSubview(localView)
-        
-        // Add tap gesture to toggle size
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleLocalViewSize))
         localView.addGestureRecognizer(tapGesture)
+        chatBackgroundView.addSubview(localView)
     }
     
     private func setupConstraints() {
-        // Debug Info TextView (always visible at top)
-        // No navigation bar, so we can use less top spacing
         debugInfoTextView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(8)
             make.left.right.equalToSuperview().inset(20)
             make.height.equalTo(120)
         }
-        
-        // Channel Input View (below debug view, layout from top to bottom)
-        // Only constrain top, let it size based on content, this leaves space for keyboard
         channelInputView.snp.makeConstraints { make in
-            make.top.equalTo(debugInfoTextView.snp.bottom).offset(8)
-            make.left.right.equalToSuperview()
+            make.top.equalTo(debugInfoTextView.snp.bottom)
+            make.left.right.bottom.equalToSuperview()
         }
         
         // Chat Background View (below debug view)
@@ -259,7 +248,7 @@ class AgentViewController: UIViewController {
                 await MainActor.run {
                     isLoading = false
                     hideLoadingToast()
-                    switchToChatView()
+                    channelInputView.isHidden = true
                 }
             } catch {
                 await MainActor.run {
@@ -360,16 +349,6 @@ class AgentViewController: UIViewController {
     }
     
     // MARK: - View Management
-    private func switchToChatView() {
-        channelInputView.isHidden = true
-        chatBackgroundView.isHidden = false
-    }
-    
-    private func switchToConfigView() {
-        chatBackgroundView.isHidden = true
-        channelInputView.isHidden = false
-    }
-    
     private func resetConnectionState() {
         rtcEngine?.stopPreview()
         rtcEngine?.leaveChannel()
@@ -383,7 +362,7 @@ class AgentViewController: UIViewController {
             toggleLocalViewSize()
         }
         
-        switchToConfigView()
+        channelInputView.isHidden = false
         
         transcripts.removeAll()
         chatBackgroundView.tableView.reloadData()
@@ -419,7 +398,7 @@ class AgentViewController: UIViewController {
     
     @objc private func toggleLocalViewSize() {
         // Only allow expand when connected and camera is on
-        if (!isCameraOn || chatBackgroundView.isHidden) && !isLocalViewExpanded {
+        if (!isCameraOn || channelInputView.isHidden == false) && !isLocalViewExpanded {
             return
         }
         
@@ -452,21 +431,9 @@ class AgentViewController: UIViewController {
             return
         }
         
-        // Validate UIDs
-        guard let userId = inputData.userId, userId > 0 else {
-            addDebugMessage("ERROR: 用户UID不能为空")
-            return
-        }
-        
-        guard let agentUid = inputData.agentUid, agentUid > 0 else {
-            addDebugMessage("ERROR: Agent UID不能为空")
-            return
-        }
-        
-        // Set channel name and UIDs
+        // Set channel name
         self.channel = inputData.channelName
-        // Note: uid is read-only (DEFAULT_USER_UID), always consistent with RTM client initialization
-        self.agentUid = agentUid
+        // Note: uid and agentUid use default constants
         
         startConnection()
     }

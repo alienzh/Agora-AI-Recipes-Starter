@@ -29,11 +29,8 @@ class ChatBackgroundView: UIView {
     
     // MARK: - UI Setup
     private func setupUI() {
-        backgroundColor = .systemBackground
-        
         // TableView for transcripts
         tableView.separatorStyle = .none
-        tableView.backgroundColor = .clear
         tableView.register(TranscriptCell.self, forCellReuseIdentifier: "TranscriptCell")
         addSubview(tableView)
         

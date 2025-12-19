@@ -94,9 +94,9 @@ class AgentViewController: UIViewController {
     
     // MARK: - UI Setup
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white
         
-        // Debug Info TextView (always visible)
+        // Debug Info TextView
         debugInfoTextView.isEditable = false
         debugInfoTextView.isSelectable = true
         debugInfoTextView.font = .systemFont(ofSize: 11)
@@ -109,55 +109,45 @@ class AgentViewController: UIViewController {
         debugInfoTextView.text = "等待连接...\n"
         view.addSubview(debugInfoTextView)
         
-        // Channel Input View
-        view.addSubview(channelInputView)
+        // Chat Background View
+        chatBackgroundView.tableView.delegate = self
+        chatBackgroundView.tableView.dataSource = self
+        chatBackgroundView.tableView.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
+        chatBackgroundView.micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
+        chatBackgroundView.endCallButton.addTarget(self, action: #selector(endCall), for: .touchUpInside)
+        view.addSubview(chatBackgroundView)
         
-        // Set default values from ViewController constants (single source of truth)
+        // Channel Input View (added after chatBackgroundView to be on top)
         channelInputView.setDefaultValues(
             channelName: AgentViewController.DEFAULT_CHANNEL_NAME,
             userId: AgentViewController.DEFAULT_USER_UID,
             agentUid: AgentViewController.DEFAULT_AGENT_UID,
             avatarUid: AgentViewController.DEFAULT_AVATAR_UID
         )
-        
         channelInputView.onJoinChannelTapped = { [weak self] inputData in
             self?.handleJoinChannel(inputData: inputData)
         }
-        
-        // Chat Background View
-        chatBackgroundView.isHidden = true
-        view.addSubview(chatBackgroundView)
-        chatBackgroundView.tableView.delegate = self
-        chatBackgroundView.tableView.dataSource = self
-        chatBackgroundView.micButton.addTarget(self, action: #selector(toggleMicrophone), for: .touchUpInside)
-        chatBackgroundView.endCallButton.addTarget(self, action: #selector(endCall), for: .touchUpInside)
+        view.addSubview(channelInputView)
         
         // Remote Video View (added to chatBackgroundView, expandable/collapsible)
         remoteView.backgroundColor = .black
-        remoteView.layer.cornerRadius = remoteViewSmallCornerRadius  // Default collapsed
+        remoteView.layer.cornerRadius = remoteViewSmallCornerRadius
         remoteView.clipsToBounds = true
         remoteView.isUserInteractionEnabled = true
-        chatBackgroundView.addSubview(remoteView)
-        
-        // Add tap gesture to toggle size
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleRemoteViewSize))
         remoteView.addGestureRecognizer(tapGesture)
+        chatBackgroundView.addSubview(remoteView)
     }
     
     private func setupConstraints() {
-        // Debug Info TextView (always visible at top)
-        // No navigation bar, so we can use less top spacing
         debugInfoTextView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(8)
             make.left.right.equalToSuperview().inset(20)
             make.height.equalTo(120)
         }
-        
-        // Channel Input View (below debug view, layout from top to bottom)
-        // Only constrain top, let it size based on content, this leaves space for keyboard
         channelInputView.snp.makeConstraints { make in
-            make.top.equalTo(debugInfoTextView.snp.bottom).offset(8)
-            make.left.right.equalToSuperview()
+            make.top.equalTo(debugInfoTextView.snp.bottom)
+            make.left.right.bottom.equalToSuperview()
         }
         
         // Chat Background View (below debug view)
@@ -264,7 +254,7 @@ class AgentViewController: UIViewController {
                 await MainActor.run {
                     isLoading = false
                     hideLoadingToast()
-                    switchToChatView()
+                    channelInputView.isHidden = true
                 }
             } catch {
                 await MainActor.run {
@@ -365,16 +355,7 @@ class AgentViewController: UIViewController {
     }
     
     // MARK: - View Management
-    private func switchToChatView() {
-        channelInputView.isHidden = true
-        chatBackgroundView.isHidden = false
-    }
-    
-    private func switchToConfigView() {
-        chatBackgroundView.isHidden = true
-        channelInputView.isHidden = false
-    }
-    
+
     private func resetConnectionState() {
         rtcEngine?.leaveChannel()
         rtmEngine?.logout()
@@ -382,7 +363,7 @@ class AgentViewController: UIViewController {
             
         })
         
-        switchToConfigView()
+        channelInputView.isHidden = false
         
         transcripts.removeAll()
         chatBackgroundView.tableView.reloadData()

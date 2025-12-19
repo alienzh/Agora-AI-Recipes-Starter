@@ -47,8 +47,7 @@ class ChannelInputView: UIView {
     
     // MARK: - UI Setup
     private func setupUI() {
-        backgroundColor = .systemBackground
-        
+        backgroundColor = .white
         // Channel Name Label
         channelNameLabel.text = "频道名称"
         channelNameLabel.font = .systemFont(ofSize: 11)
@@ -59,7 +58,7 @@ class ChannelInputView: UIView {
         channelNameTextField.placeholder = "输入频道名称"
         channelNameTextField.borderStyle = .roundedRect
         channelNameTextField.keyboardType = .default
-        channelNameTextField.backgroundColor = .white
+        channelNameTextField.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
         channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         addSubview(channelNameTextField)
         
@@ -71,10 +70,10 @@ class ChannelInputView: UIView {
         
         // User UID (Read-only)
         uidTextField.placeholder = "本地用户UID"
-        uidTextField.borderStyle = .roundedRect
+        uidTextField.borderStyle = .none
         uidTextField.keyboardType = .numberPad
-        uidTextField.backgroundColor = UIColor(white: 0.95, alpha: 1.0)  // Gray background for read-only
-        uidTextField.isUserInteractionEnabled = false  // Read-only
+        uidTextField.backgroundColor = .clear
+        uidTextField.isUserInteractionEnabled = false
         addSubview(uidTextField)
         
         // Agent UID Label
@@ -87,7 +86,7 @@ class ChannelInputView: UIView {
         agentUidTextField.placeholder = "Agent UID"
         agentUidTextField.borderStyle = .roundedRect
         agentUidTextField.keyboardType = .numberPad
-        agentUidTextField.backgroundColor = .white
+        agentUidTextField.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
         addSubview(agentUidTextField)
         
         // Avatar UID Label
@@ -100,7 +99,7 @@ class ChannelInputView: UIView {
         avatarUidTextField.placeholder = "Avatar UID"
         avatarUidTextField.borderStyle = .roundedRect
         avatarUidTextField.keyboardType = .numberPad
-        avatarUidTextField.backgroundColor = .white
+        avatarUidTextField.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
         addSubview(avatarUidTextField)
         
         startButton.setTitle("加入频道", for: .normal)
@@ -173,7 +172,6 @@ class ChannelInputView: UIView {
             make.top.equalTo(avatarUidTextField.snp.bottom).offset(16)
             make.width.equalTo(240)
             make.height.equalTo(40)
-            make.bottom.equalToSuperview().offset(-20)  // Define view height, leave space for keyboard
         }
     }
     

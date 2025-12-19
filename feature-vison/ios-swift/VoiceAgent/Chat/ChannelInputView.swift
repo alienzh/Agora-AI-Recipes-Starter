@@ -11,8 +11,6 @@ import SnapKit
 /// Channel input data model
 struct ChannelInputData {
     let channelName: String
-    let userId: Int?
-    let agentUid: Int?
 }
 
 /// Callback closure type
@@ -22,10 +20,6 @@ class ChannelInputView: UIView {
     // MARK: - UI Components
     private let channelNameLabel = UILabel()
     private let channelNameTextField = UITextField()
-    private let uidLabel = UILabel()
-    private let uidTextField = UITextField()
-    private let agentUidLabel = UILabel()
-    private let agentUidTextField = UITextField()
     private let startButton = UIButton(type: .system)
     
     // MARK: - Callback
@@ -44,8 +38,7 @@ class ChannelInputView: UIView {
     
     // MARK: - UI Setup
     private func setupUI() {
-        backgroundColor = .systemBackground
-        
+        backgroundColor = .white
         // Channel Name Label
         channelNameLabel.text = "频道名称"
         channelNameLabel.font = .systemFont(ofSize: 11)
@@ -60,33 +53,6 @@ class ChannelInputView: UIView {
         channelNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         addSubview(channelNameTextField)
         
-        // User UID Label (Read-only)
-        uidLabel.text = "本地用户 UID"
-        uidLabel.font = .systemFont(ofSize: 11)
-        uidLabel.textColor = .systemGray
-        addSubview(uidLabel)
-        
-        // User UID (Read-only)
-        uidTextField.placeholder = "本地用户UID"
-        uidTextField.borderStyle = .roundedRect
-        uidTextField.keyboardType = .numberPad
-        uidTextField.backgroundColor = UIColor(white: 0.95, alpha: 1.0)  // Gray background for read-only
-        uidTextField.isUserInteractionEnabled = false  // Read-only
-        addSubview(uidTextField)
-        
-        // Agent UID Label
-        agentUidLabel.text = "Agent UID"
-        agentUidLabel.font = .systemFont(ofSize: 11)
-        agentUidLabel.textColor = .systemGray
-        addSubview(agentUidLabel)
-        
-        // Agent UID
-        agentUidTextField.placeholder = "Agent UID"
-        agentUidTextField.borderStyle = .roundedRect
-        agentUidTextField.keyboardType = .numberPad
-        agentUidTextField.backgroundColor = .white
-        addSubview(agentUidTextField)
-        
         startButton.setTitle("加入频道", for: .normal)
         startButton.setTitleColor(.white, for: .normal)
         startButton.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
@@ -95,8 +61,6 @@ class ChannelInputView: UIView {
         startButton.isEnabled = false
         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
         addSubview(startButton)
-        
-        // Note: Default values will be set via setDefaultValues() method
     }
     
     private func setupConstraints() {
@@ -113,38 +77,11 @@ class ChannelInputView: UIView {
             make.height.equalTo(32)
         }
         
-        uidLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(channelNameTextField.snp.bottom).offset(10)
-            make.width.equalTo(240)
-        }
-        
-        uidTextField.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(uidLabel.snp.bottom).offset(3)
-            make.width.equalTo(240)
-            make.height.equalTo(32)
-        }
-        
-        agentUidLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(uidTextField.snp.bottom).offset(10)
-            make.width.equalTo(240)
-        }
-        
-        agentUidTextField.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(agentUidLabel.snp.bottom).offset(3)
-            make.width.equalTo(240)
-            make.height.equalTo(32)
-        }
-        
         startButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(agentUidTextField.snp.bottom).offset(16)
+            make.top.equalTo(channelNameTextField.snp.bottom).offset(16)
             make.width.equalTo(240)
             make.height.equalTo(40)
-            make.bottom.equalToSuperview().offset(-20)  // Define view height, leave space for keyboard
         }
     }
     
@@ -163,17 +100,8 @@ class ChannelInputView: UIView {
     
     @objc private func startButtonTapped() {
         let channelName = channelNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let userIdText = uidTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)  // Read-only
-        let agentUidText = agentUidTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)  // Editable
         
-        let userId = userIdText?.isEmpty == false ? Int(userIdText!) : nil
-        let agentUid = agentUidText?.isEmpty == false ? Int(agentUidText!) : nil
-        
-        let inputData = ChannelInputData(
-            channelName: channelName,
-            userId: userId,
-            agentUid: agentUid
-        )
+        let inputData = ChannelInputData(channelName: channelName)
         
         onJoinChannelTapped?(inputData)
     }
@@ -184,17 +112,10 @@ class ChannelInputView: UIView {
         startButton.backgroundColor = isEnabled ? .systemBlue : .systemBlue.withAlphaComponent(0.4)
     }
     
-    /// Set default values for input fields
-    /// Should be called from ViewController with values from constants
-    ///
-    /// Note: Only userId is read-only to ensure consistency with RTM client
-    /// initialization and token generation. agentUid is editable.
-    func setDefaultValues(channelName: String, userId: Int, agentUid: Int) {
+    /// Set default channel name
+    /// Should be called from ViewController with value from constants
+    func setDefaultValues(channelName: String) {
         channelNameTextField.text = channelName
-        // Set userId (read-only)
-        uidTextField.text = "\(userId)"
-        // Set default value for editable field
-        agentUidTextField.text = "\(agentUid)"
         updateButtonState(isEnabled: !channelName.isEmpty)
     }
     
@@ -202,16 +123,6 @@ class ChannelInputView: UIView {
     func loadSavedChannelName(_ channelName: String?) {
         if let channelName = channelName, !channelName.isEmpty {
             channelNameTextField.text = channelName
-        }
-    }
-    
-    /// Load saved UIDs and fill input fields
-    func loadSavedUIDs(userId: Int?, agentUid: Int?) {
-        if let userId = userId, userId > 0 {
-            uidTextField.text = "\(userId)"
-        }
-        if let agentUid = agentUid, agentUid > 0 {
-            agentUidTextField.text = "\(agentUid)"
         }
     }
 }

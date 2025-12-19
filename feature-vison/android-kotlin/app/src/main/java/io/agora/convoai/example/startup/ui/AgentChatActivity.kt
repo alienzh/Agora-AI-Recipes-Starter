@@ -54,8 +54,8 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
         viewModel = ViewModelProvider(this)[AgentChatViewModel::class.java]
         mPermissionHelp = PermissionHelp(this)
         
-        // Load saved UIDs and fill input fields
-        loadSavedUIDs()
+        // Load saved channel name and fill input field
+        loadSavedChannelName()
 
         // Observe UI state changes
         observeUiState()
@@ -86,9 +86,7 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
 
             // Set default values for ChannelInputView from ViewModel (single source of truth)
             channelInputView.setDefaultValues(
-                channelName = AgentChatViewModel.DEFAULT_CHANNEL_NAME,
-                userId = AgentChatViewModel.DEFAULT_USER_UID,
-                agentUid = AgentChatViewModel.DEFAULT_AGENT_UID
+                channelName = AgentChatViewModel.DEFAULT_CHANNEL_NAME
             )
 
             // Setup ChannelInputView callback
@@ -98,23 +96,18 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
                     val channelName = data.channelName.ifEmpty { 
                         AgentChatViewModel.generateRandomChannelName() 
                     }
-                    
-                    // Validate UIDs
-                    if (data.userId == null || data.userId <= 0) {
-                        viewModel.addStatusLog("ERROR: 用户UID不能为空")
-                        return
-                    }
-                    if (data.agentUid == null || data.agentUid <= 0) {
-                        viewModel.addStatusLog("ERROR: Agent UID不能为空")
-                        return
-                    }
 
                     // Check camera and microphone permissions before joining channel (for vision feature)
                     checkCameraAndMicPermission { granted ->
                         if (granted) {
                             // Setup local video preview
                             viewModel.setupLocalVideo(localVideoView)
-                            viewModel.joinChannelAndLogin(channelName, data.userId, data.agentUid)
+                            // Use default UIDs from ViewModel
+                            viewModel.joinChannelAndLogin(
+                                channelName, 
+                                AgentChatViewModel.DEFAULT_USER_UID,
+                                AgentChatViewModel.DEFAULT_AGENT_UID
+                            )
                         } else {
                             Toast.makeText(
                                 this@AgentChatActivity,
@@ -388,15 +381,11 @@ class AgentChatActivity : BaseActivity<ActivityAgentChatBinding>() {
     }
 
     /**
-     * Load saved channel name and UIDs and fill input fields
+     * Load saved channel name and fill input field
      */
-    private fun loadSavedUIDs() {
-        val (savedChannelName, uids) = viewModel.loadSavedChannelNameAndUIDs()
-        val (savedUserId, savedAgentUid) = uids
-        mBinding?.channelInputView?.apply {
-            loadSavedChannelName(savedChannelName)
-            loadSavedUIDs(savedUserId, savedAgentUid)
-        }
+    private fun loadSavedChannelName() {
+        val savedChannelName = viewModel.loadSavedChannelName()
+        mBinding?.channelInputView?.loadSavedChannelName(savedChannelName)
     }
     
     /**

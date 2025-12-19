@@ -72,8 +72,6 @@ class AgentChatViewModel : ViewModel() {
         AgentApp.instance().getSharedPreferences("uid_prefs", android.content.Context.MODE_PRIVATE)
     }
     private val kSavedChannelName = "saved_channel_name"
-    private val kSavedUserId = "saved_user_id"
-    private val kSavedAgentUid = "saved_agent_uid"
 
     /**
      * Connection state enum
@@ -540,7 +538,7 @@ class AgentChatViewModel : ViewModel() {
         this.agentUid = agentUid
         
         // Save channel name and UIDs for next time
-        saveChannelNameAndUIDs()
+        saveChannelName()
         
         viewModelScope.launch {
             this@AgentChatViewModel.channelName = channelName
@@ -650,30 +648,19 @@ class AgentChatViewModel : ViewModel() {
     /**
      * Load saved channel name and UIDs from SharedPreferences
      */
-    fun loadSavedChannelNameAndUIDs(): Pair<String?, Pair<Int?, Int?>> {
-        val savedChannelName = prefs.getString(kSavedChannelName, null)?.takeIf { it.isNotEmpty() }
-        val savedUserId = if (prefs.getInt(kSavedUserId, 0) > 0) prefs.getInt(kSavedUserId, 0) else null
-        val savedAgentUid = if (prefs.getInt(kSavedAgentUid, 0) > 0) prefs.getInt(kSavedAgentUid, 0) else null
-        return Pair(savedChannelName, Pair(savedUserId, savedAgentUid))
+    /**
+     * Load saved channel name from SharedPreferences
+     */
+    fun loadSavedChannelName(): String? {
+        return prefs.getString(kSavedChannelName, null)?.takeIf { it.isNotEmpty() }
     }
     
     /**
-     * Load saved UIDs from SharedPreferences (for backward compatibility)
+     * Save channel name to SharedPreferences
      */
-    fun loadSavedUIDs(): Pair<Int?, Int?> {
-        val (_, uids) = loadSavedChannelNameAndUIDs()
-        return uids
-    }
-    
-    /**
-     * Save channel name and UIDs to SharedPreferences
-     */
-    private fun saveChannelNameAndUIDs() {
-        prefs.edit().apply {
-            channelName.takeIf { it.isNotEmpty() }?.let { putString(kSavedChannelName, it) }
-            putInt(kSavedUserId, userId)
-            putInt(kSavedAgentUid, agentUid)
-            apply()
+    private fun saveChannelName() {
+        channelName.takeIf { it.isNotEmpty() }?.let {
+            prefs.edit().putString(kSavedChannelName, it).apply()
         }
     }
     

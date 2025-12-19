@@ -20,7 +20,7 @@
         android:textSize="13sp"
         android:minHeight="32dp"
         android:padding="6dp"
-        android:background="#FFFFFF"
+        android:background="#F2F2F2"
         android:textColorHint="#999999" />
 
     <!-- Local User UID (Read-only) -->
@@ -42,7 +42,7 @@
         android:textSize="13sp"
         android:minHeight="32dp"
         android:padding="6dp"
-        android:background="#F5F5F5"
+        android:background="@null"
         android:textColor="#333333"
         android:textColorHint="#999999"
         android:focusable="false"
@@ -69,7 +69,7 @@
         android:textSize="13sp"
         android:minHeight="32dp"
         android:padding="6dp"
-        android:background="#FFFFFF"
+        android:background="#F2F2F2"
         android:textColorHint="#999999" />
 
     <!-- Avatar UID (Editable) -->
@@ -92,7 +92,7 @@
         android:textSize="13sp"
         android:minHeight="32dp"
         android:padding="6dp"
-        android:background="#FFFFFF"
+        android:background="#F2F2F2"
         android:textColorHint="#999999" />
 
     <Button
