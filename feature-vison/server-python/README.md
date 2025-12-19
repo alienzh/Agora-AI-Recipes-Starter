@@ -66,9 +66,14 @@ AGORA_CHANNEL_NAME=your_channel_name_here
 
 ## Pipeline 配置
 
-在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 创建 Pipeline 时，需要确保 Pipeline 支持视觉功能。
+在 [AI Studio](https://console-conversationai.shengwang.cn/product/ConversationAI/studio) 创建 Pipeline 时，需要确保选择的 LLM 支持视觉能力。
 
-**注意**：Pipeline 需要支持图像输入模态才能正常使用此脚本启动视觉 Agent。
+**重要配置要求**：
+- **LLM 选择**：选择的 LLM 必须支持视觉能力（Vision），例如支持图像理解的多模态大模型
+
+**注意**：
+- 视觉功能通过请求参数 `input_modalities: ["text", "image"]` 启用，无需在 Pipeline 中额外配置
+- 如果选择的 LLM 不支持视觉能力，即使请求中包含了图像输入模态，Agent 也无法正确处理视觉输入
 
 ## 使用方法
 
