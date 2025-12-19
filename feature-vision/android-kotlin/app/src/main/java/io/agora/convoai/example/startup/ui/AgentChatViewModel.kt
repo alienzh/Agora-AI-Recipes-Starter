@@ -309,7 +309,7 @@ class AgentChatViewModel : ViewModel() {
             rtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                 enableVideo()
                 // Set camera to rear-facing for vision feature
-                val cameraConfig = CameraCapturerConfiguration(CameraCapturerConfiguration.CAMERA_REAR)
+                val cameraConfig = CameraCapturerConfiguration(CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_REAR)
                 setCameraCapturerConfiguration(cameraConfig)
                 // load extension provider for AI-QoS
                 loadExtensionProvider("ai_echo_cancellation_extension")
