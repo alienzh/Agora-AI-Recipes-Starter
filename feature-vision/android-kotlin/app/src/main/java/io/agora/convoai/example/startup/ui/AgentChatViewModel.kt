@@ -16,6 +16,7 @@ import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtm.ErrorInfo
 import io.agora.rtm.LinkStateEvent
 import io.agora.rtm.PresenceEvent
@@ -307,6 +308,9 @@ class AgentChatViewModel : ViewModel() {
         try {
             rtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                 enableVideo()
+                // Set camera to rear-facing for vision feature
+                val cameraConfig = CameraCapturerConfiguration(CameraCapturerConfiguration.CAMERA_REAR)
+                setCameraCapturerConfiguration(cameraConfig)
                 // load extension provider for AI-QoS
                 loadExtensionProvider("ai_echo_cancellation_extension")
                 loadExtensionProvider("ai_noise_suppression_extension")

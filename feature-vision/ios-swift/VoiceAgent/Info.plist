@@ -11,6 +11,10 @@
 	<string>App needs camera access for AI vision understanding</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>App needs microphone access for voice conversation</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

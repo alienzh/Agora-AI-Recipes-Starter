@@ -21,7 +21,7 @@
 ## 安装依赖
 
 ```bash
-cd feature-vison/server-python
+cd feature-vision/server-python
 
 # 创建虚拟环境
 python3 -m venv venv
@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 1. 复制示例配置文件：
 ```bash
-cd feature-vison/server-python
+cd feature-vision/server-python
 cp .env.example .env.local
 ```
 

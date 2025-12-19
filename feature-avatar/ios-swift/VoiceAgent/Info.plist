@@ -9,6 +9,10 @@
 	</dict>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>App needs microphone access for voice conversation</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
