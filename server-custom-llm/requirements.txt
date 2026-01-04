@@ -1,4 +1,3 @@
 openai
 uvicorn
 fastapi
-aiofiles
