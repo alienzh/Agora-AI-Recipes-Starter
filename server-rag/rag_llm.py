@@ -150,10 +150,14 @@ async def perform_rag_retrieval(
     # Use KnowledgeBase module if available
     if USE_KB_MODULE:
         kb = get_knowledge_base()
+        logger.info(f"🔍 RAG Retrieval: Searching knowledge base for query: '{query}'")
         retrieved_chunks = kb.search(query, top_k=3)
+        logger.info(f"📚 RAG Retrieval: Found {len(retrieved_chunks)} relevant chunks")
         if retrieved_chunks:
+            logger.debug(f"📄 RAG Retrieval: Retrieved chunks: {retrieved_chunks}")
             return "\n\n".join(retrieved_chunks)
         else:
+            logger.warning(f"⚠️ RAG Retrieval: No relevant information found for query: '{query}'")
             return "No relevant information found in knowledge base."
     
     # Fallback: Simple keyword-based retrieval
@@ -327,9 +331,11 @@ async def create_rag_chat_completion(
 
                 # Perform RAG retrieval
                 retrieved_context = await perform_rag_retrieval(request.messages)
+                logger.info(f"✅ RAG Context Retrieved: {len(retrieved_context)} characters")
 
                 # Adjust messages with retrieved context
                 refacted_messages = refact_messages(retrieved_context, request.messages)
+                logger.debug(f"📝 RAG Messages Refactored: Added context to {len(refacted_messages)} messages")
 
                 # Request LLM completion with enhanced context
                 client = get_openai_client(api_key)

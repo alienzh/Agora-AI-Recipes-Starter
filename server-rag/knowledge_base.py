@@ -87,6 +87,7 @@ class KnowledgeBase:
                 score = sum(1 for word in query_words if word in doc_lower)
                 if score > 0:
                     scored_docs.append((score, doc))
+                    logger.debug(f"🎯 Knowledge Base Match: category='{category}', score={score}, doc_preview='{doc[:50]}...'")
         
         # Sort by score (descending) and return top_k
         scored_docs.sort(key=lambda x: x[0], reverse=True)

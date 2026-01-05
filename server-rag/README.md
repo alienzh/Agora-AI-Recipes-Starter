@@ -77,7 +77,19 @@ INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 curl -X POST http://localhost:8000/rag/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your-api-key-here" \
-  -d '{"messages": [{"role": "user", "content": "What is Agora?"}], "stream": true, "model": "your-model-name"}'
+  -d '{"messages": [{"role": "user", "content": "什么是 Agora？"}], "stream": true, "model": "your-model-name"}'
+```
+
+### 验证知识库是否被触发
+
+启动服务后，日志中会显示 RAG 检索的详细信息：
+
+```
+🔍 RAG Retrieval: Searching knowledge base for query: '什么是 Agora？'
+📚 RAG Retrieval: Found 3 relevant chunks
+🎯 Knowledge Base Match: category='agora', score=2, doc_preview='Agora 提供实时通信解决方案...'
+✅ RAG Context Retrieved: 245 characters
+📝 RAG Messages Refactored: Added context to 2 messages
 ```
 
 ## 🔄 RAG 工作流程
