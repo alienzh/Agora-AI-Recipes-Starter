@@ -31,7 +31,6 @@ LLM_BASE_URL = "https://api.openai.com/v1"  # 修改为您的 LLM 提供商端�
 **重要提示**：
 - 服务器需要兼容 OpenAI Chat Completions API 格式的 LLM 服务
 - API Key 必须通过请求的 `Authorization` header 提供（格式：`Bearer <your-api-key>`）
-- `base_url` 不应包含 `/chat/completions` 路径，AsyncOpenAI 客户端会自动添加
 - 默认使用 OpenAI API 端点，如需使用其他服务，请修改代码中的 `LLM_BASE_URL` 常量
 
 #### 安装依赖
@@ -97,24 +96,27 @@ curl -X POST http://localhost:8000/chat/completions \
    - 右键点击端口，选择 **Port Visibility** → **Public**
    - 复制生成的公共 URL（格式类似：`https://xxxxx-8000.app.github.dev`）
 
-#### 3. 在 AI Studio 中配置自定义 LLM
+#### 3. 在 AI Studio 中创建项目并配置自定义 LLM
 
 1. 登录 [Agora Console](https://console.shengwang.cn/)
-2. 进入 **AI Studio** → **资源**（或直接访问 [资源页面](https://console-conversationai.shengwang.cn/product/ConversationAI/studio/resources)）
-3. 点击 **添加大模型资源** 或 **+ 新建**
-4. 填写配置信息：
-   - **服务地址（URL）**：填入 Codespaces 的公共 URL，**必须包含完整路径**
-     - 示例：`https://xxxxx-8000.app.github.dev/chat/completions`
-   - **API Key**：您的 LLM 服务 API Key（将在请求的 Authorization header 中传递）
+2. 进入 **AI Studio** → **项目**（或直接访问 [项目页面](https://console-conversationai.shengwang.cn/product/ConversationAI/studio/projects)）
+3. 点击 **创建项目**
+4. 填写项目信息，打开“自定义设置” 配置 llm：
+```
+{
+  "llm": {
+    "vendor": "custom",
+    "params": {
+      "model": "your-model-name"
+    },
+    "api_key": "your-api-key-her",
+    "url": "https://xxxxx-8000.app.github.dev/chat/completions"
+  }
+}
+   ```
+5. 保存项目，**记录生成的 Pipeline ID**（后续启动 Agent 时需要用到）
 
-#### 4. 创建项目
-
-1. 进入 **AI Studio** → **项目**（或直接访问 [项目页面](https://console-conversationai.shengwang.cn/product/ConversationAI/studio/projects)）
-2. 点击 **创建项目** 或 **+ 新建**
-3. 填写项目信息并选择刚才创建的自定义 LLM 资源
-4. 保存项目，**记录生成的 Pipeline ID**（后续启动 Agent 时需要用到）
-
-#### 5. 验证 Custom LLM
+#### 4. 验证 Custom LLM
 
 可以使用 `server-python-lite` 脚本验证 Custom LLM 是否正常工作。详细步骤请参考 [server-python-lite/README.md](../server-python-lite/README.md)。
 

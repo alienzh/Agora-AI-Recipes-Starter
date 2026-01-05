@@ -23,7 +23,7 @@ app = FastAPI(
 # LLM API base URL configuration
 # Modify this URL to point to your LLM provider's endpoint
 # Note: base_url should NOT include /chat/completions path, as AsyncOpenAI client will add it automatically
-LLM_BASE_URL = "https://api.deepseek.com"  # Change this to your LLM provider's endpoint if needed
+LLM_BASE_URL = "https://api.openai.com/v1"  # Change this to your LLM provider's endpoint if needed
 
 # Waiting messages for RAG requests
 WAITING_MESSAGES = [

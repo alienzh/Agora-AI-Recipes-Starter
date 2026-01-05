@@ -7,6 +7,7 @@ You can extend this to use vector databases, embedding models, or external knowl
 
 import json
 import os
+import re
 from typing import List, Dict, Optional
 import logging
 
@@ -63,6 +64,53 @@ class KnowledgeBase:
         self.knowledge[category].append(document)
         logger.debug(f"Added document to category '{category}'")
     
+    def _normalize_text(self, text: str) -> str:
+        """
+        Normalize text for better matching: remove punctuation, convert to lowercase.
+        
+        Args:
+            text: Input text
+        
+        Returns:
+            Normalized text
+        """
+        # Remove punctuation and special characters, keep Chinese, English, and numbers
+        text = re.sub(r'[^\w\s\u4e00-\u9fff]', '', text)
+        # Convert to lowercase
+        text = text.lower()
+        return text
+    
+    def _extract_keywords(self, text: str) -> set:
+        """
+        Extract keywords from text for matching.
+        Handles both Chinese and English words, preserving English words as-is.
+        
+        Args:
+            text: Input text
+        
+        Returns:
+            Set of keywords
+        """
+        keywords = set()
+        
+        # First, extract English words (alphanumeric sequences)
+        english_words = re.findall(r'[a-zA-Z]+', text.lower())
+        keywords.update(english_words)
+        
+        # Then, normalize and extract Chinese words and other tokens
+        normalized = self._normalize_text(text)
+        # Split by whitespace and filter out empty strings
+        all_words = set(word for word in normalized.split() if word)
+        keywords.update(all_words)
+        
+        # Also add the original text as a whole for substring matching
+        # This helps with queries like "什么是 Agora？" where "Agora" should match
+        normalized_whole = self._normalize_text(text)
+        if normalized_whole:
+            keywords.add(normalized_whole)
+        
+        return keywords
+    
     def search(self, query: str, top_k: int = 3) -> List[str]:
         """
         Search the knowledge base for relevant documents.
@@ -74,27 +122,55 @@ class KnowledgeBase:
         Returns:
             List of relevant document texts
         """
-        query_lower = query.lower()
-        query_words = set(query_lower.split())
+        query_keywords = self._extract_keywords(query)
+        logger.debug(f"🔍 Extracted keywords from query: {query_keywords}")
+        
+        if not query_keywords:
+            logger.warning("⚠️ No keywords extracted from query")
+            return self.knowledge.get("default", [])[:top_k]
         
         scored_docs = []
         
         # Simple keyword-based scoring
         for category, docs in self.knowledge.items():
+            # Skip default category during search, only use it as fallback
+            if category == "default":
+                continue
+                
             for doc in docs:
-                doc_lower = doc.lower()
-                # Count matching keywords
-                score = sum(1 for word in query_words if word in doc_lower)
+                doc_normalized = self._normalize_text(doc)
+                # Count matching keywords with improved matching
+                score = 0
+                matched_keywords = []
+                for keyword in query_keywords:
+                    # For English words, use word boundary matching for better accuracy
+                    if re.match(r'^[a-zA-Z]+$', keyword):
+                        # English word: use word boundary matching
+                        if re.search(r'\b' + re.escape(keyword) + r'\b', doc_normalized, re.IGNORECASE):
+                            score += 2  # Higher score for exact word match
+                            matched_keywords.append(keyword)
+                        elif keyword in doc_normalized:
+                            score += 1  # Lower score for substring match
+                            matched_keywords.append(keyword)
+                    else:
+                        # Chinese or mixed: use substring matching
+                        if keyword in doc_normalized:
+                            score += 1
+                            matched_keywords.append(keyword)
+                
                 if score > 0:
-                    scored_docs.append((score, doc))
-                    logger.debug(f"🎯 Knowledge Base Match: category='{category}', score={score}, doc_preview='{doc[:50]}...'")
+                    scored_docs.append((score, doc, category))
+                    logger.debug(f"🎯 Knowledge Base Match: category='{category}', score={score}, matched_keywords={matched_keywords}, doc_preview='{doc[:50]}...'")
         
         # Sort by score (descending) and return top_k
         scored_docs.sort(key=lambda x: x[0], reverse=True)
-        results = [doc for _, doc in scored_docs[:top_k]]
+        results = [doc for score, doc, category in scored_docs[:top_k]]
+        
+        logger.info(f"📚 Search results: found {len(results)} documents from {len(set(cat for _, _, cat in scored_docs[:top_k]))} categories")
         
         # If no matches found, return default documents
         if not results:
+            logger.warning(f"⚠️ No matches found for query, using default documents")
             results = self.knowledge.get("default", [])[:top_k]
         
         return results

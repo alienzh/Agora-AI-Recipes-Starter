@@ -23,7 +23,7 @@ app = FastAPI(
 # Modify this URL to point to your LLM provider's endpoint
 # Default: OpenAI API endpoint
 # Note: base_url should NOT include /chat/completions path, as AsyncOpenAI client will add it automatically
-LLM_BASE_URL = "https://api.deepseek.com"  # Change this to your LLM provider's endpoint if needed
+LLM_BASE_URL = "https://api.openai.com/v1"  # Change this to your LLM provider's endpoint if needed
 
 
 def extract_api_key_from_header(authorization: Optional[str] = None) -> str:
