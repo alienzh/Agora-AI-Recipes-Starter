@@ -174,9 +174,6 @@ data: [DONE]
 4. 填写项目信息，打开"自定义设置"配置 llm， 关闭 tts：
 ```json
 {
-  "tts": {
-    "enable": false
-  },
   "llm": {
     "vendor": "custom",
     "params": {
@@ -185,7 +182,6 @@ data: [DONE]
     "api_key": "your-api-key-here",
     "url": "https://xxxxx-8000.app.github.dev/audio/chat/completions",
     "output_modalities": [
-      "text",
       "audio"
     ]
   }
