@@ -23,8 +23,3 @@ Thumbs.db
 # Logs
 *.log
 
-# Test files (optional)
-file.txt
-file.pcm
-test_*.py
-
