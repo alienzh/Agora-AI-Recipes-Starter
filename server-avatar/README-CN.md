@@ -1,5 +1,7 @@
 # Agora Agent Starter Script (Avatar)
 
+中文 | [English](README.md)
+
 用于启动和停止 Agora 对话式 AI Agent（数字人版本）的命令行脚本。所有配置从本地环境变量加载。
 
 ## 适用场景
@@ -20,7 +22,7 @@
 ## 安装依赖
 
 ```bash
-cd feature-avatar/server-python
+cd server-avatar
 
 # 创建虚拟环境
 python3 -m venv venv
@@ -38,8 +40,9 @@ pip install -r requirements.txt
 ## 配置
 
 1. 复制示例配置文件：
+
 ```bash
-cd feature-avatar/server-python
+cd server-avatar
 cp .env.example .env.local
 ```
 
@@ -133,6 +136,7 @@ python agent_start_avatar.py start
    - 保存到 `.agent_id` 文件，供后续停止 Agent 使用
 
 启动成功后，脚本会输出：
+
 - Agent ID
 - Channel 名称
 - Agent RTC UID: `2001`
@@ -146,6 +150,7 @@ python agent_start_avatar.py stop
 ```
 
 可选参数：
+
 - `--agent-id`: Agent ID（可选，如果不提供则使用上一次启动的 Agent ID）
 
 示例：
@@ -186,11 +191,11 @@ Agent 将以数字人模式运行，支持数字人相关的功能。
 启动 Agent 后，可以使用移动端应用查看效果。请参考相关移动端应用的 README 文档。
 
 **重要提示**：
+
 - 移动端应用中使用的频道名称必须与 `.env.local` 中的 `AGORA_CHANNEL_NAME` 一致
 - 移动端应用必须使用固定值 `1001` 作为客户端的 RTC UID 加入频道
 - 启用 Avatar 时，Agent 只能订阅指定的 `current_rtc_uid`（固定为 `1001`），不能使用 `["*"]` 订阅所有用户
 
 ## 许可证
-
 请参考项目根目录的 LICENSE 文件。
 
