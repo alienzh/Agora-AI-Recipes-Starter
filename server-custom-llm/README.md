@@ -1,57 +1,60 @@
-# 🌟 自定义 LLM Python 示例代码
+# 🌟 Custom LLM Python Example Code
 
-> Agora 对话式 AI 引擎支持自定义大语言模型（LLM）功能。您可以参考本项目代码来实现自定义大语言模型功能。
+[中文](README-CN.md) | English
 
-本文档提供了实现自定义大语言模型功能的 Python 示例代码。
+> Agora Conversational AI Engine supports custom Large Language Model (LLM) functionality. You can refer to this project code to implement custom LLM functionality.
 
-## 🚀 快速开始
+This document provides Python example code for implementing custom LLM functionality.
 
-### 方式一：本地部署（开发测试）
+## 🚀 Quick Start
 
-#### 环境准备
+### Method 1: Local Deployment (Development & Testing)
+
+#### Environment Setup
 
 - Python 3.10+
 
-Python 虚拟环境：
+Python virtual environment:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-#### 配置 LLM API 端点（可选）
+#### Configure LLM API Endpoint (Optional)
 
-如果需要使用非 OpenAI 的 LLM 服务，可以修改 `custom_llm.py` 文件中的 `LLM_BASE_URL` 常量：
+If you need to use a non-OpenAI LLM service, you can modify the `LLM_BASE_URL` constant in the `custom_llm.py` file:
 
 ```python
-# 在 custom_llm.py 文件中（第 30 行左右）
-LLM_BASE_URL = "https://api.openai.com/v1"  # 修改为您的 LLM 提供商端点
+# In custom_llm.py file (around line 26)
+LLM_BASE_URL = "https://api.openai.com/v1"  # Change to your LLM provider endpoint
 ```
 
-**重要提示**：
-- 服务器需要兼容 OpenAI Chat Completions API 格式的 LLM 服务
-- API Key 必须通过请求的 `Authorization` header 提供（格式：`Bearer <your-api-key>`）
-- 默认使用 OpenAI API 端点，如需使用其他服务，请修改代码中的 `LLM_BASE_URL` 常量
+**Important Notes**:
 
-#### 安装依赖
+- The server requires an LLM service compatible with OpenAI Chat Completions API format
+- API Key must be provided via the `Authorization` header in requests (format: `Bearer <your-api-key>`)
+- Default uses OpenAI API endpoint, if you need to use other services, please modify the `LLM_BASE_URL` constant in the code
+
+#### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-#### 运行示例代码
+#### Run Example Code
 
 ```bash
 python3 custom_llm.py
 ```
 
-服务器运行后，您将看到以下输出：
+After the server runs, you will see the following output:
 
 ```bash
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
-使用以下命令测试服务器：
+Test the server with the following command:
 
 ```bash
 curl -X POST http://localhost:8000/chat/completions \
@@ -60,69 +63,74 @@ curl -X POST http://localhost:8000/chat/completions \
   -d '{"messages": [{"role": "user", "content": "Hello, how are you?"}], "stream": true, "model": "your-model-name"}'
 ```
 
-**注意**：将 `your-api-key-here` 和 `your-model-name` 替换为您的实际 LLM API Key 和模型名称。
+**Note**: Replace `your-api-key-here` and `your-model-name` with your actual LLM API Key and model name.
 
-### 方式二：GitHub Codespaces 部署（测试 AI Studio 自定义 LLM）
+### Method 2: GitHub Codespaces Deployment (Testing AI Studio Custom LLM)
 
-#### 1. 创建 GitHub Codespaces
+#### 1. Create GitHub Codespaces
 
-1. 在 GitHub 上打开您的代码仓库
-2. 点击 **Code** 按钮，选择 **Codespaces** 标签
-3. 点击 **Create codespace on main** 创建新的 Codespace
-4. 等待 Codespace 启动完成
+1. Open your code repository on GitHub
+2. Click the **Code** button, select the **Codespaces** tab
+3. Click **Create codespace on main** to create a new Codespace
+4. Wait for the Codespace to start
 
-#### 2. 配置端口转发
+#### 2. Configure Port Forwarding
 
-1. 在 Codespaces 终端中，进入项目目录：
+1. In the Codespaces terminal, navigate to the project directory:
+
    ```bash
    cd server-custom-llm
    ```
 
-2. 创建虚拟环境并安装依赖：
+2. Create virtual environment and install dependencies:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
 
-3. 启动服务：
+3. Start the service:
+
    ```bash
    python3 custom_llm.py
    ```
 
-4. **配置端口转发**：
-   - Codespaces 会自动检测到端口 8000
-   - 在 VS Code 的 **Ports** 标签页中，找到端口 8000
-   - 右键点击端口，选择 **Port Visibility** → **Public**
-   - 复制生成的公共 URL（格式类似：`https://xxxxx-8000.app.github.dev`）
+4. **Configure Port Forwarding**:
+   - Codespaces will automatically detect port 8000
+   - In VS Code's **Ports** tab, find port 8000
+   - Right-click the port, select **Port Visibility** → **Public**
+   - Copy the generated public URL (format similar to: `https://xxxxx-8000.app.github.dev`)
 
-#### 3. 在 AI Studio 中创建项目并配置自定义 LLM
+#### 3. Create Project in AI Studio and Configure Custom LLM
 
-1. 登录 [Agora Console](https://console.shengwang.cn/)
-2. 进入 **AI Studio** → **项目**（或直接访问 [项目页面](https://console-conversationai.shengwang.cn/product/ConversationAI/studio/projects)）
-3. 点击 **创建项目**
-4. 填写项目信息，打开“自定义设置” 配置 llm：
-```
-{
-  "llm": {
-    "vendor": "custom",
-    "params": {
-      "model": "your-model-name"
-    },
-    "api_key": "your-api-key-her",
-    "url": "https://xxxxx-8000.app.github.dev/chat/completions"
-  }
-}
+1. Log in to [Agora Console](https://console.shengwang.cn/)
+2. Go to **AI Studio** → **Projects** (or directly visit [Projects page](https://console-conversationai.shengwang.cn/product/ConversationAI/studio/projects))
+3. Click **Create Project**
+4. Fill in project information, enable "Custom Settings" to configure llm:
+
+   ```json
+   {
+     "llm": {
+       "vendor": "custom",
+       "params": {
+         "model": "your-model-name"
+       },
+       "api_key": "your-api-key-here",
+       "url": "https://xxxxx-8000.app.github.dev/chat/completions"
+     }
+   }
    ```
-5. 保存项目，**记录生成的 Pipeline ID**（后续启动 Agent 时需要用到）
 
-#### 4. 验证 Custom LLM
+5. Save the project, **record the generated Pipeline ID** (needed when starting Agent later)
 
-可以使用 `server-python-lite` 脚本验证 Custom LLM 是否正常工作。详细步骤请参考 [server-python-lite/README.md](../server-python-lite/README.md)。
+#### 4. Verify Custom LLM
 
-## 🔄 架构和流程图
+You can use the `server-python-lite` script to verify that Custom LLM is working properly. For detailed steps, please refer to [server-python-lite/README.md](../server-python-lite/README.md).
 
-### 系统架构
+## 🔄 Architecture and Flow Diagram
+
+### System Architecture
 
 ```mermaid
 flowchart LR
@@ -138,27 +146,28 @@ flowchart LR
     LLM-->|Stream Response|Server
 ```
 
-有关请求流程的更多详细信息，请参阅 [请求流程图](#📝-请求流程图) 部分。
+For more detailed information about the request flow, please refer to the [Request Flow Diagram](#-request-flow-diagram) section.
 
-## 📖 功能说明
+## 📖 Feature Description
 
-### 支持 LLM 提供商
+### Supported LLM Providers
 
-此服务器支持任何兼容 OpenAI Chat Completions API 格式的 LLM 服务。只需确保您的 LLM 服务提供与 OpenAI API 兼容的接口，并通过 `LLM_BASE_URL` 配置相应的端点即可。
+This server supports any LLM service compatible with OpenAI Chat Completions API format. Just ensure your LLM service provides an interface compatible with OpenAI API and configure the corresponding endpoint via `LLM_BASE_URL`.
 
-### 自定义大语言模型
+### Custom Large Language Model
 
-> 要成功集成 Agora 对话式 AI 引擎，您的自定义大模型服务必须提供与 OpenAI Chat Completions API 兼容的接口。
+> To successfully integrate with Agora Conversational AI Engine, your custom LLM service must provide an interface compatible with OpenAI Chat Completions API.
 
-`/chat/completions` 端点实现了流式聊天完成功能，支持：
-- 文本和图片内容输入
-- 工具调用（Tools）支持
-- 流式响应（Server-Sent Events）
-- 响应格式控制（JSON Schema）
+The `/chat/completions` endpoint implements streaming chat completion functionality, supporting:
 
-## 📝 请求流程图
+- Text and image content input
+- Tool calling (Tools) support
+- Streaming response (Server-Sent Events)
+- Response format control (JSON Schema)
 
-### LLM 请求流程
+## 📝 Request Flow Diagram
+
+### LLM Request Flow
 
 ```mermaid
 sequenceDiagram
@@ -167,35 +176,35 @@ sequenceDiagram
     participant LLM as LLM Provider
 
     Client->>Server: POST /chat/completions
-    Note over Client,Server: 包含 messages, model, stream 参数
+    Note over Client,Server: Contains messages, model, stream parameters
 
-    Server->>LLM: 创建 chat.completions 流
+    Server->>LLM: Create chat.completions stream
 
-    loop 对于每个数据块
-        LLM->>Server: 流式数据块
+    loop For each chunk
+        LLM->>Server: Streaming chunk
         Server->>Client: SSE data: chunk
     end
 
     Server->>Client: SSE data: [DONE]
 ```
 
-## 🧪 使用 server-python-lite 测试
+## 🧪 Testing with server-python-lite
 
-完成 Custom LLM 服务部署和 AI Studio 配置后，可以使用 `server-python-lite` 脚本测试 Agent 是否正常工作。
+After completing Custom LLM service deployment and AI Studio configuration, you can use the `server-python-lite` script to test if the Agent is working properly.
 
-更多详细信息，请参考 [server-python-lite/README.md](../server-python-lite/README.md)。
+For more detailed information, please refer to [server-python-lite/README.md](../server-python-lite/README.md).
 
-## 📚 资源
+## 📚 Resources
 
-- 📖 查看我们的 [对话式 AI 引擎文档](https://doc.agora.io/doc/convoai/restful/landing-page) 了解更多详情
-- 🧩 访问 [Agora SDK 示例](https://github.com/AgoraIO) 获取更多教程和示例代码
-- 👥 在 [Agora 开发者社区](https://github.com/AgoraIO-Community) 探索由开发者社区管理的高质量仓库
-- 💬 如有任何问题，欢迎在 [Stack Overflow](https://stackoverflow.com/questions/tagged/agora.io) 上提问
+- 📖 Check out our [Conversational AI Engine Documentation](https://doc.agora.io/doc/convoai/restful/landing-page) for more details
+- 🧩 Visit [Agora SDK Examples](https://github.com/AgoraIO) for more tutorials and example code
+- 👥 Explore high-quality repositories managed by the developer community at [Agora Developer Community](https://github.com/AgoraIO-Community)
+- 💬 If you have any questions, feel free to ask on [Stack Overflow](https://stackoverflow.com/questions/tagged/agora.io)
 
-## 💡 反馈
+## 💡 Feedback
 
-- 🤖 如果您对示例项目有任何问题或建议，欢迎提交 issue。
+- 🤖 If you have any questions or suggestions about the example project, please feel free to submit an issue.
 
-## 📜 许可证
+## 📜 License
 
-本项目采用 MIT 许可证。
+This project uses the MIT License.
