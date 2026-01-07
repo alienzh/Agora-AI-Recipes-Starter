@@ -1,104 +1,104 @@
 # Agora Agent Starter Script (Lite)
 
-用于启动和停止 Agora 对话式 AI Agent 的命令行脚本。所有配置从本地环境变量加载。
+Command-line script for starting and stopping Agora Conversational AI Agent. All configuration is loaded from local environment variables.
 
-## 适用场景
+## Use Cases
 
-- 快速测试和体验 Agora 对话式 AI Agent
-- 配合 Web 应用使用，通过脚本启动 Agent，然后在 Web 应用中加入频道体验
-- 需要保护服务器端认证信息的场景
+- Quick testing and experiencing Agora Conversational AI Agent
+- Use with Web applications: start Agent via script, then join channel in Web app to experience
+- Scenarios requiring protection of server-side authentication information
 
-## 前置条件
+## Prerequisites
 
-- Python 3.6 或更高版本
-- 网络连接（用于调用 Agora REST API）
-- Agora 开发者账号 [Console](https://console.shengwang.cn/)
-- 已创建 Agora 项目并获取 App ID
-- 已获取 REST API 的 Basic Auth 凭证（Key 和 Secret）
-- 已获取 Pipeline ID
+- Python 3.6 or higher
+- Network connection (for calling Agora REST API)
+- Agora developer account [Console](https://console.shengwang.cn/)
+- Created Agora project and obtained App ID
+- Obtained REST API Basic Auth credentials (Key and Secret)
+- Obtained Pipeline ID
 
-## 安装依赖
+## Install Dependencies
 
 ```bash
 cd server-python-lite
 
-# 创建虚拟环境
+# Create virtual environment
 python3 -m venv venv
 
-# 激活虚拟环境
-# Linux/macOS: source venv/bin/activate
+# Activate virtual environment
+source venv/bin/activate
 # Windows: venv\Scripts\activate
 
-# 安装依赖
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-## 配置
+## Configuration
 
-1. 复制示例配置文件：
+1. Copy example configuration file:
 ```bash
 cd server-python-lite
 cp .env.example .env.local
 ```
 
-2. 编辑 `.env.local` 文件，填入你的实际配置值：
+2. Edit `.env.local` file and fill in your actual configuration values:
 
 ```bash
 
-# App ID（用于生成 Token 和启动 Agent）
+# App ID (for generating Token and starting Agent)
 AGORA_APP_ID=your_app_id_here
 
-# App Certificate（用于生成 Token，可选）
+# App Certificate (for generating Token, optional)
 AGORA_APP_CERT=your_app_certificate_here
 
-# Basic Auth 凭证（用于调用 Agora REST API）
+# Basic Auth credentials (for calling Agora REST API)
 AGORA_BASIC_KEY=your_basic_key_here
 AGORA_BASIC_SECRET=your_basic_secret_here
 
-# Pipeline ID（用于启动 Agent）
+# Pipeline ID (for starting Agent)
 AGORA_PIPELINE_ID=your_pipeline_id_here
 
-# 频道名称（Agent 将加入的频道）
+# Channel name (channel that Agent will join)
 AGORA_CHANNEL_NAME=your_channel_name_here
 ```
 
-## 使用方法
+## Usage
 
-### 启动 Agent
+### Start Agent
 
 ```bash
 python agora_agent_startup.py start
 ```
 
-启动成功后，脚本会：
-1. 自动生成 Agent Rtc uid Token
-2. 启动 Agent
-3. 自动保存 Agent ID 到 `.agent_id` 文件（用于后续停止 Agent）
+After successful startup, the script will:
+1. Automatically generate Agent RTC UID Token
+2. Start Agent
+3. Automatically save Agent ID to `.agent_id` file (for stopping Agent later)
 
-### 停止 Agent
+### Stop Agent
 
 ```bash
 python agora_agent_startup.py stop
 ```
 
-可选参数：
-- `--agent-id`: Agent ID（可选，如果不提供则使用上一次启动的 Agent ID）
+Optional parameters:
+- `--agent-id`: Agent ID (optional, uses previous Agent ID if not provided)
 
-示例：
+Examples:
 ```bash
-# 使用上一次启动的 Agent ID
+# Use previous Agent ID
 python agora_agent_startup.py stop
 
-# 或指定 Agent ID
+# Or specify Agent ID
 python agora_agent_startup.py stop --agent-id 1NT29X10YHxxxxxWJOXLYHNYB
 ```
 
-## 查看效果
+## View Results
 
-启动 Agent 后，可以使用 Web 应用查看效果。请参考 [web-react-lite/README.md](../web-react-lite/README.md)。
+After starting Agent, you can use the Web application to view results. Please refer to [web-react-lite/README.md](../web-react-lite/README.md).
 
-**注意**：Web 应用中使用的频道名称必须与 `.env.local` 中的 `AGORA_CHANNEL_NAME` 一致。
+**Note**: The channel name used in the Web application must match `AGORA_CHANNEL_NAME` in `.env.local`.
 
-## 许可证
+## License
 
-请参考项目根目录的 LICENSE 文件。
+Please refer to the LICENSE file in the project root directory.
