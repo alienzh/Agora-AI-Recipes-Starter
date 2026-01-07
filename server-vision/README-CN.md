@@ -1,5 +1,7 @@
 # Agora Agent Starter Script (Vision)
 
+中文 | [English](README.md)
+
 用于启动和停止 Agora 对话式 AI Agent（视觉版本）的命令行脚本。所有配置从本地环境变量加载。
 
 ## 适用场景
@@ -21,7 +23,7 @@
 ## 安装依赖
 
 ```bash
-cd feature-vision/server-python
+cd server-vision
 
 # 创建虚拟环境
 python3 -m venv venv
@@ -39,8 +41,9 @@ pip install -r requirements.txt
 ## 配置
 
 1. 复制示例配置文件：
+
 ```bash
-cd feature-vision/server-python
+cd server-vision
 cp .env.example .env.local
 ```
 
@@ -79,7 +82,7 @@ AGORA_CHANNEL_NAME=your_channel_name_here
 
 ### 启动 Agent（视觉模式）
 
-直接运行命令启动 Agent，将使用固定配置（Agent RTC UID: `1009527`）：
+直接运行命令启动 Agent，将使用固定配置（Agent RTC UID: `2001`）：
 
 ```bash
 python agent_start_vision.py start
@@ -90,7 +93,7 @@ python agent_start_vision.py start
 脚本执行 `startAgent` 时的完整流程如下：
 
 1. **生成 Agent RTC UID 和 Token**
-   - Agent RTC UID 固定值：`1009527`
+   - Agent RTC UID 固定值：`2001`
    - 调用 Token 生成服务，生成 Agent 的 RTC/RTM Token
    - API: `POST https://service.apprtc.cn/toolbox/v2/token/generate`
 
@@ -106,7 +109,7 @@ python agent_start_vision.py start
        "pipeline_id": "<pipeline_id>",
        "properties": {
          "channel": "<channel_name>",
-         "agent_rtc_uid": "1009527",
+         "agent_rtc_uid": "2001",
          "remote_rtc_uids": ["*"],
          "token": "<agent_token>",
          "llm": {
@@ -133,6 +136,7 @@ python agent_start_vision.py stop
 ```
 
 可选参数：
+
 - `--agent-id`: Agent ID（可选，如果不提供则使用上一次启动的 Agent ID）
 
 示例：
@@ -158,7 +162,7 @@ python agent_start_vision.py stop --agent-id 1NT29X10YHxxxxxWJOXLYHNYB
 }
 ```
 
-- `agent_rtc_uid` 固定值：`1009527`
+- `agent_rtc_uid` 固定值：`2001`
 - `input_modalities` 设置为 `["text", "image"]`，使 Agent 能够通过视频获取摄像头画面数据
 - Agent Token 由服务端自动生成，无需手动配置
 
