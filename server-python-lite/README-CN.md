@@ -1,5 +1,7 @@
 # Agora Agent Starter Script (Lite)
 
+中文 | [English](README.md)
+
 用于启动和停止 Agora 对话式 AI Agent 的命令行脚本。所有配置从本地环境变量加载。
 
 ## 适用场景

@@ -74,7 +74,7 @@ class KnowledgeBase:
         Returns:
             Normalized text
         """
-        # Remove punctuation and special characters, keep Chinese, English, and numbers
+        # Remove punctuation and special characters, keep Chinese characters, English, and numbers
         text = re.sub(r'[^\w\s\u4e00-\u9fff]', '', text)
         # Convert to lowercase
         text = text.lower()

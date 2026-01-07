@@ -1,5 +1,7 @@
 # Agora Agent Starter Script (Lite)
 
+[中文](README-CN.md) | English
+
 Command-line script for starting and stopping Agora Conversational AI Agent. All configuration is loaded from local environment variables.
 
 ## Use Cases

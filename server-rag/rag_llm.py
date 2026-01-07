@@ -27,9 +27,9 @@ LLM_BASE_URL = "https://api.openai.com/v1"  # Change this to your LLM provider's
 
 # Waiting messages for RAG requests
 WAITING_MESSAGES = [
-    "稍等片刻，我正在思考...",
-    "让我想一下...",
-    "好问题，让我查找一下相关信息...",
+    "Please wait, I'm thinking...",
+    "Let me think about that...",
+    "Good question, let me search for relevant information...",
 ]
 
 # Import knowledge base manager
