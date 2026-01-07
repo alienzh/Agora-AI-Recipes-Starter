@@ -106,7 +106,12 @@ class AgoraStarterServer:
             "channel": channel,
             "agent_rtc_uid": agent_rtc_uid,
             "remote_rtc_uids": remote_rtc_uids,  # ["*"] 表示所有用户
-            "token": token
+            "token": token,
+            "parameters": {
+                "transcript": {
+                    "enable_words": False
+                }
+            }
         }
         
         # 添加 Avatar 配置（如果提供了 avatar_rtc_uid 和 avatar_rtc_token）

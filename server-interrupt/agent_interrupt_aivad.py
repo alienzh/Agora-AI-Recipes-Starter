@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Agora Agent Starter Script (AIVAD)
-命令行脚本，用于启动和停止 Agora 对话式 AI Agent（AIVAD 版本）
-所有配置从本地环境变量加载（.env.local 文件）
+Command-line script for starting and stopping Agora Conversational AI Agent (AIVAD version)
+All configuration is loaded from local environment variables (.env.local file)
 """
 import argparse
 import base64
@@ -12,29 +12,29 @@ import sys
 import time
 from typing import Optional, Dict, Any, List
 
-# 检查必需的依赖包
+# Check required dependencies
 try:
     import requests
 except ImportError:
-    print("[ERROR] 缺少必需的依赖包: requests", file=sys.stderr)
-    print("[ERROR] 请安装依赖包:", file=sys.stderr)
+    print("[ERROR] Missing required dependency: requests", file=sys.stderr)
+    print("[ERROR] Please install dependencies:", file=sys.stderr)
     print("[ERROR]   pip install -r requirements.txt", file=sys.stderr)
-    print("[ERROR]   或: pip install requests python-dotenv", file=sys.stderr)
+    print("[ERROR]   or: pip install requests python-dotenv", file=sys.stderr)
     sys.exit(1)
 
 class AgoraStarterServer:
     """
-    Agora Agent Starter Server 实现类（AIVAD 版本）
-    用于管理 Agora 对话式 AI Agent 的启动、停止和 Token 生成
-    支持 AIVAD 功能
+    Agora Agent Starter Server implementation class (AIVAD version)
+    Used to manage Agora Conversational AI Agent startup, shutdown, and Token generation
+    Supports AIVAD functionality
     """
     
-    # API 端点配置
+    # API endpoint configuration
     API_BASE_URL = "https://api.sd-rtn.com/cn/api/conversational-ai-agent/v2/projects"
     TOOLBOX_SERVER_HOST = "https://service.apprtc.cn/toolbox"
     JSON_MEDIA_TYPE = "application/json; charset=utf-8"
-    DEFAULT_EXPIRE_SECONDS = 60 * 60 * 24  # 默认 Token 过期时间：24 小时（秒）
-    DEFAULT_TIMEOUT = 30  # 默认 HTTP 请求超时时间（秒）
+    DEFAULT_EXPIRE_SECONDS = 60 * 60 * 24  # Default token expiration time: 24 hours (in seconds)
+    DEFAULT_TIMEOUT = 30  # Default HTTP request timeout (in seconds)
     
     def __init__(
         self,
@@ -46,28 +46,28 @@ class AgoraStarterServer:
         app_cert: Optional[str] = None
     ):
         """
-        初始化 Agora Starter Server
+        Initialize Agora Starter Server
         
-        参数:
-            app_id: Agora App ID（项目 ID）
+        Args:
+            app_id: Agora App ID (Project ID)
             basic_key: Basic Auth Key
             basic_secret: Basic Auth Secret
-            pipeline_id: Pipeline ID（用于启动 Agent）
-            channel_name: 频道名称
-            app_cert: App Certificate（可选，用于生成 Token）
+            pipeline_id: Pipeline ID (used to start Agent)
+            channel_name: Channel name
+            app_cert: App Certificate (optional, used to generate Token)
         """
-        # 保存配置信息
+        # Save configuration information
         self.app_id = app_id
         self.pipeline_id = pipeline_id
         self.channel_name = channel_name
         self.app_cert = app_cert
         
-        # 保存 Basic Auth 认证信息
+        # Save Basic Auth credentials
         self.rest_key = basic_key
         self.rest_secret = basic_secret
         
-        # 创建 HTTP 会话并配置 Basic Auth 认证
-        # 参考 Android 代码中的 Base64Encoding.gen() 方法
+        # Create HTTP session and configure Basic Auth
+        # Reference: Base64Encoding.gen() method in Android code
         self.session = requests.Session()
         credentials = f"{self.rest_key}:{self.rest_secret}"
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
@@ -85,23 +85,23 @@ class AgoraStarterServer:
         remote_rtc_uids: List[str]
     ) -> Dict[str, Any]:
         """
-        构建启动 Agent 的 JSON 请求体（AIVAD 版本）
-        参考 Android 代码中的 buildJsonPayload() 方法
+        Build JSON request body for starting Agent (AIVAD version)
+        Reference: buildJsonPayload() method in Android code
         
-        参数:
-            name: Agent 名称
-            channel: 频道名称
-            agent_rtc_uid: Agent 的 RTC UID
-            token: Token 字符串
-            remote_rtc_uids: 远程 RTC UIDs 列表
+        Args:
+            name: Agent name
+            channel: Channel name
+            agent_rtc_uid: Agent RTC UID
+            token: Token string
+            remote_rtc_uids: List of remote RTC UIDs
             
-        返回:
-            表示 JSON 请求体的字典
+        Returns:
+            Dictionary representing JSON request body
         """
         properties = {
             "channel": channel,
             "agent_rtc_uid": agent_rtc_uid,
-            "remote_rtc_uids": remote_rtc_uids,  # ["*"] 表示所有用户
+            "remote_rtc_uids": remote_rtc_uids,  # ["*"] means all users
             "token": token,
             "advanced_features": {
                 "enable_aivad": True
@@ -124,23 +124,23 @@ class AgoraStarterServer:
         remote_rtc_uids: List[str]
     ) -> str:
         """
-        执行启动 Agent 的 HTTP 请求（AIVAD 版本）
-        参考 Android 代码中的 executeJoinRequest() 方法
+        Execute HTTP request to start Agent (AIVAD version)
+        Reference: executeJoinRequest() method in Android code
         
-        参数:
-            name: Agent 名称
-            channel: 频道名称
-            agent_rtc_uid: Agent 的 RTC UID
-            token: Token 字符串
-            remote_rtc_uids: 远程 RTC UIDs 列表
+        Args:
+            name: Agent name
+            channel: Channel name
+            agent_rtc_uid: Agent RTC UID
+            token: Token string
+            remote_rtc_uids: List of remote RTC UIDs
             
-        返回:
-            响应文本（JSON 格式）
+        Returns:
+            Response text (JSON format)
             
-        抛出:
-            RuntimeError: 如果请求失败
+        Raises:
+            RuntimeError: If request fails
         """
-        # 构建 API URL：POST /api/conversational-ai-agent/v2/projects/{project_id}/join/
+        # Build API URL: POST /api/conversational-ai-agent/v2/projects/{project_id}/join/
         url = f"{self.API_BASE_URL}/{self.app_id}/join/"
         payload = self._build_json_payload(name, channel, agent_rtc_uid, token, remote_rtc_uids)
         
@@ -161,9 +161,9 @@ class AgoraStarterServer:
                 f"Join agent error: Request failed. Details: {str(e)}"
             )
         
-        # 检查响应状态码
+        # Check response status code
         if not response.ok:
-            # 尝试解析错误响应中的 detail
+            # Try to parse detail from error response
             error_detail = None
             try:
                 error_body = response.json()
@@ -182,24 +182,24 @@ class AgoraStarterServer:
             
             raise RuntimeError(error_msg)
         
-        # 返回响应文本（应该是 JSON 格式，包含 agent_id, create_ts, status）
+        # Return response text (should be JSON format, containing agent_id, create_ts, status)
         return response.text
     
     def _execute_leave_request(self, agent_id: str) -> None:
         """
-        执行停止 Agent 的 HTTP 请求
-        参考 Android 代码中的 executeLeaveRequest() 方法
+        Execute HTTP request to stop Agent
+        Reference: executeLeaveRequest() method in Android code
         
-        参数:
-            agent_id: 要停止的 Agent ID
+        Args:
+            agent_id: Agent ID to stop
             
-        抛出:
-            RuntimeError: 如果请求失败
+        Raises:
+            RuntimeError: If request fails
         """
-        # 构建 API URL：POST /api/conversational-ai-agent/v2/projects/{project_id}/agents/{agent_id}/leave
+        # Build API URL: POST /api/conversational-ai-agent/v2/projects/{project_id}/agents/{agent_id}/leave
         url = f"{self.API_BASE_URL}/{self.app_id}/agents/{agent_id}/leave"
         
-        # 发送 POST 请求，请求体为空 JSON 对象（参考 Android 代码）
+        # Send POST request with empty JSON object as body (reference Android code)
         try:
             response = self.session.post(url, json={}, timeout=self.DEFAULT_TIMEOUT)
         except requests.exceptions.Timeout:
@@ -217,9 +217,9 @@ class AgoraStarterServer:
                 f"Leave agent error: Request failed. Details: {str(e)}"
             )
         
-        # 检查响应状态码
+        # Check response status code
         if not response.ok:
-            # 尝试解析错误响应中的 detail
+            # Try to parse detail from error response
             error_detail = None
             try:
                 error_body = response.json()
@@ -236,7 +236,7 @@ class AgoraStarterServer:
             
             raise RuntimeError(error_msg)
         
-        # 关闭响应（释放资源）
+        # Close response (release resources)
         response.close()
     
     def start_agent(
@@ -248,33 +248,33 @@ class AgoraStarterServer:
         remote_rtc_uids: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
-        启动一个 Agent（AIVAD 版本）
-        参考 Android 代码中的 startAgentAsync() 方法
+        Start an Agent (AIVAD version)
+        Reference: startAgentAsync() method in Android code
         
-        参数:
-            name: Agent 名称
-            agent_rtc_uid: Agent 的 RTC UID
-            token: Token 字符串
-            channel: 频道名称（可选，如果不提供则使用实例默认值）
-            remote_rtc_uids: 远程 RTC UIDs 列表（可选，默认为 ["*"] 表示所有用户）
+        Args:
+            name: Agent name
+            agent_rtc_uid: Agent RTC UID
+            token: Token string
+            channel: Channel name (optional, uses instance default if not provided)
+            remote_rtc_uids: List of remote RTC UIDs (optional, defaults to ["*"] for all users)
             
-        返回:
-            Agora API 返回的完整响应（包含 agent_id, create_ts, status）
+        Returns:
+            Complete response from Agora API (containing agent_id, create_ts, status)
         """
-        # 使用传入的频道名或实例默认频道名
+        # Use provided channel name or instance default channel name
         channel = channel or self.channel_name
-        # 使用传入的远程 UIDs 或默认值 ["*"]
+        # Use provided remote UIDs or default value ["*"]
         remote_rtc_uids = remote_rtc_uids or ["*"]
         
-        # 执行启动请求
+        # Execute start request
         response_text = self._execute_join_request(
             name, channel, agent_rtc_uid, token, remote_rtc_uids
         )
         
-        # 解析 JSON 响应并返回完整数据
+        # Parse JSON response and return complete data
         response_json = json.loads(response_text)
         
-        # 验证 agent_id 是否存在
+        # Verify agent_id exists
         agent_id = response_json.get("agent_id", "")
         if not agent_id:
             raise RuntimeError(
@@ -285,13 +285,13 @@ class AgoraStarterServer:
     
     def stop_agent(self, agent_id: str) -> None:
         """
-        停止一个 Agent
-        参考 Android 代码中的 stopAgentAsync() 方法
+        Stop an Agent
+        Reference: stopAgentAsync() method in Android code
         
-        参数:
-            agent_id: 要停止的 Agent ID
+        Args:
+            agent_id: Agent ID to stop
         """
-        # 执行停止请求
+        # Execute stop request
         self._execute_leave_request(agent_id)
     
     def generate_token(
@@ -302,66 +302,66 @@ class AgoraStarterServer:
         expire_seconds: Optional[int] = None
     ) -> str:
         """
-        生成 RTC/RTM/Chat Token
-        参考 Android 代码中的 TokenGenerator.fetchToken() 方法
+        Generate RTC/RTM/Chat Token
+        Reference: TokenGenerator.fetchToken() method in Android code
         
-        参数:
-            channel_name: 频道名称
-            uid: 用户 ID（Agent RTC UID）
-            token_types: Token 类型列表（1=Rtc, 2=Rtm, 3=Chat）
-            expire_seconds: 过期时间（秒）（可选，默认 24 小时）
+        Args:
+            channel_name: Channel name
+            uid: User ID (Agent RTC UID)
+            token_types: List of token types (1=Rtc, 2=Rtm, 3=Chat)
+            expire_seconds: Expiration time in seconds (optional, default 24 hours)
             
-        返回:
-            Token 字符串
+        Returns:
+            Token string
             
-        抛出:
-            RuntimeError: 如果 Token 生成失败
+        Raises:
+            RuntimeError: If token generation fails
         """
-        # 使用传入的过期时间或默认值（24 小时）
+        # Use provided expiration time or default value (24 hours)
         expire = expire_seconds if expire_seconds and expire_seconds > 0 else self.DEFAULT_EXPIRE_SECONDS
         
-        # 构建请求体（参考 Android 代码中的 buildJsonRequest() 方法）
+        # Build request body (reference buildJsonRequest() method in Android code)
         payload = {
             "appId": self.app_id,
-            "appCertificate": self.app_cert or "",  # App Certificate（可选）
+            "appCertificate": self.app_cert or "",  # App Certificate (optional)
             "channelName": channel_name,
-            "expire": expire,  # 过期时间（秒）
-            "src": "Python",  # 来源标识（Android 代码中是 "Android"）
-            "ts": str(int(time.time() * 1000)),  # 当前时间戳（毫秒）
+            "expire": expire,  # Expiration time (in seconds)
+            "src": "Python",  # Source identifier ("Android" in Android code)
+            "ts": str(int(time.time() * 1000)),  # Current timestamp (in milliseconds)
             "uid": uid
         }
         
-        # 添加 Token 类型（参考 Android 代码的逻辑）
-        # 如果只有一个类型，使用 "type" 字段；多个类型使用 "types" 数组
+        # Add token types (reference logic in Android code)
+        # If only one type, use "type" field; if multiple types, use "types" array
         if len(token_types) == 1:
             payload["type"] = token_types[0]
         else:
             payload["types"] = token_types
         
-        # 构建 Token 生成 API URL
+        # Build token generation API URL
         url = f"{self.TOOLBOX_SERVER_HOST}/v2/token/generate"
         
-        # 创建独立的 HTTP 会话（Token 生成不需要 Basic Auth）
+        # Create independent HTTP session (token generation doesn't require Basic Auth)
         token_session = requests.Session()
         token_session.headers.update({
             "Content-Type": "application/json"
         })
         
-        # 发送 POST 请求
+        # Send POST request
         response = token_session.post(url, json=payload)
         
-        # 检查 HTTP 状态码
+        # Check HTTP status code
         if not response.ok:
             raise RuntimeError(
                 f"Fetch token error: httpCode={response.status_code}, "
                 f"httpMsg={response.reason}, body={response.text}"
             )
         
-        # 解析 JSON 响应
+        # Parse JSON response
         response_body = response.json()
         
-        # 检查响应码（参考 Android 代码中的错误检查）
-        # 响应格式：{"code": 0, "message": "...", "data": {"token": "..."}}
+        # Check response code (reference error checking in Android code)
+        # Response format: {"code": 0, "message": "...", "data": {"token": "..."}}
         if response_body.get("code", -1) != 0:
             raise RuntimeError(
                 f"Fetch token error: httpCode={response.status_code}, "
@@ -370,11 +370,11 @@ class AgoraStarterServer:
                 f"reqMsg={response_body.get('message')}"
             )
         
-        # 从响应中提取 Token（参考 Android 代码：bodyJson.getJSONObject("data").getString("token")）
+        # Extract token from response (reference Android code: bodyJson.getJSONObject("data").getString("token"))
         data = response_body.get("data", {})
         token = data.get("token", "")
         
-        # 验证 Token 是否存在
+        # Verify token exists
         if not token:
             raise RuntimeError(
                 f"Failed to parse token from response: {response.text}"
@@ -383,52 +383,52 @@ class AgoraStarterServer:
         return token
 
 
-# 存储 agent_id 的文件路径
+# File path for storing agent_id
 AGENT_ID_FILE = ".agent_id"
 
 
 def save_agent_id(agent_id: str):
-    """保存 agent_id 到文件"""
+    """Save agent_id to file"""
     try:
-        # 获取脚本所在目录的绝对路径
+        # Get absolute path of script directory
         script_dir = os.path.dirname(os.path.abspath(__file__))
         agent_id_path = os.path.join(script_dir, AGENT_ID_FILE)
         with open(agent_id_path, 'w') as f:
             f.write(agent_id)
     except Exception as e:
-        print(f"[WARN] 无法保存 agent_id 到文件: {e}", file=sys.stderr)
+        print(f"[WARN] Failed to save agent_id to file: {e}", file=sys.stderr)
 
 
 def load_agent_id() -> Optional[str]:
-    """从文件加载 agent_id"""
+    """Load agent_id from file"""
     try:
-        # 获取脚本所在目录的绝对路径
+        # Get absolute path of script directory
         script_dir = os.path.dirname(os.path.abspath(__file__))
         agent_id_path = os.path.join(script_dir, AGENT_ID_FILE)
         if os.path.exists(agent_id_path):
             with open(agent_id_path, 'r') as f:
                 return f.read().strip()
     except Exception as e:
-        print(f"[WARN] 无法从文件读取 agent_id: {e}", file=sys.stderr)
+        print(f"[WARN] Failed to read agent_id from file: {e}", file=sys.stderr)
     return None
 
 
 def delete_agent_id():
-    """删除 agent_id 文件"""
+    """Delete agent_id file"""
     try:
-        # 获取脚本所在目录的绝对路径
+        # Get absolute path of script directory
         script_dir = os.path.dirname(os.path.abspath(__file__))
         agent_id_path = os.path.join(script_dir, AGENT_ID_FILE)
         if os.path.exists(agent_id_path):
             os.remove(agent_id_path)
     except Exception as e:
-        print(f"[WARN] 无法删除 agent_id 文件: {e}", file=sys.stderr)
+        print(f"[WARN] Failed to delete agent_id file: {e}", file=sys.stderr)
 
 
 def load_config():
     """
-    从环境变量加载配置
-    返回配置字典
+    Load configuration from environment variables
+    Returns configuration dictionary
     """
     return {
         "BASIC_KEY": os.getenv("AGORA_BASIC_KEY", ""),
@@ -442,16 +442,16 @@ def load_config():
 
 def validate_config(config: Dict[str, str], dotenv_available: bool = True):
     """
-    验证配置是否可用
-    如果缺少必需的配置，抛出 ValueError
+    Validate configuration is available
+    Raises ValueError if required configuration is missing
     
-    参数:
-        config: 配置字典
-        dotenv_available: python-dotenv 是否可用
+    Args:
+        config: Configuration dictionary
+        dotenv_available: Whether python-dotenv is available
     """
     missing = []
     if not config.get("BASIC_KEY") or not config.get("BASIC_SECRET"):
-        missing.append("AGORA_BASIC_KEY 和 AGORA_BASIC_SECRET")
+        missing.append("AGORA_BASIC_KEY and AGORA_BASIC_SECRET")
     if not config.get("PIPELINE_ID"):
         missing.append("AGORA_PIPELINE_ID")
     if not config.get("APP_ID"):
@@ -460,32 +460,32 @@ def validate_config(config: Dict[str, str], dotenv_available: bool = True):
         missing.append("AGORA_CHANNEL_NAME")
     
     if missing:
-        error_msg = f"配置缺失：{', '.join(missing)} "
+        error_msg = f"Missing configuration: {', '.join(missing)} "
         if not dotenv_available:
-            error_msg += "\n\n提示：检测到 python-dotenv 未安装，无法加载 .env.local 文件。\n"
-            error_msg += "请先安装依赖包：\n"
+            error_msg += "\n\nNote: python-dotenv is not installed, cannot load .env.local file.\n"
+            error_msg += "Please install dependencies first:\n"
             error_msg += "  pip install -r requirements.txt\n"
-            error_msg += "  或: pip install python-dotenv\n"
-            error_msg += "\n然后创建 .env.local 文件（参考 .env.example）并填入配置。"
+            error_msg += "  or: pip install python-dotenv\n"
+            error_msg += "\nThen create .env.local file (refer to .env.example) and fill in configuration."
         else:
-            error_msg += "必须在 .env.local 文件或环境变量中设置"
+            error_msg += "must be set in .env.local file or environment variables"
         raise ValueError(error_msg)
 
 
 def cmd_start_agent(config: Dict[str, str], dotenv_available: bool = True):
     """
-    启动 Agent 的命令行函数（AIVAD 版本）
-    默认启用 AIVAD 功能
+    Command-line function to start Agent (AIVAD version)
+    AIVAD is enabled by default
     
-    参数:
-        config: 配置字典
-        dotenv_available: python-dotenv 是否可用
+    Args:
+        config: Configuration dictionary
+        dotenv_available: Whether python-dotenv is available
     """
     try:
-        # 固定的 RTC UID
+        # Fixed RTC UID
         agent_rtc_uid = "1009527"
         
-        # 验证基本配置
+        # Validate basic configuration
         validate_config(config, dotenv_available)
         
         app_id = config["APP_ID"].strip()
@@ -495,29 +495,29 @@ def cmd_start_agent(config: Dict[str, str], dotenv_available: bool = True):
         basic_secret = config["BASIC_SECRET"].strip()
         pipeline_id = config["PIPELINE_ID"].strip()
         
-        # 默认 token 类型：RTC 和 RTM
+        # Default token types: RTC and RTM
         token_types = [1, 2]  # 1=RTC, 2=RTM
         
-        # 创建 AgoraStarterServer 实例（用于生成 Token）
+        # Create AgoraStarterServer instance (for token generation)
         token_server = AgoraStarterServer(
             app_id=app_id,
-            basic_key="dummy",  # 占位符，生成 Token 不需要 Basic Auth
-            basic_secret="dummy",  # 占位符，生成 Token 不需要 Basic Auth
-            pipeline_id="",  # 占位符，生成 Token 不需要 Pipeline ID
+            basic_key="dummy",  # Placeholder, token generation doesn't require Basic Auth
+            basic_secret="dummy",  # Placeholder, token generation doesn't require Basic Auth
+            pipeline_id="",  # Placeholder, token generation doesn't require Pipeline ID
             channel_name=channel_name,
             app_cert=app_cert if app_cert else None
         )
         
-        # 生成 Agent Token
-        print(f"[INFO] 正在生成 Agent Token (app_id={app_id}, channel={channel_name})...")
+        # Generate Agent Token
+        print(f"[INFO] Generating Agent Token (app_id={app_id}, channel={channel_name})...")
         agent_token = token_server.generate_token(
             channel_name=channel_name,
             uid=agent_rtc_uid,
             token_types=token_types
         )
-        print(f"[INFO] Agent Token 生成成功")
+        print(f"[INFO] Agent Token generated successfully")
         
-        # 创建用于启动 Agent 的 AgoraStarterServer 实例
+        # Create AgoraStarterServer instance for starting Agent
         server = AgoraStarterServer(
             app_id=app_id,
             basic_key=basic_key,
@@ -527,10 +527,10 @@ def cmd_start_agent(config: Dict[str, str], dotenv_available: bool = True):
             app_cert=app_cert if app_cert else None
         )
         
-        # 启动 Agent（AIVAD 模式）
-        print(f"[INFO] 正在启动 Agent（AIVAD 模式）(app_id={app_id}, channel={channel_name})...")
+        # Start Agent (AIVAD mode)
+        print(f"[INFO] Starting Agent (AIVAD mode) (app_id={app_id}, channel={channel_name})...")
         print(f"[INFO] Agent RTC UID: {agent_rtc_uid}")
-        print(f"[INFO] AIVAD 功能: 已启用")
+        print(f"[INFO] AIVAD feature: Enabled")
         
         agent_data = server.start_agent(
             name=channel_name,
@@ -541,22 +541,22 @@ def cmd_start_agent(config: Dict[str, str], dotenv_available: bool = True):
         
         agent_id = agent_data.get("agent_id", "")
         if not agent_id:
-            raise RuntimeError("无法从响应中获取 agent_id")
+            raise RuntimeError("Failed to get agent_id from response")
         
-        # 保存 agent_id 供下次使用
+        # Save agent_id for next use
         save_agent_id(agent_id)
         
-        print(f"[INFO] Agent 启动成功！")
+        print(f"[INFO] Agent started successfully!")
         print(f"[INFO] Agent ID: {agent_id}")
         print(f"[INFO] Channel: {channel_name}")
         print(f"[INFO] Agent RTC UID: {agent_rtc_uid}")
-        print(f"[INFO] AIVAD 功能: 已启用")
-        print(f"\n💡 现在可以打开应用，加入频道 {channel_name} 来体验对话式 AI（AIVAD）")
+        print(f"[INFO] AIVAD feature: Enabled")
+        print(f"\n💡 You can now open the app and join channel {channel_name} to experience Conversational AI (AIVAD)")
         
         return 0
         
     except Exception as e:
-        print(f"[ERROR] 启动 Agent 失败: {e}", file=sys.stderr)
+        print(f"[ERROR] Failed to start Agent: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         return 1
@@ -564,51 +564,51 @@ def cmd_start_agent(config: Dict[str, str], dotenv_available: bool = True):
 
 def cmd_stop_agent(config: Dict[str, str], agent_id: Optional[str] = None):
     """
-    停止 Agent 的命令行函数
+    Command-line function to stop Agent
     """
     try:
-        # 验证配置（停止只需要 basic_key 和 basic_secret）
+        # Validate configuration (stopping only requires basic_key and basic_secret)
         basic_key = config.get("BASIC_KEY", "")
         basic_secret = config.get("BASIC_SECRET", "")
         app_id = config.get("APP_ID", "")
         
         if not basic_key or not basic_secret:
-            raise ValueError("配置缺失：AGORA_BASIC_KEY 和 AGORA_BASIC_SECRET 必须在 .env.local 文件或环境变量中设置")
+            raise ValueError("Missing configuration: AGORA_BASIC_KEY and AGORA_BASIC_SECRET must be set in .env.local file or environment variables")
         if not app_id:
-            raise ValueError("配置缺失：AGORA_APP_ID 必须在 .env.local 文件或环境变量中设置")
+            raise ValueError("Missing configuration: AGORA_APP_ID must be set in .env.local file or environment variables")
         
-        # 如果没有提供 agent_id，尝试从文件加载上一次的
+        # If agent_id not provided, try to load from file
         if not agent_id:
             agent_id = load_agent_id()
             if not agent_id:
-                print("[ERROR] 未找到 agent_id。", file=sys.stderr)
-                print("[ERROR] 请提供 --agent-id 参数，或确保之前已成功启动过 Agent。", file=sys.stderr)
-                print("[ERROR] 使用方式: python agent_start_aivad.py stop --agent-id <agent_id>", file=sys.stderr)
+                print("[ERROR] agent_id not found.", file=sys.stderr)
+                print("[ERROR] Please provide --agent-id parameter, or ensure Agent was started successfully before.", file=sys.stderr)
+                print("[ERROR] Usage: python agent_interrupt_aivad.py stop --agent-id <agent_id>", file=sys.stderr)
                 return 1
-            print(f"[INFO] 使用上一次的 Agent ID: {agent_id}")
+            print(f"[INFO] Using previous Agent ID: {agent_id}")
         
-        # 创建 AgoraStarterServer 实例
+        # Create AgoraStarterServer instance
         server = AgoraStarterServer(
             app_id=app_id,
             basic_key=basic_key,
             basic_secret=basic_secret,
-            pipeline_id="",  # 占位符，停止 Agent 不需要 Pipeline ID
-            channel_name="",  # 占位符，停止 Agent 不需要 channel_name
+            pipeline_id="",  # Placeholder, stopping Agent doesn't require Pipeline ID
+            channel_name="",  # Placeholder, stopping Agent doesn't require channel_name
             app_cert=None
         )
         
-        # 停止 Agent
-        print(f"[INFO] 正在停止 Agent (agent_id={agent_id})...")
+        # Stop Agent
+        print(f"[INFO] Stopping Agent (agent_id={agent_id})...")
         server.stop_agent(agent_id)
         
-        # 删除保存的 agent_id 文件
+        # Delete saved agent_id file
         delete_agent_id()
         
-        print(f"[INFO] Agent 停止成功！")
+        print(f"[INFO] Agent stopped successfully!")
         return 0
         
     except Exception as e:
-        print(f"[ERROR] 停止 Agent 失败: {e}", file=sys.stderr)
+        print(f"[ERROR] Failed to stop Agent: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         return 1
@@ -616,21 +616,21 @@ def cmd_stop_agent(config: Dict[str, str], agent_id: Optional[str] = None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Agora Agent Starter Script (AIVAD) - 启动和停止 Agora 对话式 AI Agent（AIVAD 版本）'
+        description='Agora Agent Starter Script (AIVAD) - Start and stop Agora Conversational AI Agent (AIVAD version)'
     )
-    subparsers = parser.add_subparsers(dest='command', help='可用命令')
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
-    # start 命令
-    start_parser = subparsers.add_parser('start', help='启动 Agent（AIVAD 模式，默认启用）')
+    # start command
+    start_parser = subparsers.add_parser('start', help='Start Agent (AIVAD mode, enabled by default)')
     
-    # stop 命令
-    stop_parser = subparsers.add_parser('stop', help='停止 Agent')
+    # stop command
+    stop_parser = subparsers.add_parser('stop', help='Stop Agent')
     stop_parser.add_argument(
         '--agent-id',
         type=str,
         default=None,
         metavar='AGENT_ID',
-        help='Agent ID（可选，如果不提供则使用上一次启动的 Agent ID）'
+        help='Agent ID (optional, uses previous Agent ID if not provided)'
     )
     
     args = parser.parse_args()
@@ -639,24 +639,24 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(1)
     
-    # 检查并加载 .env.local 文件
+    # Check and load .env.local file
     dotenv_available = False
     try:
         from dotenv import load_dotenv
         dotenv_available = True
-        # 获取脚本所在目录的绝对路径，然后加载 .env.local 文件
+        # Get absolute path of script directory, then load .env.local file
         script_dir = os.path.dirname(os.path.abspath(__file__))
         env_path = os.path.join(script_dir, ".env.local")
         load_dotenv(env_path)
     except ImportError:
-        print("[WARN] python-dotenv 未安装，将不会加载 .env.local 文件。", file=sys.stderr)
-        print("[WARN] 您仍可使用环境变量，或安装 python-dotenv:", file=sys.stderr)
+        print("[WARN] python-dotenv not installed, will not load .env.local file.", file=sys.stderr)
+        print("[WARN] You can still use environment variables, or install python-dotenv:", file=sys.stderr)
         print("[WARN]   pip install python-dotenv", file=sys.stderr)
     
-    # 加载配置
+    # Load configuration
     config = load_config()
     
-    # 执行命令
+    # Execute command
     if args.command == 'start':
         sys.exit(cmd_start_agent(config, dotenv_available))
     elif args.command == 'stop':
