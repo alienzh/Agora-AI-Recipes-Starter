@@ -1,14 +1,14 @@
-// 简化版 utils，用于 ConvoAI API
+// Simplified utils for ConvoAI API
 
 /**
- * 生成追踪 ID
+ * Generate trace ID
  */
 export function genTranceID(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
 }
 
 /**
- * 解码流消息（简化版）
+ * Decode stream message (simplified version)
  */
 export function decodeStreamMessage(data: Uint8Array | string): any {
   if (typeof data === 'string') {

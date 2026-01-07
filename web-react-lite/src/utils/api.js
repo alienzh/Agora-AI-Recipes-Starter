@@ -1,20 +1,20 @@
 /**
- * 生成 Token
- * @param {string} channelName - 频道名称
- * @param {string} uid - 用户ID
- * @param {number} expire - 过期时间（秒），默认 86400（24小时）
- * @param {number[]} types - Token 类型数组
+ * Generate Token
+ * @param {string} channelName - Channel name
+ * @param {string} uid - User ID
+ * @param {number} expire - Expiration time (seconds), default 86400 (24 hours)
+ * @param {number[]} types - Token type array
  * @param {string} appId - Agora App ID
- * @param {string} appCertificate - Agora App Certificate（选填，为空时返回 null 表示不使用 token）
- * @returns {Promise<string|null>} 返回 token（如果 appCertificate 为空则返回 null）
+ * @param {string} appCertificate - Agora App Certificate (optional, returns null if empty to indicate no token used)
+ * @returns {Promise<string|null>} Returns token (returns null if appCertificate is empty)
  */
 export async function generateToken(channelName, uid, expire = 86400, types = [1], appId, appCertificate) {
-  // 检查配置是否已填写
+  // Check if configuration is filled
   if (!appId) {
-    throw new Error('App ID 未配置')
+    throw new Error('App ID not configured')
   }
   
-  // 如果 appCertificate 为空，返回 null 表示不使用 token
+  // If appCertificate is empty, return null to indicate no token used
   if (!appCertificate || appCertificate.trim() === '') {
     return null
   }
@@ -41,7 +41,7 @@ export async function generateToken(channelName, uid, expire = 86400, types = [1
       body: JSON.stringify(params),
     })
 
-    // 检查 HTTP 状态
+    // Check HTTP status
     if (!response.ok) {
       const errorText = await response.text()
       throw new Error(`HTTP ${response.status}: ${errorText}`)
@@ -49,7 +49,7 @@ export async function generateToken(channelName, uid, expire = 86400, types = [1
 
     const result = await response.json()
 
-    // 提取 token（支持多种响应格式）
+    // Extract token (supports multiple response formats)
     let token = null
     
     if (result?.data?.token) {
@@ -74,7 +74,7 @@ export async function generateToken(channelName, uid, expire = 86400, types = [1
       return token
     }
 
-    throw new Error('无法从响应中提取 token')
+    throw new Error('Unable to extract token from response')
   } catch (error) {
     console.error('Token generation error:', error)
     throw error

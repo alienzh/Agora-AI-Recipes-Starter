@@ -1,113 +1,108 @@
 # Web React Lite
 
-一个基于 React 和 Vite 的前端项目，专注于 RTM、RTC 和 ConvoAI 的连接功能。
+[中文文档](./README-CN.md) | [English Documentation](./README.md)
 
-**注意**: 此版本不包含 Agent 启动功能，Agent 的启动和停止应由后端服务处理。
+A React and Vite based frontend project focused on RTM, RTC, and ConvoAI connection functionality.
 
-## 开始使用
+This is a **standalone frontend application** that does not require any backend server. All functionality runs entirely in the browser.
 
-### 安装依赖
+## Getting Started
+
+### Install Dependencies
 
 ```bash
 npm install --legacy-peer-deps
 ```
 
-### 开发模式
+### Development Mode
 
 ```bash
 npm run dev
 ```
 
-**注意**: `web-react-lite` 版本只启动前端开发服务器，不包含后端 API 代理服务器。Agent 的启动和停止应由后端服务处理。
+This will start the frontend development server. No backend server is required.
 
-### 构建生产版本
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-### 预览生产构建
+### Preview Production Build
 
 ```bash
 npm run preview
 ```
 
-### 使用说明
+## Usage
 
-1. 启动项目后，在入口页面填写以下信息：
-   - **App ID**: Agora App ID（必填）
-   - **App Certificate**: Agora App Certificate（选填）
-   - **频道名称**: 频道名称（必填）
+1. After starting the project, fill in the following information on the entry page:
+   - **App ID**: Agora App ID (required)
+   - **App Certificate**: Agora App Certificate (optional)
+   - **Channel Name**: Channel name (required)
 
-2. 点击"连接对话式AI引擎"按钮开始连接
+2. Click the "Connect Conversational AI Engine" button to start connecting
 
-**注意**: `web-react-lite` 版本只启动前端开发服务器，不包含后端 API 代理服务器。Agent 的启动和停止应由后端服务处理。
+### Configuration
 
-### 配置项说明
+- **App ID**: Agora App ID, used to initialize RTM and RTC engines (required)
+- **App Certificate**: Agora App Certificate, used to generate user Token (optional)
+- **Channel Name**: Channel name to join (required)
 
-- **App ID**: Agora App ID，用于初始化 RTM 和 RTC 引擎（必填）
-- **App Certificate**: Agora App Certificate，用于生成用户 Token（选填）
-- **频道名称**: 用于加入的频道名称（必填）
+## Features
 
-**注意**: Agent 的启动和停止应由后端服务处理，前端不参与
+This version implements the following features:
 
-## 功能说明
+1. **RTM Connection**: Initialize RTM engine and login
+2. **RTC Connection**: Initialize RTC engine and join channel
+3. **Audio Processing**: Create, publish and subscribe audio tracks
+4. **ConvoAI Message Subscription**: Subscribe and display conversation transcriptions
+5. **Debug Logs**: Real-time display of connection status and event logs (shown on the right side)
 
-此版本实现了以下功能：
+## How It Works
 
-1. **RTM 连接**: 初始化 RTM 引擎并登录
-2. **RTC 连接**: 初始化 RTC 引擎并加入频道
-3. **音频处理**: 创建、发布和订阅音频轨道
-4. **ConvoAI 消息订阅**: 订阅并显示对话转录内容
-5. **Debug 日志**: 实时显示连接状态和事件日志（显示在右侧）
+This application connects directly to Agora's services:
 
-**不包含的功能**：
+- **Token Generation**: Uses Agora's public token generation service (`https://service.apprtc.cn/toolbox/v2/token/generate`) when App Certificate is provided
+- **RTM/RTC**: Connects directly to Agora RTM and RTC services
+- **ConvoAI**: Subscribes to conversational AI messages through RTM channels
 
-- Agent 启动（由后端处理）
-- Agent Token 生成（由后端处理）
-- Agent 停止（由后端处理）
+**Note**: The Agent (AI assistant) must be started separately through Agora's platform or other means. This frontend application only handles the client-side connection and message display.
 
-## 如何启动 Agent
+## Project Structure
 
-`web-react-lite` 版本不包含 Agent 启动功能，需要通过后端服务来启动 Agent。
-
-### 使用 Python 后端服务
-
-我们提供了一个 Python 后端服务示例，具体使用方法请参考：
-
-📁 [server-python/README.md](../server-python/README.md)
-
-该服务提供了 Agent 启动和停止的 API 接口，前端可以通过调用这些接口来控制 Agent。
-
-### 其他后端服务
-
-你也可以使用其他语言（如 Node.js、Java 等）实现后端服务，只要提供以下 API 接口即可：
-
-- `POST /api/agent` - 启动 Agent
-- `POST /api/agent/stop` - 停止 Agent
-
-具体的 API 参数和返回值格式，请参考 `server-python` 中的实现。
-
-## 项目结构
-
-```
+```text
 web-react-lite/
 ├── src/
-│   ├── config/
-│   │   └── env.js              # 环境变量配置（已弃用，保留用于向后兼容）
 │   ├── components/
-│   │   ├── MainView.jsx         # 主视图组件（合并了配置和聊天功能）
-│   │   └── main-view.css        # 主视图样式
-│   ├── conversational-ai-api/  # ConvoAI API 封装
+│   │   ├── MainView.jsx         # Main view component (combines configuration and chat functionality)
+│   │   └── main-view.css        # Main view styles
+│   ├── conversational-ai-api/  # ConvoAI API wrapper
 │   ├── utils/
-│   │   ├── api.js              # Token 生成 API
-│   │   └── configStorage.js    # 配置存储工具（localStorage）
-│   ├── App.jsx                 # 主应用组件（包含日志管理和两栏布局）
-│   ├── App.css                 # 应用样式（包含两栏布局）
-│   ├── main.jsx                # 入口文件
-│   └── index.css                # 全局样式
-├── .env.example                # 环境变量示例文件（已弃用，配置改为页面输入）
-├── index.html                   # HTML 模板
-├── vite.config.js              # Vite 配置
-└── package.json                # 项目配置
+│   │   ├── api.js              # Token generation API
+│   │   └── configStorage.js     # Configuration storage utility (localStorage)
+│   ├── App.jsx                 # Main application component (includes log management and two-column layout)
+│   ├── App.css                 # Application styles (includes two-column layout)
+│   ├── main.jsx                # Entry file
+│   └── index.css               # Global styles
+├── index.html                   # HTML template
+├── vite.config.js              # Vite configuration
+└── package.json                # Project configuration
 ```
+
+## Technical Details
+
+- **Framework**: React 18
+- **Build Tool**: Vite
+- **SDKs**:
+  - `agora-rtc-sdk-ng`: Agora RTC SDK
+  - `agora-rtm`: Agora RTM SDK
+- **Storage**: Uses `localStorage` to persist configuration
+- **Token Service**: Uses Agora's public token generation service (no backend required)
+
+## Notes
+
+- This is a **pure frontend application** - no backend server is needed
+- Configuration is entered directly in the UI and stored in browser localStorage
+- Token generation (if App Certificate is provided) uses Agora's public service
+- The Agent must be started separately through Agora's platform or other external means

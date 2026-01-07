@@ -1,4 +1,4 @@
-// 简化版 logger，用于 ConvoAI API
+// Simplified logger for ConvoAI API
 export enum ELoggerType {
   log = 'log',
   info = 'info',

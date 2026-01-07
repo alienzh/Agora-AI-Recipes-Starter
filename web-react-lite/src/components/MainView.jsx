@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { saveConfig, loadConfig } from '../utils/configStorage'
 import { generateToken } from '../utils/api'
 import AgoraRTM from 'agora-rtm'
@@ -31,7 +31,7 @@ function MainView({ addLog, clearLogs }) {
   const localAudioTrackRef = useRef(null)
   const uidRef = useRef(null)
 
-  // 页面加载时从 localStorage 读取已保存的配置
+  // Load saved configuration from localStorage on page load
   useEffect(() => {
     const savedConfig = loadConfig()
     if (savedConfig) {
@@ -39,14 +39,14 @@ function MainView({ addLog, clearLogs }) {
       setAppCertificate(savedConfig.appCertificate)
       setChannelName(savedConfig.channelName)
     }
-    // 添加初始日志
+    // Add initial log
     if (addLog) {
-      addLog('等待连接...', 'info')
+      addLog('Waiting for connection...', 'info')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 安全添加日志
+  // Safely add log
   const safeAddLog = (message, type = 'info') => {
     if (addLog && typeof addLog === 'function') {
       addLog(message, type)
@@ -56,36 +56,36 @@ function MainView({ addLog, clearLogs }) {
   // MARK: - Engine Initialization
   const initializeRTM = (uid) => {
     if (rtmClientRef.current) {
-      safeAddLog('RTM Client 已初始化', 'info')
+      safeAddLog('RTM Client already initialized', 'info')
       return rtmClientRef.current
     }
 
     if (!appId) {
-      safeAddLog('RTM Client 初始化失败: AG_APP_ID 未配置', 'error')
-      throw new Error('AG_APP_ID 未配置')
+      safeAddLog('RTM Client initialization failed: AG_APP_ID not configured', 'error')
+      throw new Error('AG_APP_ID not configured')
     }
 
     try {
       const userId = String(uid)
       const rtmClient = new AgoraRTM.RTM(appId, userId)
       rtmClientRef.current = rtmClient
-      safeAddLog('RTM Client 初始化成功', 'success')
+      safeAddLog('RTM Client initialized successfully', 'success')
       return rtmClient
     } catch (error) {
-      safeAddLog(`RTM Client 初始化失败: ${error.message}`, 'error')
+      safeAddLog(`RTM Client initialization failed: ${error.message}`, 'error')
       throw error
     }
   }
 
   const initializeRTC = () => {
     if (rtcClientRef.current) {
-      safeAddLog('RTC Engine 已初始化', 'info')
+      safeAddLog('RTC Engine already initialized', 'info')
       return rtcClientRef.current
     }
 
     if (!appId) {
-      safeAddLog('RTC Engine 初始化失败: AG_APP_ID 未配置', 'error')
-      throw new Error('AG_APP_ID 未配置')
+      safeAddLog('RTC Engine initialization failed: AG_APP_ID not configured', 'error')
+      throw new Error('AG_APP_ID not configured')
     }
 
     try {
@@ -98,26 +98,32 @@ function MainView({ addLog, clearLogs }) {
       const rtcClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       rtcClientRef.current = rtcClient
       
-      // 绑定 RTC 事件监听
+      // Bind RTC event listeners
       bindRTCEvents(rtcClient)
       
-      safeAddLog('RTC Engine 初始化成功', 'success')
+      safeAddLog('RTC Engine initialized successfully', 'success')
       return rtcClient
     } catch (error) {
-      safeAddLog(`RTC Engine 初始化失败: ${error.message}`, 'error')
+      safeAddLog(`RTC Engine initialization failed: ${error.message}`, 'error')
       throw error
     }
   }
 
-  // 绑定 RTC 事件监听
+  // Bind RTC event listeners
   const bindRTCEvents = (client) => {
-    // 用户加入频道
+    // User joined channel
     client.on('user-joined', (user) => {
       console.log('[RTC Callback] User joined:', user.uid)
       safeAddLog(`onUserJoined: ${user.uid}`, 'success')
     })
 
-    // 用户发布音视频流
+    // User left channel
+    client.on('user-left', (user, reason) => {
+      console.log('[RTC Callback] User left:', user.uid, 'reason:', reason)
+      safeAddLog(`User left: ${user.uid} (${reason || 'Unknown reason'})`, 'info')
+    })
+
+    // User published audio/video stream
     client.on('user-published', async (user, mediaType) => {
       console.log('[RTC Callback] User published:', user.uid, 'mediaType:', mediaType)
       try {
@@ -131,30 +137,30 @@ function MainView({ addLog, clearLogs }) {
       }
     })
 
-    // 连接状态变化
+    // Connection state change
     client.on('connection-state-change', (curState, revState, reason) => {
       console.log('[RTC Callback] Connection state changed:', { current: curState, previous: revState, reason })
       if (curState === 'CONNECTED') {
         safeAddLog('onJoinChannelSuccess', 'success')
       } else if (curState === 'DISCONNECTED') {
         if (reason === 'LEAVE') {
-          safeAddLog('已离开频道', 'info')
+          safeAddLog('Left channel', 'info')
         } else {
-          safeAddLog(`连接断开: ${reason || '未知原因'}`, 'error')
+          safeAddLog(`Connection disconnected: ${reason || 'Unknown reason'}`, 'error')
         }
       } else if (curState === 'FAILED') {
-        safeAddLog(`连接失败: ${reason || '未知原因'}`, 'error')
+        safeAddLog(`Connection failed: ${reason || 'Unknown reason'}`, 'error')
       }
     })
   }
 
-  // 设置 ConvoAI 事件监听
+  // Setup ConvoAI event listeners
   const setupConvoAIEvents = () => {
     if (!convoAIAPIRef.current) return
 
     const convoAIAPI = convoAIAPIRef.current
 
-    // 注册转录更新事件回调
+    // Register transcript update event callback
     convoAIAPI.on(EConversationalAIAPIEvents.TRANSCRIPT_UPDATED, (chatHistory) => {
       console.log('[ConvoAI] ===== TRANSCRIPT_UPDATED event triggered =====')
       console.log('[ConvoAI] Transcript updated, items count:', chatHistory.length)
@@ -164,14 +170,14 @@ function MainView({ addLog, clearLogs }) {
         return
       }
       
-      // 将聊天历史转换为 transcripts 格式
+      // Convert chat history to transcripts format
       const newTranscripts = chatHistory
         .sort((a, b) => {
-          // 先按 turn_id 排序
+          // Sort by turn_id first
           if (a.turn_id !== b.turn_id) {
             return a.turn_id - b.turn_id
           }
-          // 再按 uid 排序
+          // Then sort by uid
           try {
             const aUidNumber = Number(a.uid)
             const bUidNumber = Number(b.uid)
@@ -182,7 +188,7 @@ function MainView({ addLog, clearLogs }) {
           }
         })
         .map((item) => {
-          // 判断是用户还是 Agent：uid === 0 是用户，否则是 Agent
+          // Determine if user or Agent: uid === 0 is user, otherwise Agent
           const isAgent = Number(item.uid) !== 0
           return {
             id: `${item.turn_id}-${item.uid}-${item._time}`,
@@ -196,16 +202,21 @@ function MainView({ addLog, clearLogs }) {
       setTranscripts(newTranscripts)
     })
 
-    // 注册 Agent 状态变化事件回调
+    // Register Agent state change event callback
     convoAIAPI.on(EConversationalAIAPIEvents.AGENT_STATE_CHANGED, (agentUserId, event) => {
       console.log('[ConvoAI] Agent state changed:', agentUserId, event.state)
     })
 
-    // 注册错误事件回调
+    // Register error event callback
     convoAIAPI.on(EConversationalAIAPIEvents.AGENT_ERROR, (agentUserId, error) => {
       console.error('[ConvoAI] Agent error:', agentUserId, error)
     })
   }
+
+  // MARK: - Constants
+  const UID_MIN = 1000
+  const UID_MAX = 9999999
+  const TOKEN_EXPIRE_TIME = 86400 // 24 hours
 
   // MARK: - Connection Flow
   const handleConnect = async (e) => {
@@ -213,66 +224,66 @@ function MainView({ addLog, clearLogs }) {
     if (channelName.trim() && appId.trim() && !isConnecting) {
       setIsConnecting(true)
       
-      // 清除之前的日志，开始新的连接
+      // Clear previous logs and start new connection
       if (clearLogs) {
         clearLogs()
       }
       
-      // 保存配置到 localStorage
+      // Save configuration to localStorage
       saveConfig(appId, appCertificate, channelName)
       
-      const uid = Math.floor(Math.random() * (9999999 - 1000 + 1)) + 1000
+      const uid = Math.floor(Math.random() * (UID_MAX - UID_MIN + 1)) + UID_MIN
       uidRef.current = uid
       const channel = channelName.trim()
       
       try {
-        safeAddLog('开始连接...', 'info')
+        safeAddLog('Starting connection...', 'info')
         safeAddLog(`App ID: ${appId}`, 'info')
-        safeAddLog(`频道名称: ${channel}`, 'info')
+        safeAddLog(`Channel Name: ${channel}`, 'info')
 
-        // 步骤 1: 初始化引擎
-        safeAddLog('初始化 RTM 引擎...', 'info')
+        // Step 1: Initialize engines
+        safeAddLog('Initializing RTM engine...', 'info')
         initializeRTM(uid)
         
-        safeAddLog('初始化 RTC 引擎...', 'info')
+        safeAddLog('Initializing RTC engine...', 'info')
         initializeRTC()
 
-        // 步骤 2: 生成用户 token
-        safeAddLog('获取 Token 调用中...', 'info')
-        const userToken = await generateToken(channel, String(uid), 86400, [1, 2], appId, appCertificate)
-        // userToken 可以是 null（不使用 token），这是有效的
+        // Step 2: Generate user token
+        safeAddLog('Requesting token...', 'info')
+        const userToken = await generateToken(channel, String(uid), TOKEN_EXPIRE_TIME, [1, 2], appId, appCertificate)
+        // userToken can be null (no token used), which is valid
         if (userToken === undefined) {
-          throw new Error('获取 token 失败，请重试')
+          throw new Error('Failed to get token, please try again')
         }
         setToken(userToken || '')
         if (userToken === null) {
-          safeAddLog('不使用 Token（App Certificate 未配置）', 'info')
+          safeAddLog('No token used (App Certificate not configured)', 'info')
         } else {
-          safeAddLog('获取 Token 调用成功', 'success')
+          safeAddLog('Token retrieved successfully', 'success')
         }
 
-        // 步骤 3: RTM 登录
-        safeAddLog('RTM Login 调用中...', 'info')
+        // Step 3: RTM login
+        safeAddLog('RTM Login calling...', 'info')
         try {
-          // 如果 userToken 是 null，不传 token 参数
+          // If userToken is null, don't pass token parameter
           if (userToken === null) {
             await rtmClientRef.current.login()
           } else {
             await rtmClientRef.current.login({ token: userToken })
           }
-          safeAddLog('RTM Login 调用成功', 'success')
+          safeAddLog('RTM Login successful', 'success')
         } catch (error) {
           if (error.code === -10017 || error.message?.includes('Same subscribe, join or login request')) {
-            safeAddLog('RTM Login 调用成功（已登录）', 'success')
+            safeAddLog('RTM Login successful (already logged in)', 'success')
           } else {
             throw error
           }
         }
 
-        // 步骤 4: RTC 加入频道
-        safeAddLog('joinChannel 调用中...', 'info')
+        // Step 4: RTC join channel
+        safeAddLog('joinChannel calling...', 'info')
         
-        // 创建本地音频轨道
+        // Create local audio track
         if (!localAudioTrackRef.current) {
           localAudioTrackRef.current = await AgoraRTC.createMicrophoneAudioTrack({
             AEC: true,
@@ -281,23 +292,23 @@ function MainView({ addLog, clearLogs }) {
           })
         }
 
-        // 加入频道（如果 userToken 是 null，传递 null 给 join 方法）
+        // Join channel (if userToken is null, pass null to join method)
         const userId = typeof uid === 'number' ? uid : parseInt(uid, 10)
         await rtcClientRef.current.join(appId, channel, userToken, userId)
-        safeAddLog('joinChannel 调用成功', 'success')
+        safeAddLog('joinChannel successful', 'success')
 
-        // 发布本地音频轨道
+        // Publish local audio track
         if (localAudioTrackRef.current) {
           await rtcClientRef.current.publish([localAudioTrackRef.current])
         }
 
-        // 步骤 5: RTM 加入频道
-        safeAddLog('RTM 加入频道中...', 'info')
+        // Step 5: RTM join channel
+        safeAddLog('RTM joining channel...', 'info')
         await rtmClientRef.current.subscribe(channel)
-        safeAddLog('RTM 加入频道成功', 'success')
+        safeAddLog('RTM joined channel successfully', 'success')
 
-        // 步骤 6: 初始化 ConvoAI API
-        safeAddLog('初始化 ConvoAI API...', 'info')
+        // Step 6: Initialize ConvoAI API
+        safeAddLog('Initializing ConvoAI API...', 'info')
         const convoAIAPI = ConversationalAIAPI.init({
           rtcEngine: rtcClientRef.current,
           rtmEngine: rtmClientRef.current,
@@ -305,27 +316,46 @@ function MainView({ addLog, clearLogs }) {
           renderMode: undefined
         })
         convoAIAPIRef.current = convoAIAPI
-        safeAddLog('ConvoAI API 初始化成功', 'success')
+        safeAddLog('ConvoAI API initialized successfully', 'success')
 
-        // 步骤 7: 订阅 ConvoAI 消息
-        safeAddLog('订阅 ConvoAI 消息...', 'info')
+        // Step 7: Subscribe to ConvoAI messages
+        safeAddLog('Subscribing to ConvoAI messages...', 'info')
         convoAIAPI.subscribeMessage(channel)
-        safeAddLog('订阅 ConvoAI 消息成功', 'success')
+        safeAddLog('Subscribed to ConvoAI messages successfully', 'success')
 
-        // 设置 ConvoAI 事件监听
+        // Setup ConvoAI event listeners
         setupConvoAIEvents()
 
-        safeAddLog('连接成功，进入聊天页面', 'success')
+        safeAddLog('Connection successful, entering chat page', 'success')
         
-        // 所有步骤成功，切换到聊天视图
+        // All steps successful, switch to chat view
         setIsConnecting(false)
         setViewMode('chat')
       } catch (error) {
         console.error('[Connection] Connection failed:', error)
-        safeAddLog(`连接失败: ${error.message}`, 'error')
+        
+        // Optimize error messages
+        let errorMessage = 'Connection failed'
+        if (error.message) {
+          if (error.message.includes('App ID')) {
+            errorMessage = `Connection failed: ${error.message}, please check App ID configuration`
+          } else if (error.message.includes('token') || error.message.includes('Token')) {
+            errorMessage = `Connection failed: ${error.message}, please check App Certificate configuration`
+          } else if (error.message.includes('network') || error.message.includes('Network')) {
+            errorMessage = `Connection failed: Network error, please check network connection`
+          } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+            errorMessage = `Connection failed: Request timeout, please try again later`
+          } else {
+            errorMessage = `Connection failed: ${error.message}`
+          }
+        } else if (error.code) {
+          errorMessage = `Connection failed: Error code ${error.code}`
+        }
+        
+        safeAddLog(errorMessage, 'error')
         setIsConnecting(false)
         
-        // 清理已创建的资源
+        // Cleanup created resources
         await cleanupResources()
       }
     }
@@ -387,7 +417,6 @@ function MainView({ addLog, clearLogs }) {
     }
   }
 
-
   const isDisabled = !channelName.trim() || !appId.trim() || isConnecting
 
   // MARK: - Render
@@ -395,13 +424,13 @@ function MainView({ addLog, clearLogs }) {
     return (
       <div className="chat-view">
         <div className="chat-view-container">
-          {/* 字幕滚动视图 */}
+          {/* Transcript scroll view */}
           <TranscriptScrollView 
             transcripts={transcripts} 
             scrollRef={scrollRef}
           />
 
-          {/* 控制栏 */}
+          {/* Control bar */}
           <ControlBar
             isMicMuted={isMicMuted}
             onToggleMicrophone={toggleMicrophone}
@@ -412,7 +441,7 @@ function MainView({ addLog, clearLogs }) {
     )
   }
 
-  // 配置视图
+  // Configuration view
   return (
     <div className="entrance-view">
       <div className="entrance-container">
@@ -439,7 +468,7 @@ function MainView({ addLog, clearLogs }) {
             <input
               id="app-id"
               type="text"
-              placeholder="请输入 Agora App ID"
+              placeholder="Enter Agora App ID"
               value={appId}
               onChange={(e) => setAppId(e.target.value)}
               className="channel-input"
@@ -450,12 +479,12 @@ function MainView({ addLog, clearLogs }) {
 
           <div className="form-group">
             <label htmlFor="app-certificate" className="form-label">
-              App Certificate <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>(选填)</span>
+              App Certificate <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>(Optional)</span>
             </label>
             <input
               id="app-certificate"
               type="text"
-              placeholder="请输入 Agora App Certificate（可选）"
+              placeholder="Enter Agora App Certificate (optional)"
               value={appCertificate}
               onChange={(e) => setAppCertificate(e.target.value)}
               className="channel-input"
@@ -465,12 +494,12 @@ function MainView({ addLog, clearLogs }) {
 
           <div className="form-group">
             <label htmlFor="channel-name" className="form-label">
-              频道名称
+              Channel Name
             </label>
             <input
               id="channel-name"
               type="text"
-              placeholder="请输入频道名称"
+              placeholder="Enter channel name"
               value={channelName}
               onChange={(e) => setChannelName(e.target.value)}
               className="channel-input"
@@ -486,10 +515,10 @@ function MainView({ addLog, clearLogs }) {
             {isConnecting ? (
               <>
                 <span className="loading-spinner"></span>
-                连接中...
+                Connecting...
               </>
             ) : (
-              '连接对话式AI引擎'
+              'Connect Conversational AI Engine'
             )}
           </button>
         </form>
@@ -498,14 +527,29 @@ function MainView({ addLog, clearLogs }) {
   )
 }
 
-// 字幕滚动视图
+// Transcript scroll view
 function TranscriptScrollView({ transcripts, scrollRef }) {
+  // Use useLayoutEffect to scroll immediately after DOM update for better reliability
+  useLayoutEffect(() => {
+    if (scrollRef.current && transcripts.length > 0) {
+      // Use requestAnimationFrame to ensure execution before browser paint
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo({
+            top: scrollRef.current.scrollHeight,
+            behavior: 'smooth'
+          })
+        }
+      })
+    }
+  }, [transcripts, scrollRef])
+
   return (
     <div className="transcript-scroll-view" ref={scrollRef}>
       <div className="transcript-list">
         {transcripts.length === 0 ? (
           <div className="empty-transcript">
-            <p>等待对话开始...</p>
+            <p>Waiting for conversation to start...</p>
           </div>
         ) : (
           transcripts.map((transcript, index) => (
@@ -517,14 +561,14 @@ function TranscriptScrollView({ transcripts, scrollRef }) {
   )
 }
 
-// 字幕行
+// Transcript row
 function TranscriptRow({ transcript }) {
   const isAgent = transcript.type === 'agent'
   
   return (
     <div className={`transcript-row ${isAgent ? 'agent' : 'user'}`}>
       <div className="transcript-avatar" style={{ backgroundColor: isAgent ? '#3b82f6' : '#10b981' }}>
-        {isAgent ? 'AI' : '我'}
+        {isAgent ? 'AI' : 'Me'}
       </div>
       <div className="transcript-content">
         <p>{transcript.text}</p>
@@ -533,17 +577,17 @@ function TranscriptRow({ transcript }) {
   )
 }
 
-// 控制栏
+// Control bar
 function ControlBar({ isMicMuted, onToggleMicrophone, onEndCall }) {
   return (
     <div className="control-bar">
       <div className="control-bar-content">
         <div className="control-group">
-          {/* 麦克风控制 */}
+          {/* Microphone control */}
           <button
             className={`microphone-button ${isMicMuted ? 'muted' : ''}`}
             onClick={onToggleMicrophone}
-            aria-label={isMicMuted ? '取消静音' : '静音'}
+            aria-label={isMicMuted ? 'Unmute' : 'Mute'}
           >
             {isMicMuted ? (
               <svg className="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -562,11 +606,11 @@ function ControlBar({ isMicMuted, onToggleMicrophone, onEndCall }) {
             )}
           </button>
 
-          {/* 结束通话按钮 */}
+          {/* End call button */}
           <button
             className="end-call-button"
             onClick={onEndCall}
-            aria-label="结束通话"
+            aria-label="End call"
           >
             <svg className="phone-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>

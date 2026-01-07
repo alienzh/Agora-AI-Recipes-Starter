@@ -1,15 +1,15 @@
 /**
- * 配置存储工具
- * 使用 localStorage 保存用户输入的 App ID 和 App Certificate
+ * Configuration storage utility
+ * Use localStorage to save user-entered App ID and App Certificate
  */
 
 const STORAGE_KEY = 'agora_config'
 
 /**
- * 保存配置到 localStorage
+ * Save configuration to localStorage
  * @param {string} appId - Agora App ID
  * @param {string} appCertificate - Agora App Certificate
- * @param {string} channelName - 频道名称
+ * @param {string} channelName - Channel name
  */
 export function saveConfig(appId, appCertificate, channelName) {
   try {
@@ -22,14 +22,14 @@ export function saveConfig(appId, appCertificate, channelName) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
     return true
   } catch (error) {
-    console.error('保存配置失败:', error)
+    console.error('Failed to save configuration:', error)
     return false
   }
 }
 
 /**
- * 从 localStorage 读取配置
- * @returns {Object|null} 返回配置对象，如果不存在则返回 null
+ * Load configuration from localStorage
+ * @returns {Object|null} Returns configuration object, or null if not exists
  */
 export function loadConfig() {
   try {
@@ -44,7 +44,7 @@ export function loadConfig() {
       channelName: config.channelName || ''
     }
   } catch (error) {
-    console.error('读取配置失败:', error)
+    console.error('Failed to load configuration:', error)
     return null
   }
 }

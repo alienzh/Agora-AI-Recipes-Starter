@@ -33,7 +33,7 @@
   overflow: hidden;
 }
 
-/* 日志视图样式 */
+/* Log view styles */
 .log-view {
   display: flex;
   flex-direction: column;
