@@ -1,0 +1,360 @@
+{
+  "language": {
+    "enUS": "English",
+    "zhCN": "中文",
+    "esES": "Español",
+    "jaJP": "日本語",
+    "koKR": "한국어",
+    "arSA": "العربية",
+    "hiIN": "हिन्दी"
+  },
+  "metadata": {
+    "title": "Agora Convo AI",
+    "description": "Chat with a sample AI voice agent and select different voices in a live demo of Agora's Conversational AI Engine."
+  },
+  "common": {
+    "language": "Language"
+  },
+  "homePage": {
+    "title": "Agora Convo AI"
+  },
+  "status": {
+    "unknown": "Unknown",
+    "connecting": "Connecting...",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "reconnecting": "Disconnected",
+    "na": "--",
+    "good": "Good",
+    "medium": "Fair",
+    "bad": "Poor"
+  },
+  "roomInfo": {
+    "tooltip": "Network and channel information",
+    "networkInfo": "NETWORK INFO",
+    "yourNetwork": "Your Network",
+    "networkLevel": {
+      "good": "Good",
+      "medium": "Fair",
+      "bad": "Poor",
+      "unknown": "Unknown"
+    },
+    "salStatus": {
+      "off": "Disable",
+      "autoLearning": "Seamless Mode",
+      "manual": "Personalized Mode"
+    },
+    "vadStatus": {
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "channelInfo": "CHANNEL INFO",
+    "agentStatus": "Agent Status",
+    "roomStatus": "Room Status",
+    "roomId": "Room ID",
+    "yourId": "Your ID",
+    "agentId": "Agent ID",
+    "unknown": "Unknown",
+    "serviceInfo": "Service Info",
+    "sal": "Voiceprint Lock",
+    "vad": "IIH",
+    "more": "More..."
+  },
+  "aiGenerateInfo": "AI-generated content",
+  "moreInfo": {
+    "title": "More INFO",
+    "moreAction": "More Actions"
+  },
+  "settings": {
+    "tab": {
+      "agent": "Agent",
+      "settings": "Settings",
+      "user": "User Center"
+    },
+    "custom_agent": {
+      "title": "Custom Agent",
+      "description": "Please contact Agora staff to get a custom agent ID",
+      "placeholder": "Enter agent ID to retrieve",
+      "retrieve_button": "Retrieve",
+      "message_success": "Agent retrieved successfully",
+      "message_error": "Failed to retrieve agent. No such agent in the database.",
+      "message_sunset": "Agent has been taken offline. Please contact Agora staff."
+    },
+    "save": "Save",
+    "options": {
+      "custom": "Custom",
+      "preset": "Preset",
+      "error": "Failed to get presets"
+    },
+    "asr": {
+      "language": "Language"
+    },
+    "custom_llm": {
+      "title": "Custom LLM",
+      "url": "Custom LLM URL",
+      "api_key": "Custom LLM Key",
+      "model": "Custom LLM Model",
+      "prompt": "Custom LLM Prompt",
+      "promptPlaceholder": "Enter prompt",
+      "style": "Custom LLM Style"
+    },
+    "advanced_features": {
+      "title": "Advanced Settings",
+      "enable_bhvs": {
+        "title": "BHVS",
+        "description": "Background Human Voice Suppression"
+      },
+      "enable_aivad": {
+        "title": "Intelligent Interruption Handling",
+        "description": "This feature makes AI better understand you and reduces false interruption."
+      },
+      "enable_sal": {
+        "title": "Voiceprint Lock",
+        "off": "Off",
+        "off_description": "Without this, the agent might be interrupted or distracted by other voices nearby.",
+        "autoLearning": "Seamless Mode",
+        "autoLearning_description": "AI automatically learns your voiceprint from your conversations with the agent and will ignore other people's voices.",
+        "manual": "Personalized Mode",
+        "manual_description": "Record a short voiceprint, and the agent will focus only on your voice.",
+        "has_voice_print": "Local Personalized Voiceprint",
+        "voice_print_time": "Voiceprint recorded at: {time}",
+        "create_sal_title": "Create my voiceprint",
+        "create_sal_button": "Create",
+        "recreate_sal_button": "Record again",
+        "record_title": "Please read this clearly and aloud.",
+        "hint": "You can only save one voiceprint. Recording a new one will replace the current one.",
+        "record_button": "Click to record",
+        "recording_time": "Sample text：{time}s / 10s",
+        "recording_warning": "Click to stop recording and upload, minimum 10s, maximum 20s",
+        "recording_tooltip": "Stop recording and upload",
+        "uploading_hint": "Uploading...",
+        "upload_succeed": "Upload succeed",
+        "upload_failed": "Upload failed, please try again",
+        "recording_warning_min": "That's a bit too short. Please record for at least 10 seconds.",
+        "recording_warning_max": "Recording finished",
+        "no_record_dialog_title": "No voiceprint recorded",
+        "no_record_dialog_description": "You'll need a voiceprint to use Personalized Mode. The app will switch back to [Previous Mode] when you exit.",
+        "no_record_dialog_button_cancel": "Cancel",
+        "no_record_dialog_button_confirm": "Confirm",
+        "record_dialog_title": "Voiceprint Recording Prompt",
+        "record_dialog_description": "Your voice is stored locally by default. Agora's voiceprint locking feature needs to collect your voice. After completing a single experience of this feature, the voiceprint will be deleted from the cloud, and your voice will never be used for commercial purposes. Please refer to the <link>Privacy Policy</link> for details.",
+        "record_dialog_button_cancel": "Cancel",
+        "record_dialog_button_confirm": "Confirm"
+      }
+    },
+    "standard_avatar": {
+      "title": "AI Avatar",
+      "close": "Close",
+      "dialog": {
+        "title": "AI Avatar Will Be Reset",
+        "description": "Reconfigure AI avatar after changing preset/language.",
+        "confirm": "Confirm Change",
+        "cancel": "Cancel",
+        "do-not-ask-again": "Do not show again"
+      },
+      "tags": {
+        "all": "All"
+      }
+    },
+    "transcription": {
+      "render-mode": "Transcript",
+      "word": {
+        "title": "Word Mode",
+        "description": "Word-by-word rendering, subtitles synchronized with speech"
+      },
+      "chunk": {
+        "title": "Text - Sync Mode",
+        "description": "Text mode with subtitles and speech displayed synchronously"
+      },
+      "text": {
+        "title": "Text - Subtitle First Mode",
+        "description": "Subtitles rendered all at once"
+      }
+    },
+    "voice-lock": {
+      "title": "Voice Lock",
+      "description": "Voice Lock (TODO)"
+    }
+  },
+  "agent": {
+    "greeting": {
+      "hi": "",
+      "greeting1": "Greetings, Human",
+      "greeting2": "Welcome to use Agora Convo AI Engine",
+      "greeting3": "Have you ever questioned the nature of your reality?",
+      "connecting": "I'm connecting...",
+      "connected": "I've joined",
+      "speakLoudly": "I'm ready to listen. Please speak clearly to start.",
+      "failed": "Failed to join. Please try again."
+    },
+    "privacyDialog": {
+      "title": "Personal Data Protection Guide",
+      "description": "Welcome to the Agora Conversational AI Engine! By tapping \"Agree,\" you confirm you’ve read and accepted our <link>Terms of Services</link> and <policyLink>Privacy Policy</policyLink>. If you don't agree, some features of the app will be unavailable. This avatar is AI-generated.",
+      "cancel": "Disagree",
+      "confirm": "Agree"
+    },
+    "getStart": "Call AI Engine",
+    "subtitle": "Subtitles",
+    "enableSubtitle": "Enable Subtitles",
+    "disableSubtitle": "Disable Subtitles",
+    "agentLabel": "Agent",
+    "userLabel": "You",
+    "hangUp": "Exit AI Conversation",
+    "tooltip-mic-current-enable": "Click to mute",
+    "tooltip-mic-current-disable": "Unmute",
+    "tooltip-mic-current-disallow": "Browser microphone permission not granted",
+    "switchMic": "Switch Microphone",
+    "agentConnected": "Agent Joined!",
+    "agentDisconnected": "Agent left!",
+    "agentConnectedTimeout": "Timeout. Please try again.",
+    "agentAborted": "Agent left abnormally. Please try again.",
+    "agentReconnectedTimeout": "Network error. Please check your network settings.",
+    "tmpDisconnected": "Network error. Please check your network settings.",
+    "agentReconnected": "Agent Joined!",
+    "errorTitle": "Failed to join. Please try again.",
+    "reminder": {
+      "firstSpeaking": "At the beginning of the conversation, please speak loudly and clearly to help the AI agent better lock onto your voice."
+    },
+    "startAgentError": "Connection failed.",
+    "interrupted": "Interrupted",
+    "loading": "Loading...",
+    "pleaseSepeak": "You can start speaking",
+    "listening": "Listening...",
+    "muted": "Muted",
+    "interruptAgentTip": "Speak or click button to interrupt agent",
+    "clickAndInterruptAgent": "Click to interrupt agent"
+  },
+  "compatibility": {
+    "errorTitle": "Compatibility Check",
+    "errorDescription": "Please check if your browser supports WebRTC and whether the microphone permission is enabled",
+    "errorHelper": "We recommend using the latest version of your browser on the latest operating system",
+    "errorButton": "I understand"
+  },
+  "devMode": {
+    "badge": "Dev Mode",
+    "endpoint": "Agent Endpoint",
+    "unknown": "Unknown",
+    "agentUrl": "Agent URL",
+    "title": "Dev Mode",
+    "description": "In dev mode, you can debug the Agent",
+    "userChatHistory": "User Message History",
+    "historyNumber": "{sum} messages",
+    "userID": "User ID",
+    "agentID": "Agent ID",
+    "channelName": "Channel Name",
+    "copy": "Copy",
+    "copySuccess": "Copied successfully"
+  },
+  "userInfo": {
+    "logout": "Log Out",
+    "user-center": "User Center",
+    "my-agent": "User Center",
+    "nickname": "Nickname",
+    "nickname-placeholder": "Please enter your nickname",
+    "gender": "Gender",
+    "birthday": "Birthday",
+    "bio": "Bio",
+    "bio-placeholder": "Please enter your bio, let AI agent know you better ❤️",
+    "call-you": "Call me:",
+    "mr": "Mr.",
+    "ms": "Ms.",
+    "deleteAccount": {
+      "button": "Delete Account",
+      "title": "Important Notice",
+      "description": "Once deleted, your account and all its data will be permanently erased and cannot be recovered. Please proceed with caution.",
+      "checkbox": "I understand the risks of deleting my account",
+      "uncheckWarning": "To continue, you must check the box to confirm you understand the risks.",
+      "confirm": "Confirm Deletion",
+      "cancel": "Cancel"
+    },
+    "privacy": {
+      "userAgreement": "User Agreement",
+      "privacyPolicy": "Privacy Policy"
+    }
+  },
+  "log": {
+    "label": "Quick Report",
+    "uploadSuccess": "Uploaded",
+    "uploadErrorTip": "Opps! Something went wrong. Please try reporting again.",
+    "uploadSuccessTip": "We've received your report. Thanks for helping us improve!"
+  },
+  "login": {
+    "title": "Log in or Sign up",
+    "buttonTip1": "Read me first",
+    "buttonTip2": "Log in to chat for free",
+    "panelTitle": "Unlock ♾️ Free Chat",
+    "panelDescription": " ",
+    "panelButton": "Log in with Agora account",
+    "panelSignupButton": "Sign up for free",
+    "privacyPolicy": "I accept the <link>Terms of Service</link> and <policyLink>Privacy Policy</policyLink>",
+    "termsTip": "Please accept the terms to proceed.",
+    "unauthorizedError": "Your session has expired. Please log in again."
+  },
+  "conversationTimer": {
+    "tip": "Session limited to {minutes} minutes.",
+    "tipSmallScreen": "Session limited",
+    "title": "Time's Up!",
+    "description": "Each conversation is limited to {minutes} minutes. The time is up for this conversation. You can close this dialog to start a new conversation.",
+    "button": "Got it"
+  },
+  "dialog": {
+    "title": "Notice",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "agent-action": {
+    "max-image-size": "Image size must be less than 5MB",
+    "upload-image-failed": "Failed to upload image. Please try again.",
+    "missing-image-url": "Image URL is not available for resending. Please upload a new image.",
+    "resend-image-error": "Failed to resend image. Please try again.",
+    "resend-image-success": "Image resent successfully.",
+    "max-image-dimensions": "Image dimensions must not exceed 2048x2048 pixels.",
+    "upload-image-tooltip": "Image size up to 5MB, dimensions under 2048x2048. Supports JPG, PNG, WEBP, JPEG formats.",
+    "avatar-busy-error": "All avatars are busy now. Please try again later."
+  },
+  "preset": {
+    "more": "More+",
+    "sip_call_in": "Customer Service - Phone In",
+    "sip_call_out": "Customer Service - Phone Out",
+    "sip_call_in_description": "Customer Service - Phone In Description",
+    "sip_call_out_description": "Enter your phone number/fixed phone number and dial out, the AI smart customer service will call your phone and communicate with you"
+  },
+  "sip": {
+    "phone_number_placeholder": "enter your phone number",
+    "region_placeholder": "Search country/region code",
+    "region_not_found": "Region not found",
+    "invalid_phone_number": "Please enter a valid phone number",
+    "inbound_hint": "To ensure the normal operation of the call service and dispute tracing, your call records (including phone number, call time, and call duration) will be recorded.",
+    "CL": "Chile",
+    "IN": "India",
+    "US": "United States",
+    "CN": "China",
+    "status": {
+      "idle": "Idle",
+      "calling": "Calling... Please answer the phone on your end",
+      "connected": "On the phone...",
+      "disconnected": "Call ended. Please exit"
+    },
+    "dialog": {
+      "title": "To ensure the normal operation of the call service and dispute tracing, your call records (including phone number, call time, and call duration) will be recorded",
+      "confirm": "Call Now",
+      "cancel": "Cancel"
+    },
+    "exceed_max_calls": "You’ve reached today’s call limit (20)",
+    "timer": "Smart Customer Service Phone Communication Single Experience Limit 10 Minutes",
+    "startSipError": "Failed to start phone call. Please try again later."
+  },
+  "mock": {
+    "preset": {
+      "title": "Smart Assistant",
+      "description": "Universal AI assistant that you can chat with about anything you want to know",
+      "mock-1": "Smart Assistant",
+      "mock-2": "Customer Service - Online Call",
+      "mock-3": "English Practice Partner",
+      "mock-4": "Emotional Companion - Male",
+      "mock-5": "Emotional Companion - Female",
+      "mock-6": "More+"
+    }
+  }
+}

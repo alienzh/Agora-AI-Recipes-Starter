@@ -1,0 +1,641 @@
+@import "tailwindcss";
+
+@plugin 'tailwindcss-animate';
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-roboto-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand-black-3: var(--ai_brand_black3);
+  --color-brand-black-8: var(--ai_brand_black8);
+  --color-brand-black: var(--ai_brand_black10);
+
+  --color-brand-light-7: var(--ai_brand_lightbrand7);
+  --color-brand-light: var(--ai_brand_lightbrand6);
+
+  --color-brand-main-3: var(--ai_brand_main3);
+  --color-brand-main-4: var(--ai_brand_main4);
+  --color-brand-main-5: var(--ai_brand_main5);
+  --color-brand-main-6: var(--ai_brand_main6);
+  --color-brand-main-7: var(--ai_brand_main7);
+  --color-brand-main: var(--ai_brand_main6);
+  --color-brand-main-hover: var(--ai_mainhover);
+
+  --color-brand-white-1: var(--ai_brand_white1);
+  --color-brand-white-2: var(--ai_brand_white2);
+  --color-brand-white-6: var(--ai_brand_white6);
+  --color-brand-white-8: var(--ai_brand_white8);
+  --color-brand-white: var(--ai_brand_white10);
+
+  --color-brand-red-6: var(--ai_red6);
+  --color-brand-red: var(--ai_red1);
+
+  --color-brand-green: var(--ai_green6);
+
+  --color-icontext: var(--ai_icontext1);
+  --color-icontext-hover: var(--ai_icontext2);
+  --color-icontext-disabled: var(--ai_icontext3);
+  --color-icontext-inverse: var(--ai_icontext_inverse1);
+  --color-icontext-4: var(--ai_icontext4);
+
+  --color-fill: var(--ai_fill1);
+  --color-fill-popover: var(--ai_fill2);
+  --color-fill-drawer: var(--ai_fill5);
+
+  --color-block-2: var(--ai_block2);
+  --color-block-3: var(--ai_block3);
+  --color-block-4: var(--ai_block4_chat);
+  --color-block-5: var(--ai_block5);
+  --color-block: var(--ai_block1);
+  --color-yellow-6: var(--ai_yellow6);
+  --color-bluepurple5: var(--ai_bluepurple5);
+
+  --color-line-2: var(--ai_line2);
+  --color-line-3: var(--ai_line3);
+  --color-line: var(--ai_line1);
+
+  --radius-xxxl: calc(var(--radius) + 10px);
+  --radius-xxl: calc(var(--radius) + 6px);
+  --radius-xl: calc(var(--radius) + 2px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-xs: calc(var(--radius) - 8px);
+
+  --spacing-modal-max-width: var(--modal-max-width);
+
+  --color-secondhover: var(--ai_secondhover);
+
+  --animate-rotate: rotate 3s linear infinite;
+  --animate-shake: shake 0.2s ease-in-out 2;
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg) scale(10);
+    }
+    100% {
+      transform: rotate(-360deg) scale(10);
+    }
+  }
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25%,
+    75% {
+      transform: translateX(-10px);
+    }
+    50% {
+      transform: translateX(10px);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility image-rendering-high-quality {
+  image-rendering: high-quality;
+}
+
+@layer utilities {
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@layer base {
+  :root {
+    --radius: 0.875rem;
+    --modal-max-width: 425px;
+    --ag-header-height: 40px;
+    --ag-body-padding: 20px;
+    --ag-main-min-height: calc(
+      100dvh -
+      var(--ag-header-height) -
+      var(--ag-body-padding) *
+      3
+    );
+    --ag-sidebar-width: 340px;
+    --ag-action-height: 60px;
+    --ag-greeting-height: 75px;
+    --ag-spline-height: 320px;
+
+    @media (max-width: 1024px) {
+      --ag-sidebar-width: 240px;
+    }
+
+    @media (max-width: 768px) {
+      --ag-greeting-height: 48px;
+      --ag-spline-height: 240px;
+    }
+  }
+
+  :root {
+    /* CONVO AI */
+    --ai_icontext1-light: #21212b;
+    --ai_icontext1-dark: #ffffff;
+    --ai_icontext2-light: #8e8f9e;
+    --ai_icontext2-dark: rgba(255 255 255 / 0.75);
+    --ai_icontext3-light: #bbbbbb;
+    --ai_icontext3-dark: rgba(255 255 255 / 0.5);
+    --ai_icontext_inverse1-light: #ffffff;
+    --ai_icontext_inverse1-dark: rgba(0 0 0 / 0.9);
+    --ai_brand_main6-light: #00c2ff;
+    --ai_brand_main6-dark: #446cff;
+    --ai_brand_main5-light: rgba(0 194 255 / 0.8);
+    --ai_brand_main5-dark: rgba(68 108 255 / 0.8);
+    --ai_brand_main4-light: rgba(0 194 255 / 0.6);
+    --ai_brand_main4-dark: rgba(68 108 255 / 0.6);
+    --ai_brand_main3-light: #b5e4ff;
+    --ai_brand_main3-dark: rgba(68 108 255 / 0.4);
+    --ai_brand_white10-light: #ffffff;
+    --ai_brand_white10-dark: #ffffff;
+    --ai_fill1-light: #ffffff;
+    --ai_fill1-dark: #121212;
+    --ai_fill2-light: #f7f7f7;
+    --ai_fill2-dark: #292a2d;
+    --ai_input-light: rgba(247 247 247 / 0.6);
+    --ai_input-dark: rgba(38 44 55 / 0.5);
+    --ai_line1-light: rgba(227 231 239 / 0.1);
+    --ai_line1-dark: rgba(80 80 81 / 0.6);
+    --ai_mainhover-light: rgba(227 231 239 / 0.5);
+    --ai_mainhover-dark: rgba(53 53 71 / 0.8);
+    --ai_click-light: #ececf3;
+    --ai_click-dark: rgba(132 135 142 / 0.8);
+    --ai_line2-light: rgba(226 229 234 / 0.5);
+    --ai_line2-dark: rgba(85 91 105 / 0.9);
+    --ai_block2-light: rgba(255 255 255 / 0.98);
+    --ai_block2-dark: rgba(64 64 69 / 0.98);
+    --ai_block1-light: rgba(255 255 255 / 0.7);
+    --ai_block1-dark: rgba(63 63 90 / 0.7);
+    --ai_block4_chat-light: #f4f3ff;
+    --ai_block4_chat-dark: #444549;
+    --ai_icontext4-light: rgba(61 64 77 / 0.8);
+    --ai_icontext4-dark: rgba(255 255 255 / 0.3);
+    --ai_red6-light: #f5655c;
+    --ai_red6-dark: #e6544b;
+    --ai_green6-light: #16d1a4;
+    --ai_green6-dark: #50e3c2;
+    --ai_block3-light: rgba(255 255 255 / 0.95);
+    --ai_block3-dark: #252525;
+    --chamfer_allround-light: 99999px;
+    --chamfer_allround-rem-light: 6249.9375rem;
+    --chamfer_allround-dark: 99999px;
+    --chamfer_allround-rem-dark: 6249.9375rem;
+    --chamfer_xxxl-light: 24px;
+    --chamfer_xxxl-rem-light: 1.5rem;
+    --chamfer_xxxl-dark: 24px;
+    --chamfer_xxxl-rem-dark: 1.5rem;
+    --chamfer_xxl-light: 20px;
+    --chamfer_xxl-rem-light: 1.25rem;
+    --chamfer_xxl-dark: 20px;
+    --chamfer_xxl-rem-dark: 1.25rem;
+    --chamfer_xl-light: 16px;
+    --chamfer_xl-rem-light: 1rem;
+    --chamfer_xl-dark: 16px;
+    --chamfer_xl-rem-dark: 1rem;
+    --chamfer_l-light: 14px;
+    --chamfer_l-rem-light: 0.875rem;
+    --chamfer_l-dark: 14px;
+    --chamfer_l-rem-dark: 0.875rem;
+    --chamfer_m-light: 12px;
+    --chamfer_m-rem-light: 0.75rem;
+    --chamfer_m-dark: 12px;
+    --chamfer_m-rem-dark: 0.75rem;
+    --chamfer_s-light: 8px;
+    --chamfer_s-rem-light: 0.5rem;
+    --chamfer_s-dark: 8px;
+    --chamfer_s-rem-dark: 0.5rem;
+    --chamfer_xs-light: 6px;
+    --chamfer_xs-rem-light: 0.375rem;
+    --chamfer_xs-dark: 6px;
+    --chamfer_xs-rem-dark: 0.375rem;
+    --ai_yellow6-light: #ffc700;
+    --ai_yellow6-dark: #ffc700;
+    --ai_brand_lightbrand6-light: #40f5ff;
+    --ai_brand_lightbrand6-dark: #a0faff;
+    --ai_line3-light: rgba(226 229 234 / 0.1);
+    --ai_line3-dark: rgba(255 255 255 / 0.03);
+    --ai_disable-light: #f8f8f8;
+    --ai_disable-dark: rgba(34 34 34 / 0.2);
+    --ai_brand_white8-light: rgba(255 255 255 / 0.8);
+    --ai_brand_white8-dark: rgba(255 255 255 / 0.8);
+    --ai_brand_white6-light: rgba(255 255 255 / 0.6);
+    --ai_brand_white6-dark: rgba(255 255 255 / 0.6);
+    --ai_block5-light: rgba(255 255 255 / 0.95);
+    --ai_block5-dark: rgba(62 62 67 / 0.9);
+    --ai_brand_lightbrand7-light: #17f1fe;
+    --ai_brand_lightbrand7-dark: #17f1fe;
+    --ai_mask1-light: rgba(41 66 65 / 0.5);
+    --ai_mask1-dark: rgba(36 36 57 / 0.85);
+    --ai_secondhover-light: rgba(227 231 239 / 0.5);
+    --ai_secondhover-dark: rgba(83 82 104 / 0.2);
+    --ai_secondhover3-light: rgba(0 194 255 / 0.1);
+    --ai_secondhover3-dark: rgba(9 9 11 / 0.5);
+    --ai_menuicontext5-light: var(--ai_brand_main6);
+    --ai_menuicontext5-dark: #ffffff;
+    --ai_red1-light: rgba(245 101 92 / 0.2);
+    --ai_red1-dark: rgba(230 84 75 / 0.3);
+    --ai_brand_black10-light: rgba(0 0 0 / 0.98);
+    --ai_brand_black10-dark: rgba(0 0 0 / 0.98);
+    --ai_brand_black8-light: rgba(0 0 0 / 0.8);
+    --ai_brand_black8-dark: rgba(0 0 0 / 0.8);
+    --ai_erricontext6-light: var(--ai_red6);
+    --ai_erricontext6-dark: #ffffff;
+    --chamfer_l_big-light: 15px;
+    --chamfer_l_big-rem-light: 0.9375rem;
+    --chamfer_l_big-dark: 15px;
+    --chamfer_l_big-rem-dark: 0.9375rem;
+    --chamfer_4xl-light: 32px;
+    --chamfer_4xl-rem-light: 2rem;
+    --chamfer_4xl-dark: 32px;
+    --chamfer_4xl-rem-dark: 2rem;
+    --ai_fill3-light: #ffffff;
+    --ai_fill3-dark: #22233d;
+    --ai_fill4-light: #fdfdfd;
+    --ai_fill4-dark: #242439;
+    --ai_icontext_inverse2-light: #ffffff;
+    --ai_icontext_inverse2-dark: rgba(0 0 0 / 0.7);
+    --ai_fill5-light: #ffffff;
+    --ai_fill5-dark: #3e3e4d;
+    --ai_brand_white1-light: rgba(255 255 255 / 0.1);
+    --ai_brand_white1-dark: rgba(255 255 255 / 0.1);
+    --ai_brand_black3-light: rgba(0 0 0 / 0.3);
+    --ai_brand_black3-dark: rgba(0 0 0 / 0.3);
+    --ai_brand_main7-light: #00a5d9;
+    --ai_brand_main7-dark: #3a5cd9;
+    --ai_brand_black6-light: rgba(0 0 0 / 0.6);
+    --ai_brand_black6-dark: rgba(0 0 0 / 0.6);
+    --ai_blue6-light: #39caff;
+    --ai_blue6-dark: #39caff;
+    --ai_mask2-light: rgba(0 0 0 / 0.5);
+    --ai_mask2-dark: rgba(0 0 0 / 0.5);
+    --ai_brand_lightpurple-light: rgba(185 206 255 / 0.3);
+    --ai_brand_lightpurple-dark: rgba(185 206 255 / 0.4);
+    --ai_click_app-light: #ececf3;
+    --ai_click_app-dark: #30343e;
+    --ai_brand_white2-light: rgba(255 255 255 / 0.2);
+    --ai_brand_white2-dark: rgba(255 255 255 / 0.2);
+    --ai_toast-light: rgba(47 47 47 / 0.85);
+    --ai_toast-dark: rgba(255 255 255 / 0.95);
+    --ai_btn2-light: #f7f7f7;
+    --ai_btn2-dark: #555b69;
+    --ai_brand_black4-light: rgba(0 0 0 / 0.4);
+    --ai_brand_black4-dark: rgba(0 0 0 / 0.4);
+    --ai_brand_black5-light: rgba(0 0 0 / 0.5);
+    --ai_brand_black5-dark: rgba(0 0 0 / 0.5);
+    --ai_fill6-light: #ffffff;
+    --ai_fill6-dark: #282f40;
+    --ai_fill7-light: #f7f7f7;
+    --ai_fill7-dark: #1a202e;
+    --ai_mask3-light: rgba(247 247 247 / 0.8);
+    --ai_mask3-dark: rgba(41 42 45 / 0.8);
+    --ai_brand_main2-light: rgba(0 194 255 / 0.2);
+    --ai_brand_main2-dark: rgba(68 108 255 / 0.2);
+    --ai_brand_main1-light: rgba(0 194 255 / 0.1);
+    --ai_brand_main1-dark: rgba(68 108 255 / 0.1);
+    --ai_darkgreen-light: #299451;
+    --ai_darkgreen-dark: #299451;
+    --ai_bluepurple5-light: rgba(86 140 255 / 0.9);
+    --ai_bluepurple5-dark: rgba(86 140 255 / 0.9);
+  }
+  :root {
+    --ai_block1: var(--ai_block1-light);
+    --ai_block2: var(--ai_block2-light);
+    --ai_block3: var(--ai_block3-light);
+    --ai_block4_chat: var(--ai_block4_chat-light);
+    --ai_block5: var(--ai_block5-light);
+    --ai_brand_black10: var(--ai_brand_black10-light);
+    --ai_brand_black3: var(--ai_brand_black3-light);
+    --ai_brand_black8: var(--ai_brand_black8-light);
+    --ai_brand_lightbrand6: var(--ai_brand_lightbrand6-light);
+    --ai_brand_lightbrand7: var(--ai_brand_lightbrand7-light);
+    --ai_brand_main3: var(--ai_brand_main3-light);
+    --ai_brand_main4: var(--ai_brand_main4-light);
+    --ai_brand_main5: var(--ai_brand_main5-light);
+    --ai_brand_main6: var(--ai_brand_main6-light);
+    --ai_brand_main7: var(--ai_brand_main7-light);
+    --ai_brand_white1: var(--ai_brand_white1-light);
+    --ai_brand_white2: var(--ai_brand_white2-light);
+    --ai_brand_white10: var(--ai_brand_white10-light);
+    --ai_brand_white6: var(--ai_brand_white6-light);
+    --ai_brand_white8: var(--ai_brand_white8-light);
+    --ai_click: var(--ai_click-light);
+    --ai_disable: var(--ai_disable-light);
+    --ai_erricontext6: var(--ai_erricontext6-light);
+    --ai_fill1: var(--ai_fill1-light);
+    --ai_fill2: var(--ai_fill2-light);
+    --ai_fill3: var(--ai_fill3-light);
+    --ai_fill4: var(--ai_fill4-light);
+    --ai_fill5: var(--ai_fill5-light);
+    --ai_green6: var(--ai_green6-light);
+    --ai_icontext1: var(--ai_icontext1-light);
+    --ai_icontext2: var(--ai_icontext2-light);
+    --ai_icontext3: var(--ai_icontext3-light);
+    --ai_icontext4: var(--ai_icontext4-light);
+    --ai_icontext_inverse1: var(--ai_icontext_inverse1-light);
+    --ai_icontext_inverse2: var(--ai_icontext_inverse2-light);
+    --ai_input: var(--ai_input-light);
+    --ai_line1: var(--ai_line1-light);
+    --ai_line2: var(--ai_line2-light);
+    --ai_line3: var(--ai_line3-light);
+    --ai_mainhover: var(--ai_mainhover-light);
+    --ai_mask1: var(--ai_mask1-light);
+    --ai_menuicontext5: var(--ai_menuicontext5-light);
+    --ai_red1: var(--ai_red1-light);
+    --ai_red6: var(--ai_red6-light);
+    --ai_secondhover: var(--ai_secondhover-light);
+    --ai_secondhover3: var(--ai_secondhover3-light);
+    --ai_yellow6: var(--ai_yellow6-light);
+    --ai_bluepurple5: var(--ai_bluepurple5-light);
+    --fcr_ui_scene_inverse2: var(--fcr_ui_scene_inverse2);
+  }
+
+  .dark {
+    --background: var(--ai_fill1);
+    --foreground: #c3c3c3;
+    --card: var(--ai_fill2);
+    --card-foreground: #c3c3c3;
+    --popover: var(--ai_input);
+    --popover-foreground: var(--ai_icontext1);
+    --primary: #c3c3c3;
+    --primary-foreground: #d9d9d9;
+    --secondary: #262626;
+    --secondary-foreground: #c3c3c3;
+    --muted: var(--ai_disable);
+    --muted-foreground: #c3c3c3;
+    --accent: var(--ai_mainhover);
+    --accent-foreground: var(--ai_icontext1);
+    --destructive: #e6544b;
+    --destructive-foreground: #c3c3c3;
+    --border: var(--ai_line1);
+    --input: var(--ai_line1);
+    --ring: #e3e7ef;
+
+    --ai_block1: var(--ai_block1-dark);
+    --ai_block2: var(--ai_block2-dark);
+    --ai_block3: var(--ai_block3-dark);
+    --ai_block4_chat: var(--ai_block4_chat-dark);
+    --ai_block5: var(--ai_block5-dark);
+    --ai_brand_black10: var(--ai_brand_black10-dark);
+    --ai_brand_black3: var(--ai_brand_black3-dark);
+    --ai_brand_black8: var(--ai_brand_black8-dark);
+    --ai_brand_lightbrand6: var(--ai_brand_lightbrand6-dark);
+    --ai_brand_lightbrand7: var(--ai_brand_lightbrand7-dark);
+    --ai_brand_main3: var(--ai_brand_main3-dark);
+    --ai_brand_main4: var(--ai_brand_main4-dark);
+    --ai_brand_main5: var(--ai_brand_main5-dark);
+    --ai_brand_main6: var(--ai_brand_main6-dark);
+    --ai_brand_main7: var(--ai_brand_main7-dark);
+    --ai_brand_white1: var(--ai_brand_white1-dark);
+    --ai_brand_white2: var(--ai_brand_white2-dark);
+    --ai_brand_white10: var(--ai_brand_white10-dark);
+    --ai_brand_white6: var(--ai_brand_white6-dark);
+    --ai_brand_white8: var(--ai_brand_white8-dark);
+    --ai_click: var(--ai_click-dark);
+    --ai_disable: var(--ai_disable-dark);
+    --ai_erricontext6: var(--ai_erricontext6-dark);
+    --ai_fill1: var(--ai_fill1-dark);
+    --ai_fill2: var(--ai_fill2-dark);
+    --ai_fill3: var(--ai_fill3-dark);
+    --ai_fill4: var(--ai_fill4-dark);
+    --ai_fill5: var(--ai_fill5-dark);
+    --ai_green6: var(--ai_green6-dark);
+    --ai_icontext1: var(--ai_icontext1-dark);
+    --ai_icontext2: var(--ai_icontext2-dark);
+    --ai_icontext3: var(--ai_icontext3-dark);
+    --ai_icontext4: var(--ai_icontext4-dark);
+    --ai_icontext_inverse1: var(--ai_icontext_inverse1-dark);
+    --ai_icontext_inverse2: var(--ai_icontext_inverse2-dark);
+    --ai_input: var(--ai_input-dark);
+    --ai_line1: var(--ai_line1-dark);
+    --ai_line2: var(--ai_line2-dark);
+    --ai_line3: var(--ai_line3-dark);
+    --ai_mainhover: var(--ai_mainhover-dark);
+    --ai_mask1: var(--ai_mask1-dark);
+    --ai_menuicontext5: var(--ai_menuicontext5-dark);
+    --ai_red1: var(--ai_red1-dark);
+    --ai_red6: var(--ai_red6-dark);
+    --ai_secondhover: var(--ai_secondhover-dark);
+    --ai_secondhover3: var(--ai_secondhover3-dark);
+    --ai_yellow6: var(--ai_yellow6-dark);
+    --ai_bluepurple5: var(--ai_bluepurple5-dark);
+    --fcr_ui_scene_inverse2: var(--fcr_ui_scene_inverse2);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .ag-custom-gradient-title {
+    background: linear-gradient(
+      90deg,
+      #226afe 0%,
+      #828efc 34%,
+      #17b2ff 62%,
+      #2238fe 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    .Typewriter {
+      display: flex;
+      align-items: center;
+    }
+
+    .Typewriter__wrapper {
+      @apply text-center;
+    }
+
+    .Typewriter__cursor {
+      @apply inline-block min-h-7 min-w-7 h-7 w-7 rounded-full bg-brand-main;
+    }
+  }
+
+  .ag-custom-gradient-title.failed {
+    background: linear-gradient(90deg, #fe5522 0%, #ff8989 50%, #fe5522 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    .Typewriter__cursor {
+      @apply inline-block min-h-7 min-w-7 h-7 w-7 rounded-full bg-[#FE5522];
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ag-custom-gradient-title {
+      .Typewriter__cursor {
+        @apply h-5 w-5 min-h-5 min-w-5;
+      }
+
+      &.failed {
+        .Typewriter__cursor {
+          @apply h-5 w-5 min-h-5 min-w-5;
+        }
+      }
+    }
+  }
+
+  .ag-custom-gradient-button {
+    background: linear-gradient(90deg, #17f1fe 0%, #17c5ff 15.5%, #283dff 100%);
+    border-radius: 9999px;
+    color: var(--ai_brand_white10);
+  }
+
+  .ag-sip-call-out-button {
+    background: linear-gradient(
+      114deg,
+      #17c5ff 3.21%,
+      #315dff 49.08%,
+      #446cff 93.98%
+    );
+  }
+
+  .ag-warn-time-pulse {
+    color: var(--ai_red6);
+    animation: warn-time-pulse 2s infinite;
+  }
+
+  @keyframes warn-time-pulse {
+    0% {
+      color: var(--ai_red6);
+    }
+    50% {
+      color: var(--ai_red1);
+    }
+    100% {
+      color: var(--ai_red6);
+    }
+  }
+
+  @keyframes ag-rainbow {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 200% 0%;
+    }
+  }
+
+  /* Custom Scrollbar Styles */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) transparent;
+  }
+}
+
+@layer components {
+  [data-rmiz] {
+    @apply block relative;
+  }
+
+  [data-rmiz-ghost] {
+    @apply pointer-events-none absolute;
+  }
+
+  [data-rmiz-btn-zoom],
+  [data-rmiz-btn-unzoom] {
+    @apply hidden;
+  }
+
+  [data-rmiz-modal][open] {
+    @apply fixed inset-0 w-screen h-screen m-0 p-0 overflow-hidden;
+    @apply max-w-none max-h-none bg-transparent;
+  }
+
+  [data-rmiz-modal-overlay] {
+    @apply absolute inset-0 transition-colors;
+  }
+
+  [data-rmiz-modal-img] {
+    @apply absolute transform-gpu transition-transform duration-300;
+    transform-origin: 0 0;
+  }
+
+  [data-rmiz-content="found"] img {
+    @apply cursor-zoom-in;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rmiz-modal-overlay],
+  [data-rmiz-modal-img] {
+    transition-duration: 0.01ms !important;
+  }
+}
